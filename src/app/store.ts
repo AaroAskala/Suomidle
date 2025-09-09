@@ -2,8 +2,16 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import balance from '../lib/balance';
 import upgrades from '../lib/upgrades';
+import prestigeData from '../lib/prestige.json' assert { type: 'json' };
 
-const baseMultiplier = 2;
+export interface PrestigeConfig {
+  threshold: number;
+  baseMultiplier: number;
+  [key: string]: unknown;
+}
+
+export const prestigeConfig: PrestigeConfig = prestigeData as PrestigeConfig;
+const baseMultiplier = prestigeConfig.baseMultiplier;
 
 interface State {
   population: number;
@@ -84,6 +92,7 @@ export const useGameStore = create<State>()(
         if (gain > 0) set({ population: s.population + gain });
       },
       prestige: () => {
+        if (get().population < prestigeConfig.threshold) return;
         set((s) => {
           const level = s.prestigeLevel + 1;
           const mult = baseMultiplier ** level;
