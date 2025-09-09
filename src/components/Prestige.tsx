@@ -1,22 +1,29 @@
 import { useGameStore } from '../app/store';
-import balance from '../lib/balance';
+import { getTier } from '../content';
 
 export function Prestige() {
   const population = useGameStore((s) => s.population);
-  const prestige = useGameStore((s) => s.prestige);
-  const level = useGameStore((s) => s.prestigeLevel);
-  const multiplier = useGameStore((s) => s.multiplier);
+  const tierLevel = useGameStore((s) => s.tierLevel);
+  const canAdvance = useGameStore((s) => s.canAdvanceTier());
+  const advance = useGameStore((s) => s.advanceTier);
+  const current = getTier(tierLevel);
+  const next = getTier(tierLevel + 1);
   return (
     <div>
-      <h2>Prestige</h2>
-      <div>Prestige Level: {level}</div>
-      <div>Multiplier: {multiplier}x</div>
-      <button
-        disabled={population < balance.prestigeThreshold}
-        onClick={() => prestige()}
-      >
-        Prestige
+      <h2>Tiers</h2>
+      <div>
+        Tier Level: {tierLevel}
+        {current ? ` (${current.name})` : ''}
+      </div>
+      {next && (
+        <div>
+          Next Tier: {next.name} ({next.population})
+        </div>
+      )}
+      <button disabled={!canAdvance} onClick={() => advance()}>
+        Advance Tier
       </button>
+      <div>Population: {Math.floor(population)}</div>
     </div>
   );
 }

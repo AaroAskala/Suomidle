@@ -1,20 +1,24 @@
 import { useGameStore } from '../app/store';
-import balance from '../lib/balance';
+import { buildings, getBuildingCost } from '../content';
 
 export function Store() {
-  const buy = useGameStore((s) => s.buyGenerator);
+  const buy = useGameStore((s) => s.purchaseBuilding);
   const population = useGameStore((s) => s.population);
-  const generators = useGameStore((s) => s.generators);
+  const owned = useGameStore((s) => s.buildings);
+  const tier = useGameStore((s) => s.tierLevel);
   return (
     <div>
       <h2>Store</h2>
-      {balance.generators.map((gen) => {
-        const count = generators[gen.id] || 0;
-        const price = balance.getPrice(gen, count);
+      {buildings.map((b) => {
+        if (b.unlock?.tier && tier < b.unlock.tier) return null;
+        const count = owned[b.id] || 0;
+        const price = getBuildingCost(b, count);
         return (
-          <div key={gen.id}>
-            <span>{gen.name} ({count}) </span>
-            <button disabled={population < price} onClick={() => buy(gen.id)}>
+          <div key={b.id}>
+            <span>
+              {b.name} ({count}){' '}
+            </span>
+            <button disabled={population < price} onClick={() => buy(b.id)}>
               Buy {Math.round(price)}
             </button>
           </div>

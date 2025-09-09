@@ -1,173 +1,175 @@
 import { create } from 'zustand';
-
 import {
   persist,
   createJSONStorage,
-  type StorageValue,
   type PersistOptions,
+  type StorageValue,
 } from 'zustand/middleware';
-import balance from '../lib/balance';
-import upgrades from '../lib/upgrades';
-import prestigeData from '../lib/prestige.json' assert { type: 'json' };
+import {
+  buildings,
+  tech,
+  getBuilding,
+  getTech,
+  getTier,
+  getBuildingCost,
+} from '../content';
 
-export interface PrestigeConfig {
-  threshold: number;
-  baseMultiplier: number;
-  [key: string]: unknown;
+interface Multipliers {
+  population_cps: number;
 }
-
-export const prestigeConfig: PrestigeConfig = prestigeData as PrestigeConfig;
-const baseMultiplier = prestigeConfig.baseMultiplier;
 
 interface State {
   population: number;
-  generators: Record<string, number>;
-  upgrades: Set<string>;
+  tierLevel: number;
+  buildings: Record<string, number>;
+  techOwned: Set<string>;
+  multipliers: Multipliers;
+  cps: number;
   clickPower: number;
-  cpsMultiplier: number;
-  prestigeLevel: number;
-  multiplier: number;
-  lastSaved: number;
   addPopulation: (amount: number) => void;
-  buyGenerator: (id: string) => void;
-  purchaseUpgrade: (id: string) => void;
+  purchaseBuilding: (id: string) => void;
+  purchaseTech: (id: string) => void;
   recompute: () => void;
   tick: (delta: number) => void;
-  prestige: () => void;
+  canAdvanceTier: () => boolean;
+  advanceTier: () => void;
 }
 
 interface PersistOptionsWithSerialization
-  extends PersistOptions<State, State> {
-  serialize: (state: StorageValue<State>) => string;
-  deserialize: (str: string) => StorageValue<State>;
+  extends PersistOptions<State, Partial<State>> {
+  serialize: (state: StorageValue<Partial<State>>) => string;
+  deserialize: (str: string) => StorageValue<Partial<State>>;
+  migrate?: (persistedState: any, version: number) => Partial<State>;
 }
 
 export const useGameStore = create<State>()(
   persist(
     (set, get) => ({
       population: 0,
-      generators: {},
-      upgrades: new Set<string>(),
+      tierLevel: 1,
+      buildings: {},
+      techOwned: new Set<string>(),
+      multipliers: { population_cps: 1 },
+      cps: 0,
       clickPower: 1,
-      cpsMultiplier: 1,
-      prestigeLevel: 0,
-      multiplier: 1,
-      lastSaved: Date.now(),
       addPopulation: (amount) =>
-        set((s) => ({ population: s.population + amount * s.multiplier })),
-      buyGenerator: (id) => {
-        const gen = balance.generators.find((g) => g.id === id);
-        if (!gen) return;
-        const count = get().generators[id] || 0;
-        const price = balance.getPrice(gen, count);
-        if (get().population >= price) {
-          set((s) => ({
-            population: s.population - price,
-            generators: { ...s.generators, [id]: count + 1 },
-          }));
-        }
-      },
-      purchaseUpgrade: (id) => {
-        const upg = upgrades.find((u) => u.id === id);
+        set((s) => ({ population: s.population + amount })),
+      purchaseBuilding: (id) => {
+        const b = getBuilding(id);
+        if (!b) return;
         const s = get();
-        if (!upg || s.upgrades.has(id) || s.population < upg.cost) return;
-        const owned = new Set(s.upgrades);
+        if (b.unlock?.tier && s.tierLevel < b.unlock.tier) return;
+        const count = s.buildings[id] || 0;
+        const price = getBuildingCost(b, count);
+        if (s.population < price) return;
+        set({
+          population: s.population - price,
+          buildings: { ...s.buildings, [id]: count + 1 },
+        });
+        get().recompute();
+      },
+      purchaseTech: (id) => {
+        const t = getTech(id);
+        const s = get();
+        if (!t || s.techOwned.has(id)) return;
+        if (t.unlock?.tier && s.tierLevel < t.unlock.tier) return;
+        if (s.population < t.cost) return;
+        const owned = new Set(s.techOwned);
         owned.add(id);
-        set({ population: s.population - upg.cost, upgrades: owned });
+        const multipliers = { ...s.multipliers };
+        for (const eff of t.effects) {
+          if (eff.target === 'population_cps') {
+            if (eff.type === 'mult') multipliers.population_cps *= eff.value;
+            else multipliers.population_cps += eff.value;
+          }
+        }
+        set({ population: s.population - t.cost, techOwned: owned, multipliers });
         get().recompute();
       },
       recompute: () => {
-        const owned = get().upgrades;
-        let click = 1;
-        let cps = 1;
-        for (const id of owned) {
-          const upg = upgrades.find((u) => u.id === id);
-          if (!upg) continue;
-          const { type, target, value } = upg.apply;
-          if (target === 'click') {
-            if (type === 'add') click += value;
-            else click *= value;
-          } else if (target === 'cps') {
-            if (type === 'add') cps += value;
-            else cps *= value;
-          }
+        const s = get();
+        let cps = 0;
+        for (const b of buildings) {
+          const count = s.buildings[b.id] || 0;
+          cps += b.baseProd * count;
         }
-        set({ clickPower: click, cpsMultiplier: cps });
+        cps *= s.multipliers.population_cps;
+        set({ cps });
       },
       tick: (delta) => {
-        const s = get();
-        let gain = 0;
-        for (const gen of balance.generators) {
-          const count = s.generators[gen.id] || 0;
-          gain += gen.rate * count * delta * s.cpsMultiplier;
-        }
-        gain *= s.multiplier;
-        if (gain > 0) set({ population: s.population + gain });
+        const gain = get().cps * delta;
+        if (gain > 0) set((s) => ({ population: s.population + gain }));
       },
-      prestige: () => {
-        if (get().population < prestigeConfig.threshold) return;
-        set((s) => {
-          const level = s.prestigeLevel + 1;
-          const mult = baseMultiplier ** level;
-          return {
-            population: 0,
-            generators: {},
-            prestigeLevel: level,
-            multiplier: mult,
-          };
-        });
+      canAdvanceTier: () => {
+        const s = get();
+        const next = getTier(s.tierLevel + 1);
+        return !!next && s.population >= next.population;
+      },
+      advanceTier: () => {
+        if (get().canAdvanceTier())
+          set((s) => ({ tierLevel: s.tierLevel + 1 }));
       },
     }),
     {
       name: 'suomidle',
+      version: 2,
       storage: createJSONStorage(() => localStorage),
-      serialize: (state: StorageValue<State>): string =>
+      serialize: (state: StorageValue<Partial<State>>): string =>
         JSON.stringify({
           ...state,
           state: {
             ...state.state,
-            upgrades: Array.from(state.state.upgrades as Set<string>),
+            techOwned: Array.from(state.state.techOwned ?? []),
           },
         }),
-      deserialize: (str: string): StorageValue<State> => {
+      deserialize: (str: string): StorageValue<Partial<State>> => {
         const data = JSON.parse(str);
         return {
           ...data,
           state: {
             ...data.state,
-            upgrades: new Set<string>(data.state.upgrades),
+            techOwned: new Set<string>(data.state.techOwned ?? []),
           },
-        } as StorageValue<State>;
+        } as StorageValue<Partial<State>>;
       },
-      onRehydrateStorage: () => (state: State | undefined): void => {
-        if (state) {
-          state.prestigeLevel ??= 0;
-          state.multiplier = baseMultiplier ** state.prestigeLevel;
-          const now = Date.now();
-          const delta = (now - state.lastSaved) / 1000;
-          let gain = 0;
-          for (const gen of balance.generators) {
-            const count = state.generators[gen.id] || 0;
-            gain += gen.rate * count * delta * state.cpsMultiplier;
+      migrate: (persistedState: any, version: number): Partial<State> => {
+        if (version >= 2) return persistedState as Partial<State>;
+        const old = persistedState as any;
+        const mapped: Record<string, number> = {};
+        if (old.generators) {
+          for (const [id, count] of Object.entries(old.generators as Record<string, number>)) {
+            if (buildings.find((b) => b.id === id)) mapped[id] = count as number;
           }
-          gain *= state.multiplier;
-          state.population += gain;
-          state.lastSaved = now;
-          state.recompute();
         }
+        const owned = new Set<string>();
+        if (old.upgrades) {
+          for (const id of old.upgrades as string[]) {
+            if (tech.find((t) => t.id === id)) owned.add(id);
+          }
+        }
+        return {
+          population: old.population ?? 0,
+          tierLevel: 1,
+          buildings: mapped,
+          techOwned: owned,
+          multipliers: { population_cps: 1 },
+          cps: 0,
+          clickPower: 1,
+        };
       },
-    } as PersistOptionsWithSerialization
-  )
+      onRehydrateStorage: () => (state: State | undefined) => {
+        if (state) state.recompute();
+      },
+    } as PersistOptionsWithSerialization,
+  ),
 );
 
 export const saveGame = () => {
   const state = useGameStore.getState();
   const payload = {
     ...state,
-    upgrades: Array.from(state.upgrades),
-    lastSaved: Date.now(),
+    techOwned: Array.from(state.techOwned),
   };
-  const data = { state: payload, version: 0 };
+  const data = { state: payload, version: 2 };
   localStorage.setItem('suomidle', JSON.stringify(data));
-  useGameStore.setState({ lastSaved: payload.lastSaved });
 };
