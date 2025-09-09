@@ -8,7 +8,6 @@ import {
 import {
   buildings,
   tech,
-  tiers,
   getBuilding,
   getTech,
   getTier,
@@ -150,7 +149,7 @@ export const useGameStore = create<State>()(
           multipliers: { population_cps: 1 },
           cps: 0,
           clickPower: 1,
-        };
+        } as State;
       },
       onRehydrateStorage: () => (state: State | undefined) => {
         if (state) state.recompute();
