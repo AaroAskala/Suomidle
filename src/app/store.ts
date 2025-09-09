@@ -1,5 +1,11 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+
+import {
+  persist,
+  createJSONStorage,
+  type StorageValue,
+  type PersistOptions,
+} from 'zustand/middleware';
 import balance from '../lib/balance';
 import upgrades from '../lib/upgrades';
 import prestigeData from '../lib/prestige.json' assert { type: 'json' };
@@ -34,6 +40,12 @@ interface State {
   recompute: () => void;
   tick: (delta: number) => void;
   prestige: () => void;
+}
+
+interface PersistOptionsWithSerialization
+  extends PersistOptions<State, State> {
+  serialize: (state: StorageValue<State>) => string;
+  deserialize: (str: string) => StorageValue<State>;
 }
 
 export const useGameStore = create<State>()(
@@ -114,8 +126,26 @@ export const useGameStore = create<State>()(
     }),
     {
       name: 'suomidle',
-      storage: createJSONStorage(() => localStorage, { replacer, reviver }),
-      onRehydrateStorage: () => (state) => {
+      storage: createJSONStorage(() => localStorage),
+      serialize: (state: StorageValue<State>): string =>
+        JSON.stringify({
+          ...state,
+          state: {
+            ...state.state,
+            upgrades: Array.from(state.state.upgrades as Set<string>),
+          },
+        }),
+      deserialize: (str: string): StorageValue<State> => {
+        const data = JSON.parse(str);
+        return {
+          ...data,
+          state: {
+            ...data.state,
+            upgrades: new Set<string>(data.state.upgrades),
+          },
+        } as StorageValue<State>;
+      },
+      onRehydrateStorage: () => (state: State | undefined): void => {
         if (state) {
           state.prestigeLevel ??= 0;
           state.multiplier = baseMultiplier ** state.prestigeLevel;
@@ -132,7 +162,7 @@ export const useGameStore = create<State>()(
           state.recompute();
         }
       },
-    }
+    } as PersistOptionsWithSerialization
   )
 );
 
