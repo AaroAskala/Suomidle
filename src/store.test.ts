@@ -23,11 +23,31 @@ describe('model v2', () => {
     expect(useGameStore.getState().cps).toBeGreaterThan(before);
   });
 
-  it("Tech 'hand_tools' multiplies CPS", () => {
+  it("Tech 'vihta' multiplies CPS", () => {
     useGameStore.setState({ population: 1000 });
     useGameStore.getState().purchaseBuilding('sauna');
     const before = useGameStore.getState().cps;
-    useGameStore.getState().purchaseTech('hand_tools');
-    expect(useGameStore.getState().cps).toBeCloseTo(before * 2);
+    useGameStore.getState().purchaseTech('vihta');
+    expect(useGameStore.getState().cps).toBeCloseTo(before * 1.25);
+  });
+
+  it('rehydrates techOwned from stored array', async () => {
+    const payload = {
+      state: {
+        population: 0,
+        tierLevel: 1,
+        buildings: {},
+        techOwned: ['vihta'],
+        multipliers: { population_cps: 1 },
+        cps: 0,
+        clickPower: 1,
+      },
+      version: 2,
+    };
+    localStorage.setItem('suomidle', JSON.stringify(payload));
+    await useGameStore.persist.rehydrate();
+    const owned = useGameStore.getState().techOwned;
+    expect(owned instanceof Set).toBe(true);
+    expect(owned.has('vihta')).toBe(true);
   });
 });

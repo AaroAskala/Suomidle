@@ -39,7 +39,7 @@ interface PersistOptionsWithSerialization
   extends PersistOptions<State, Partial<State>> {
   serialize: (state: StorageValue<Partial<State>>) => string;
   deserialize: (str: string) => StorageValue<Partial<State>>;
-  migrate?: (persistedState: any, version: number) => Partial<State>;
+  migrate?: (persistedState: unknown, version: number) => Partial<State>;
 }
 
 export const useGameStore = create<State>()(
@@ -124,26 +124,39 @@ export const useGameStore = create<State>()(
         }),
       deserialize: (str: string): StorageValue<Partial<State>> => {
         const data = JSON.parse(str);
+        const raw = data.state?.techOwned;
+        const owned =
+          raw instanceof Set
+            ? raw
+            : Array.isArray(raw)
+              ? new Set<string>(raw)
+              : raw && typeof raw === 'object'
+                ? new Set<string>(Object.keys(raw))
+                : new Set<string>();
         return {
           ...data,
           state: {
             ...data.state,
-            techOwned: new Set<string>(data.state.techOwned ?? []),
+            techOwned: owned,
           },
         } as StorageValue<Partial<State>>;
       },
-      migrate: (persistedState: any, version: number): Partial<State> => {
+      migrate: (persistedState: unknown, version: number): Partial<State> => {
         if (version >= 2) return persistedState as Partial<State>;
-        const old = persistedState as any;
+        const old = persistedState as {
+          population?: number;
+          generators?: Record<string, number>;
+          upgrades?: string[];
+        };
         const mapped: Record<string, number> = {};
         if (old.generators) {
-          for (const [id, count] of Object.entries(old.generators as Record<string, number>)) {
-            if (buildings.find((b) => b.id === id)) mapped[id] = count as number;
+          for (const [id, count] of Object.entries(old.generators)) {
+            if (buildings.find((b) => b.id === id)) mapped[id] = count;
           }
         }
         const owned = new Set<string>();
         if (old.upgrades) {
-          for (const id of old.upgrades as string[]) {
+          for (const id of old.upgrades) {
             if (tech.find((t) => t.id === id)) owned.add(id);
           }
         }
@@ -158,7 +171,17 @@ export const useGameStore = create<State>()(
         };
       },
       onRehydrateStorage: () => (state: State | undefined) => {
-        if (state) state.recompute();
+        if (state) {
+          if (!(state.techOwned instanceof Set)) {
+            const current = state.techOwned as unknown;
+            state.techOwned = Array.isArray(current)
+              ? new Set(current)
+              : current && typeof current === 'object'
+                ? new Set(Object.keys(current as Record<string, unknown>))
+                : new Set<string>();
+          }
+          state.recompute();
+        }
       },
     } as PersistOptionsWithSerialization,
   ),
