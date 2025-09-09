@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import balance from '../lib/balance';
 import upgrades from '../lib/upgrades';
 import prestigeData from '../lib/prestige.json' assert { type: 'json' };
@@ -12,6 +12,12 @@ export interface PrestigeConfig {
 
 export const prestigeConfig: PrestigeConfig = prestigeData as PrestigeConfig;
 const baseMultiplier = prestigeConfig.baseMultiplier;
+
+const replacer = (_key: string, value: unknown) =>
+  value instanceof Set ? Array.from(value) : value;
+
+const reviver = (key: string, value: unknown) =>
+  key === 'upgrades' && Array.isArray(value) ? new Set(value) : value;
 
 interface State {
   population: number;
@@ -108,24 +114,7 @@ export const useGameStore = create<State>()(
     }),
     {
       name: 'suomidle',
-      serialize: (state) =>
-        JSON.stringify({
-          ...state,
-          state: {
-            ...state.state,
-            upgrades: Array.from(state.state.upgrades as Set<string>),
-          },
-        }),
-      deserialize: (str) => {
-        const data = JSON.parse(str);
-        return {
-          ...data,
-          state: {
-            ...data.state,
-            upgrades: new Set<string>(data.state.upgrades),
-          },
-        };
-      },
+      storage: createJSONStorage(() => localStorage, { replacer, reviver }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.prestigeLevel ??= 0;
