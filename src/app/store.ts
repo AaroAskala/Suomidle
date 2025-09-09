@@ -3,18 +3,23 @@ import { persist } from 'zustand/middleware';
 import balance from '../lib/balance';
 import upgrades from '../lib/upgrades';
 
+const baseMultiplier = 2;
+
 interface State {
   population: number;
   generators: Record<string, number>;
   upgrades: Set<string>;
   clickPower: number;
   cpsMultiplier: number;
+  prestigeLevel: number;
+  multiplier: number;
   lastSaved: number;
   addPopulation: (amount: number) => void;
   buyGenerator: (id: string) => void;
   purchaseUpgrade: (id: string) => void;
   recompute: () => void;
   tick: (delta: number) => void;
+  prestige: () => void;
 }
 
 export const useGameStore = create<State>()(
@@ -25,9 +30,11 @@ export const useGameStore = create<State>()(
       upgrades: new Set<string>(),
       clickPower: 1,
       cpsMultiplier: 1,
+      prestigeLevel: 0,
+      multiplier: 1,
       lastSaved: Date.now(),
       addPopulation: (amount) =>
-        set((s) => ({ population: s.population + amount })),
+        set((s) => ({ population: s.population + amount * s.multiplier })),
       buyGenerator: (id) => {
         const gen = balance.generators.find((g) => g.id === id);
         if (!gen) return;
@@ -72,9 +79,21 @@ export const useGameStore = create<State>()(
         let gain = 0;
         for (const gen of balance.generators) {
           const count = s.generators[gen.id] || 0;
-          gain += gen.rate * count * delta * s.cpsMultiplier;
+          gain += gen.rate * count * delta * s.cpsMultiplier * s.multiplier;
         }
         if (gain > 0) set({ population: s.population + gain });
+      },
+      prestige: () => {
+        set((s) => {
+          const level = s.prestigeLevel + 1;
+          const mult = baseMultiplier ** level;
+          return {
+            population: 0,
+            generators: {},
+            prestigeLevel: level,
+            multiplier: mult,
+          };
+        });
       },
     }),
     {
@@ -99,12 +118,15 @@ export const useGameStore = create<State>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
+          state.prestigeLevel ??= 0;
+          state.multiplier = baseMultiplier ** state.prestigeLevel;
           const now = Date.now();
           const delta = (now - state.lastSaved) / 1000;
           let gain = 0;
           for (const gen of balance.generators) {
             const count = state.generators[gen.id] || 0;
-            gain += gen.rate * count * delta * state.cpsMultiplier;
+            gain +=
+              gen.rate * count * delta * state.cpsMultiplier * state.multiplier;
           }
           state.population += gain;
           state.lastSaved = now;
@@ -117,7 +139,12 @@ export const useGameStore = create<State>()(
 
 export const saveGame = () => {
   const state = useGameStore.getState();
-  const payload = { ...state, lastSaved: Date.now() };
-  localStorage.setItem('suomidle', JSON.stringify(payload));
+  const payload = {
+    ...state,
+    upgrades: Array.from(state.upgrades),
+    lastSaved: Date.now(),
+  };
+  const data = { state: payload, version: 0 };
+  localStorage.setItem('suomidle', JSON.stringify(data));
   useGameStore.setState({ lastSaved: payload.lastSaved });
 };
