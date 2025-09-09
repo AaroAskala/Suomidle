@@ -1,0 +1,40 @@
+[
+  {
+    "id": "hand_tools",
+    "name": "Hand Tools",
+    "icon": "HandTools.png",
+    "cost": 100,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 2 }
+    ]
+  },
+  {
+    "id": "vihta",
+    "name": "Vihta",
+    "icon": "Vihta.png",
+    "cost": 500,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.25 }
+    ]
+  },
+  {
+    "id": "kalja",
+    "name": "Kalja",
+    "icon": "Kalja.png",
+    "cost": 3000,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.5 }
+    ],
+    "unlock": { "tier": 2 }
+  },
+  {
+    "id": "kossu",
+    "name": "Kossu",
+    "icon": "Kossu.png",
+    "cost": 10000,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.6 }
+    ],
+    "unlock": { "tier": 3 }
+  }
+]

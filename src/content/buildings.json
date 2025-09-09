@@ -1,0 +1,35 @@
+[
+  {
+    "id": "sauna",
+    "name": "Sauna",
+    "icon": "Sauna.png",
+    "baseCost": 10,
+    "costMult": 1.15,
+    "baseProd": 0.1
+  },
+  {
+    "id": "kylakauppa",
+    "name": "Kyläkauppa",
+    "icon": "Kyläkauppa.png",
+    "baseCost": 100,
+    "costMult": 1.15,
+    "baseProd": 1
+  },
+  {
+    "id": "alko",
+    "name": "Alko",
+    "icon": "Alko.png",
+    "baseCost": 1000,
+    "costMult": 1.15,
+    "baseProd": 6
+  },
+  {
+    "id": "ensiapu",
+    "name": "Ensiapu",
+    "icon": "Ensiapu.png",
+    "baseCost": 5000,
+    "costMult": 1.16,
+    "baseProd": 20,
+    "unlock": { "tier": 2 }
+  }
+]
