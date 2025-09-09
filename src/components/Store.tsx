@@ -3,7 +3,7 @@ import balance from '../lib/balance';
 
 export function Store() {
   const buy = useGameStore((s) => s.buyGenerator);
-  const coins = useGameStore((s) => s.coins);
+  const population = useGameStore((s) => s.population);
   const generators = useGameStore((s) => s.generators);
   return (
     <div>
@@ -14,7 +14,7 @@ export function Store() {
         return (
           <div key={gen.id}>
             <span>{gen.name} ({count}) </span>
-            <button disabled={coins < price} onClick={() => buy(gen.id)}>
+            <button disabled={population < price} onClick={() => buy(gen.id)}>
               Buy {Math.round(price)}
             </button>
           </div>

@@ -1,12 +1,12 @@
 import { useGameStore } from '../app/store';
 
 export function HUD() {
-  const coins = useGameStore((s) => s.coins);
-  const addCoins = useGameStore((s) => s.addCoins);
+  const population = useGameStore((s) => s.population);
+  const addPopulation = useGameStore((s) => s.addPopulation);
   return (
     <div>
-      <div>Coins: {Math.floor(coins)}</div>
-      <button onClick={() => addCoins(1)}>Click</button>
+      <div>Population: {Math.floor(population)}</div>
+      <button onClick={() => addPopulation(1)}>Click</button>
     </div>
   );
 }
