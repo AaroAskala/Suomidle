@@ -20,7 +20,7 @@ export function BuildingsGrid() {
         return (
           <ImageCardButton
             key={b.id}
-            icon={`/assets/buildings/${b.icon}`}
+            icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
             title={`${b.name} (${count})`}
             subtitle={`Next: ${Math.round(price)} | +${cpsDelta.toFixed(2)} CPS`}
             disabled={disabled}
