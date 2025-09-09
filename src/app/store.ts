@@ -3,10 +3,10 @@ import { persist } from 'zustand/middleware';
 import balance from '../lib/balance';
 
 interface State {
-  coins: number;
+  population: number;
   generators: Record<string, number>;
   lastSaved: number;
-  addCoins: (amount: number) => void;
+  addPopulation: (amount: number) => void;
   buyGenerator: (id: string) => void;
   tick: (delta: number) => void;
 }
@@ -14,18 +14,19 @@ interface State {
 export const useGameStore = create<State>()(
   persist(
     (set, get) => ({
-      coins: 0,
+      population: 0,
       generators: {},
       lastSaved: Date.now(),
-      addCoins: (amount) => set((s) => ({ coins: s.coins + amount })),
+      addPopulation: (amount) =>
+        set((s) => ({ population: s.population + amount })),
       buyGenerator: (id) => {
         const gen = balance.generators.find((g) => g.id === id);
         if (!gen) return;
         const count = get().generators[id] || 0;
         const price = balance.getPrice(gen, count);
-        if (get().coins >= price) {
+        if (get().population >= price) {
           set((s) => ({
-            coins: s.coins - price,
+            population: s.population - price,
             generators: { ...s.generators, [id]: count + 1 },
           }));
         }
@@ -37,7 +38,7 @@ export const useGameStore = create<State>()(
           const count = s.generators[gen.id] || 0;
           gain += gen.rate * count * delta;
         }
-        if (gain > 0) set({ coins: s.coins + gain });
+        if (gain > 0) set({ population: s.population + gain });
       },
     }),
     {
@@ -51,7 +52,7 @@ export const useGameStore = create<State>()(
             const count = state.generators[gen.id] || 0;
             gain += gen.rate * count * delta;
           }
-          state.coins += gain;
+          state.population += gain;
           state.lastSaved = now;
         }
       },
