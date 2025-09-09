@@ -4,9 +4,9 @@ import { HUD } from './components/HUD';
 import { useGameStore } from './app/store';
 
 describe('HUD', () => {
-  it('increments coins on click', () => {
+  it('increments population on click', () => {
     render(<HUD />);
     fireEvent.click(screen.getByText(/click/i));
-    expect(useGameStore.getState().coins).toBe(1);
+    expect(useGameStore.getState().population).toBe(1);
   });
 });

@@ -3,7 +3,7 @@ export interface Generator {
   name: string;
   baseCost: number;
   costMultiplier: number;
-  rate: number; // coins per second
+  rate: number; // population per second
 }
 
 export const balance = {
