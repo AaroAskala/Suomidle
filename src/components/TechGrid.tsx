@@ -20,7 +20,7 @@ export function TechGrid() {
         return (
           <ImageCardButton
             key={t.id}
-            icon={`/assets/tech/${t.icon}`}
+            icon={`${import.meta.env.BASE_URL}assets/tech/${t.icon}`}
             title={t.name}
             subtitle={subtitle}
             disabled={disabled}
