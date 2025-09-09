@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import { persist, type StorageValue, type PersistOptions } from 'zustand/middleware';
+import {
+  persist,
+  createJSONStorage,
+  type StorageValue,
+  type PersistOptions,
+} from 'zustand/middleware';
 import balance from '../lib/balance';
 import upgrades from '../lib/upgrades';
 import prestigeData from '../lib/prestige.json' assert { type: 'json' };
@@ -114,6 +119,7 @@ export const useGameStore = create<State>()(
     }),
     {
       name: 'suomidle',
+      storage: createJSONStorage(() => localStorage),
       serialize: (state: StorageValue<State>): string =>
         JSON.stringify({
           ...state,
