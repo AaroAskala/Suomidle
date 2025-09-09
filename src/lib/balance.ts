@@ -14,6 +14,7 @@ export const balance = {
   getPrice(gen: Generator, count: number) {
     return gen.baseCost * Math.pow(gen.costMultiplier, count);
   },
+  prestigeThreshold: 1_000_000,
 };
 
 export default balance;
