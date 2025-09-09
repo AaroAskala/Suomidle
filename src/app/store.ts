@@ -124,11 +124,20 @@ export const useGameStore = create<State>()(
         }),
       deserialize: (str: string): StorageValue<Partial<State>> => {
         const data = JSON.parse(str);
+        const raw = data.state?.techOwned;
+        const owned =
+          raw instanceof Set
+            ? raw
+            : Array.isArray(raw)
+              ? new Set<string>(raw)
+              : raw && typeof raw === 'object'
+                ? new Set<string>(Object.keys(raw))
+                : new Set<string>();
         return {
           ...data,
           state: {
             ...data.state,
-            techOwned: new Set<string>(data.state.techOwned ?? []),
+            techOwned: owned,
           },
         } as StorageValue<Partial<State>>;
       },
@@ -162,7 +171,17 @@ export const useGameStore = create<State>()(
         };
       },
       onRehydrateStorage: () => (state: State | undefined) => {
-        if (state) state.recompute();
+        if (state) {
+          if (!(state.techOwned instanceof Set)) {
+            const current = state.techOwned as unknown;
+            state.techOwned = Array.isArray(current)
+              ? new Set(current)
+              : current && typeof current === 'object'
+                ? new Set(Object.keys(current as Record<string, unknown>))
+                : new Set<string>();
+          }
+          state.recompute();
+        }
       },
     } as PersistOptionsWithSerialization,
   ),
