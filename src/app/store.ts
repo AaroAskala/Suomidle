@@ -36,10 +36,10 @@ interface State {
 }
 
 interface PersistOptionsWithSerialization
-  extends PersistOptions<State, State> {
-  serialize: (state: StorageValue<State>) => string;
-  deserialize: (str: string) => StorageValue<State>;
-  migrate?: (persistedState: any, version: number) => State;
+  extends PersistOptions<State, Partial<State>> {
+  serialize: (state: StorageValue<Partial<State>>) => string;
+  deserialize: (str: string) => StorageValue<Partial<State>>;
+  migrate?: (persistedState: any, version: number) => Partial<State>;
 }
 
 export const useGameStore = create<State>()(
@@ -114,20 +114,26 @@ export const useGameStore = create<State>()(
       name: 'suomidle',
       version: 2,
       storage: createJSONStorage(() => localStorage),
-      serialize: (state: StorageValue<State>): string =>
+      serialize: (state: StorageValue<Partial<State>>): string =>
         JSON.stringify({
           ...state,
-          state: { ...state.state, techOwned: Array.from(state.state.techOwned) },
+          state: {
+            ...state.state,
+            techOwned: Array.from(state.state.techOwned ?? []),
+          },
         }),
-      deserialize: (str: string): StorageValue<State> => {
+      deserialize: (str: string): StorageValue<Partial<State>> => {
         const data = JSON.parse(str);
         return {
           ...data,
-          state: { ...data.state, techOwned: new Set<string>(data.state.techOwned) },
-        } as StorageValue<State>;
+          state: {
+            ...data.state,
+            techOwned: new Set<string>(data.state.techOwned ?? []),
+          },
+        } as StorageValue<Partial<State>>;
       },
-      migrate: (persistedState: any, version: number): State => {
-        if (version >= 2) return persistedState as State;
+      migrate: (persistedState: any, version: number): Partial<State> => {
+        if (version >= 2) return persistedState as Partial<State>;
         const old = persistedState as any;
         const mapped: Record<string, number> = {};
         if (old.generators) {
@@ -149,7 +155,7 @@ export const useGameStore = create<State>()(
           multipliers: { population_cps: 1 },
           cps: 0,
           clickPower: 1,
-        } as State;
+        };
       },
       onRehydrateStorage: () => (state: State | undefined) => {
         if (state) state.recompute();
