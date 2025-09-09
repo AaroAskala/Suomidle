@@ -39,7 +39,7 @@ interface PersistOptionsWithSerialization
   extends PersistOptions<State, Partial<State>> {
   serialize: (state: StorageValue<Partial<State>>) => string;
   deserialize: (str: string) => StorageValue<Partial<State>>;
-  migrate?: (persistedState: any, version: number) => Partial<State>;
+  migrate?: (persistedState: unknown, version: number) => Partial<State>;
 }
 
 export const useGameStore = create<State>()(
@@ -132,18 +132,22 @@ export const useGameStore = create<State>()(
           },
         } as StorageValue<Partial<State>>;
       },
-      migrate: (persistedState: any, version: number): Partial<State> => {
+      migrate: (persistedState: unknown, version: number): Partial<State> => {
         if (version >= 2) return persistedState as Partial<State>;
-        const old = persistedState as any;
+        const old = persistedState as {
+          population?: number;
+          generators?: Record<string, number>;
+          upgrades?: string[];
+        };
         const mapped: Record<string, number> = {};
         if (old.generators) {
-          for (const [id, count] of Object.entries(old.generators as Record<string, number>)) {
-            if (buildings.find((b) => b.id === id)) mapped[id] = count as number;
+          for (const [id, count] of Object.entries(old.generators)) {
+            if (buildings.find((b) => b.id === id)) mapped[id] = count;
           }
         }
         const owned = new Set<string>();
         if (old.upgrades) {
-          for (const id of old.upgrades as string[]) {
+          for (const id of old.upgrades) {
             if (tech.find((t) => t.id === id)) owned.add(id);
           }
         }
