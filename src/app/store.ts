@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import {
   persist,
   createJSONStorage,
@@ -17,6 +18,12 @@ export interface PrestigeConfig {
 
 export const prestigeConfig: PrestigeConfig = prestigeData as PrestigeConfig;
 const baseMultiplier = prestigeConfig.baseMultiplier;
+
+const replacer = (_key: string, value: unknown) =>
+  value instanceof Set ? Array.from(value) : value;
+
+const reviver = (key: string, value: unknown) =>
+  key === 'upgrades' && Array.isArray(value) ? new Set(value) : value;
 
 interface State {
   population: number;
