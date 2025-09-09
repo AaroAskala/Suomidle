@@ -23,11 +23,11 @@ describe('model v2', () => {
     expect(useGameStore.getState().cps).toBeGreaterThan(before);
   });
 
-  it("Tech 'hand_tools' multiplies CPS", () => {
+  it("Tech 'vihta' multiplies CPS", () => {
     useGameStore.setState({ population: 1000 });
     useGameStore.getState().purchaseBuilding('sauna');
     const before = useGameStore.getState().cps;
-    useGameStore.getState().purchaseTech('hand_tools');
-    expect(useGameStore.getState().cps).toBeCloseTo(before * 2);
+    useGameStore.getState().purchaseTech('vihta');
+    expect(useGameStore.getState().cps).toBeCloseTo(before * 1.25);
   });
 });

@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { HUD } from './components/HUD';
-import { Store } from './components/Store';
+import { BuildingsGrid } from './components/BuildingsGrid';
+import { TechGrid } from './components/TechGrid';
 import { Prestige } from './components/Prestige';
-import { Upgrades } from './components/Upgrades';
 import { startGameLoop } from './app/gameLoop';
 import './App.css';
 
@@ -13,9 +13,9 @@ function App() {
   return (
     <>
       <HUD />
-      <Store />
+      <BuildingsGrid />
+      <TechGrid />
       <Prestige />
-      <Upgrades />
     </>
   );
 }
