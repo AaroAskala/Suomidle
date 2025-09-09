@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, type StorageValue, type PersistOptions } from 'zustand/middleware';
 import balance from '../lib/balance';
 import upgrades from '../lib/upgrades';
 import prestigeData from '../lib/prestige.json' assert { type: 'json' };
@@ -106,44 +106,51 @@ export const useGameStore = create<State>()(
         });
       },
     }),
-    {
-      name: 'suomidle',
-      serialize: (state) =>
-        JSON.stringify({
-          ...state,
-          state: {
-            ...state.state,
-            upgrades: Array.from(state.state.upgrades as Set<string>),
-          },
-        }),
-      deserialize: (str) => {
-        const data = JSON.parse(str);
-        return {
-          ...data,
-          state: {
-            ...data.state,
-            upgrades: new Set<string>(data.state.upgrades),
-          },
-        };
-      },
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.prestigeLevel ??= 0;
-          state.multiplier = baseMultiplier ** state.prestigeLevel;
-          const now = Date.now();
-          const delta = (now - state.lastSaved) / 1000;
-          let gain = 0;
-          for (const gen of balance.generators) {
-            const count = state.generators[gen.id] || 0;
-            gain += gen.rate * count * delta * state.cpsMultiplier;
+    (
+      {
+        name: 'suomidle',
+        serialize: (state: StorageValue<State>): string =>
+          JSON.stringify({
+            ...state,
+            state: {
+              ...state.state,
+              upgrades: Array.from(state.state.upgrades as Set<string>),
+            },
+          }),
+        deserialize: (str: string): StorageValue<State> => {
+          const data = JSON.parse(str);
+          return {
+            ...data,
+            state: {
+              ...data.state,
+              upgrades: new Set<string>(data.state.upgrades),
+            },
+          } as StorageValue<State>;
+        },
+        onRehydrateStorage: (): ((state: State | undefined) => void) => (
+          state: State | undefined,
+        ) => {
+          if (state) {
+            state.prestigeLevel ??= 0;
+            state.multiplier = baseMultiplier ** state.prestigeLevel;
+            const now = Date.now();
+            const delta = (now - state.lastSaved) / 1000;
+            let gain = 0;
+            for (const gen of balance.generators) {
+              const count = state.generators[gen.id] || 0;
+              gain += gen.rate * count * delta * state.cpsMultiplier;
+            }
+            gain *= state.multiplier;
+            state.population += gain;
+            state.lastSaved = now;
+            state.recompute();
           }
-          gain *= state.multiplier;
-          state.population += gain;
-          state.lastSaved = now;
-          state.recompute();
-        }
-      },
-    }
+        },
+      } as PersistOptions<State, State> & {
+        serialize: (state: StorageValue<State>) => string;
+        deserialize: (str: string) => StorageValue<State>;
+      }
+    )
   )
 );
 
