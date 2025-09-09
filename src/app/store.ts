@@ -79,8 +79,9 @@ export const useGameStore = create<State>()(
         let gain = 0;
         for (const gen of balance.generators) {
           const count = s.generators[gen.id] || 0;
-          gain += gen.rate * count * delta * s.cpsMultiplier * s.multiplier;
+          gain += gen.rate * count * delta * s.cpsMultiplier;
         }
+        gain *= s.multiplier;
         if (gain > 0) set({ population: s.population + gain });
       },
       prestige: () => {
@@ -125,9 +126,9 @@ export const useGameStore = create<State>()(
           let gain = 0;
           for (const gen of balance.generators) {
             const count = state.generators[gen.id] || 0;
-            gain +=
-              gen.rate * count * delta * state.cpsMultiplier * state.multiplier;
+            gain += gen.rate * count * delta * state.cpsMultiplier;
           }
+          gain *= state.multiplier;
           state.population += gain;
           state.lastSaved = now;
           state.recompute();
