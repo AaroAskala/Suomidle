@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore, computePrestigePoints, computePrestigeMult } from '../app/store';
 
-describe('prestige', () => {
+describe('polta sauna', () => {
   beforeEach(() => {
     useGameStore.persist.clearStorage();
     useGameStore.setState({
@@ -19,17 +19,17 @@ describe('prestige', () => {
     useGameStore.getState().recompute();
   });
 
-  it('cannot prestige below minimum population', () => {
+  it('cannot polta sauna below minimum lämpötila', () => {
     useGameStore.setState({ totalPopulation: 9999 });
     expect(useGameStore.getState().canPrestige()).toBe(false);
   });
 
-  it('computes points and multiplier at 100k population', () => {
+  it('computes points and multiplier at 100k lämpötila', () => {
     expect(computePrestigePoints(100000)).toBe(1);
     expect(computePrestigeMult(1)).toBeCloseTo(1.1);
   });
 
-  it('prestige resets progress and keeps lifetime stats', () => {
+  it('polta sauna resets progress and keeps lifetime stats', () => {
     useGameStore.setState({
       population: 500,
       totalPopulation: 100000,
