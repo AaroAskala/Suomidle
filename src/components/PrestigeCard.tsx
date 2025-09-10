@@ -1,12 +1,29 @@
+import { useMemo } from 'react';
 import { ImageCardButton } from './ImageCardButton';
-import { useGameStore } from '../app/store';
+import {
+  computePrestigeMult,
+  computePrestigePoints,
+  useGameStore,
+} from '../app/store';
 import { prestige as prestigeData } from '../content';
 
 export function PrestigeCard() {
-  const mult = useGameStore((s) => s.prestigeMult);
+  const prestigePoints = useGameStore((s) => s.prestigePoints);
+  const prestigeMult = useGameStore((s) => s.prestigeMult);
+  const totalPopulation = useGameStore((s) => s.totalPopulation);
   const canPrestige = useGameStore((s) => s.canPrestige());
-  const { multAfter, deltaMult } = useGameStore((s) => s.projectPrestigeGain());
   const prestige = useGameStore((s) => s.prestige);
+
+  const { multAfter, deltaMult } = useMemo(() => {
+    const pointsAfter = computePrestigePoints(totalPopulation);
+    const multAfter = computePrestigeMult(pointsAfter);
+    const deltaPoints = pointsAfter - prestigePoints;
+    return {
+      multAfter,
+      deltaMult: multAfter - prestigeMult,
+      deltaPoints,
+    };
+  }, [prestigePoints, prestigeMult, totalPopulation]);
 
   const subtitle = canPrestige
     ? `Gain +${(deltaMult * 100).toFixed(0)}% → ${multAfter.toFixed(2)}×`
@@ -15,7 +32,7 @@ export function PrestigeCard() {
   return (
     <ImageCardButton
       icon={prestigeData.icon}
-      title={`Prestige: ${mult.toFixed(2)}×`}
+      title={`Prestige: ${prestigeMult.toFixed(2)}×`}
       subtitle={subtitle}
       disabled={!canPrestige}
       onClick={() => {
