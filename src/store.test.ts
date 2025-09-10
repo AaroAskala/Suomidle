@@ -70,6 +70,7 @@ describe('model v3', () => {
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
+    useGameStore.getState().recompute();
     const state = useGameStore.getState();
     expect(state.population).toBe(50);
     expect(state.buildings.sauna).toBe(1);

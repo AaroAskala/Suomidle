@@ -248,11 +248,7 @@ export const useGameStore = create<State>()(
           prestigeMult: 1,
         };
       },
-      onRehydrateStorage: () => (state: State | undefined) => {
-        if (state) {
-          state.recompute();
-        }
-      },
+      onRehydrateStorage: () => () => {},
     } as PersistOptions<State, Partial<State>>,
   ),
 );
@@ -267,9 +263,9 @@ export const saveGame = () => {
   delete rest.tick;
   delete rest.canAdvanceTier;
   delete rest.advanceTier;
-  delete (rest as any).canPrestige;
-  delete (rest as any).projectPrestigeGain;
-  delete (rest as any).prestige;
+  delete rest.canPrestige;
+  delete rest.projectPrestigeGain;
+  delete rest.prestige;
   const data = { state: rest, version: 3 };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };
