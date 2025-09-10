@@ -4,13 +4,16 @@ import { BuildingsGrid } from './components/BuildingsGrid';
 import { TechGrid } from './components/TechGrid';
 import { Prestige } from './components/Prestige';
 import { PrestigeCard } from './components/PrestigeCard';
-import { startGameLoop } from './app/gameLoop';
+import { startGameLoop, stopGameLoop } from './app/gameLoop';
 import { useGameStore } from './app/store';
 import './App.css';
 
 function App() {
   useEffect(() => {
     startGameLoop();
+    return () => {
+      stopGameLoop();
+    };
   }, []);
   useEffect(() => {
     useGameStore.getState().recompute();
