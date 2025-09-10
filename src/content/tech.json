@@ -27,5 +27,45 @@
       { "type": "mult", "target": "population_cps", "value": 1.6 }
     ],
     "unlock": { "tier": 3 }
+  },
+  {
+    "id": "kiulu_ja_kauha",
+    "name": "Kiulu ja Kauha",
+    "icon": "Kiulu_ja_Kauha.png",
+    "cost": 25000,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.30 }
+    ],
+    "unlock": { "tier": 4 }
+  },
+  {
+    "id": "saunalakki",
+    "name": "Saunalakki",
+    "icon": "Saunalakki.png",
+    "cost": 60000,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.40 }
+    ],
+    "unlock": { "tier": 5 }
+  },
+  {
+    "id": "lampomittari",
+    "name": "Lämpömittari",
+    "icon": "Lämpömittari.png",
+    "cost": 150000,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.50 }
+    ],
+    "unlock": { "tier": 6 }
+  },
+  {
+    "id": "saunaklonkku",
+    "name": "Saunaklonkku",
+    "icon": "Saunaklonkku.png",
+    "cost": 800000,
+    "effects": [
+      { "type": "mult", "target": "population_cps", "value": 1.70 }
+    ],
+    "unlock": { "tier": 7 }
   }
 ]
