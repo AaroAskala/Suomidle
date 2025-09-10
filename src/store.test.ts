@@ -6,12 +6,15 @@ describe('model v3', () => {
     useGameStore.persist.clearStorage();
     useGameStore.setState({
       population: 0,
+      totalPopulation: 0,
       tierLevel: 1,
       buildings: {},
       techCounts: {},
       multipliers: { population_cps: 1 },
       cps: 0,
       clickPower: 1,
+      prestigePoints: 0,
+      prestigeMult: 1,
     });
     useGameStore.getState().recompute();
   });
