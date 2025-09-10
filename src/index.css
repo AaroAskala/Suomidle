@@ -6,6 +6,7 @@
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
+  --surface-elevated: #2a2a2a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -58,6 +59,7 @@ button:focus-visible {
   :root {
     color: #213547;
     background-color: #ffffff;
+    --surface-elevated: #f9f9f9;
   }
   a:hover {
     color: #747bff;
@@ -65,4 +67,28 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px;
+  padding: 8px;
+  background-color: var(--surface-elevated);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+}
+
+.card:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.card__text {
+  width: 100%;
+  padding: 4px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  text-align: center;
 }
