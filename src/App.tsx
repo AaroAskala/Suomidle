@@ -21,7 +21,7 @@ function App() {
   }, []);
   useEffect(() => {
     const body = document.body;
-    body.style.backgroundImage = `url(/assets/backgrounds/tier${tierLevel}.svg)`;
+    body.style.backgroundImage = `url(${import.meta.env.BASE_URL}assets/backgrounds/tier${tierLevel}.svg)`;
     body.style.backgroundSize = 'cover';
     body.style.backgroundPosition = 'center';
     body.style.backgroundRepeat = 'no-repeat';
