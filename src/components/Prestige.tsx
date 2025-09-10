@@ -2,21 +2,20 @@ import { useGameStore } from '../app/store';
 import { getTier } from '../content';
 
 export function Prestige() {
-  const population = useGameStore((s) => s.population);
   const tierLevel = useGameStore((s) => s.tierLevel);
   const canAdvance = useGameStore((s) => s.canAdvanceTier());
   const advance = useGameStore((s) => s.advanceTier);
   const current = getTier(tierLevel);
   const next = getTier(tierLevel + 1);
   return (
-    <div>
-      <h2>Uusi sauna</h2>
-      <div>
+    <div className="hud hud__card">
+      <h2 className="text--h2">Uusi sauna</h2>
+      <div className="text--body">
         Sauna Taso: {tierLevel}
         {current ? ` (${current.name})` : ''}
       </div>
       {next && (
-        <div>
+        <div className="text--body">
           Next Sauna: {next.name} ({next.population})
         </div>
       )}
@@ -24,10 +23,10 @@ export function Prestige() {
         className="btn btn--primary"
         disabled={!canAdvance}
         onClick={() => advance()}
+        style={{ marginTop: '0.5rem' }}
       >
         Uusi sauna!
       </button>
-      <div className="hud hud__population">Lämpötila: {Math.floor(population)}</div>
     </div>
   );
 }
