@@ -13,7 +13,7 @@ export function HUD() {
         className="btn btn--primary"
         onClick={() => addPopulation(click)}
       >
-        Click
+        Heitä löylyä!
       </button>
     </div>
   );
