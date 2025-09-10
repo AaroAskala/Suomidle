@@ -12,12 +12,12 @@ export function Prestige() {
     <div>
       <h2>Uusi sauna</h2>
       <div>
-        Uusi sauna Level: {tierLevel}
+        Sauna Taso: {tierLevel}
         {current ? ` (${current.name})` : ''}
       </div>
       {next && (
         <div>
-          Next Uusi sauna: {next.name} ({next.population})
+          Next Sauna: {next.name} ({next.population})
         </div>
       )}
       <button
@@ -25,7 +25,7 @@ export function Prestige() {
         disabled={!canAdvance}
         onClick={() => advance()}
       >
-        Advance Uusi sauna
+        Uusi sauna!
       </button>
       <div>Lämpötila: {Math.floor(population)}</div>
     </div>
