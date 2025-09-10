@@ -54,6 +54,22 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Heads-up display container */
+.hud {
+  background-color: color-mix(in srgb, var(--surface) 80%, transparent);
+  padding: 1rem;
+}
+
+/* Typography helpers */
+.text--h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.text--body {
+  font-size: 1rem;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
