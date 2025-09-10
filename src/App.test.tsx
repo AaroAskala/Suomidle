@@ -6,7 +6,7 @@ import { useGameStore } from './app/store';
 describe('HUD', () => {
   it('increments population on click', () => {
     render(<HUD />);
-    fireEvent.click(screen.getByText(/click/i));
+    fireEvent.click(screen.getByRole('button'));
     expect(useGameStore.getState().population).toBe(1);
   });
 });
