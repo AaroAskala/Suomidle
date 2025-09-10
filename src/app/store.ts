@@ -10,6 +10,7 @@ import {
   getTech,
   getTier,
   getBuildingCost,
+  prestige as prestigeData,
 } from '../content';
 
 interface Multipliers {
@@ -18,12 +19,15 @@ interface Multipliers {
 
 interface State {
   population: number;
+  totalPopulation: number;
   tierLevel: number;
   buildings: Record<string, number>;
   techCounts: Record<string, number>;
   multipliers: Multipliers;
   cps: number;
   clickPower: number;
+  prestigePoints: number;
+  prestigeMult: number;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -31,16 +35,42 @@ interface State {
   tick: (delta: number) => void;
   canAdvanceTier: () => boolean;
   advanceTier: () => void;
+  canPrestige: () => boolean;
+  projectPrestigeGain: () => {
+    pointsNow: number;
+    multNow: number;
+    pointsAfter: number;
+    multAfter: number;
+    deltaMult: number;
+  };
+  prestige: () => boolean;
 }
 
 const initialState = {
   population: 0,
+  totalPopulation: 0,
   tierLevel: 1,
   buildings: {} as Record<string, number>,
   techCounts: {} as Record<string, number>,
   multipliers: { population_cps: 1 },
   cps: 0,
   clickPower: 1,
+  prestigePoints: 0,
+  prestigeMult: 1,
+};
+
+export const computePrestigePoints = (totalPop: number) => {
+  if (prestigeData.formula.type === 'sqrt') {
+    return Math.floor(Math.sqrt(totalPop / prestigeData.formula.k));
+  }
+  return 0;
+};
+
+export const computePrestigeMult = (points: number) => {
+  if (prestigeData.formula.stacking === 'add') {
+    return prestigeData.formula.base + points * prestigeData.formula.multPerPoint;
+  }
+  return 1;
 };
 
 export const useGameStore = create<State>()(
@@ -48,7 +78,10 @@ export const useGameStore = create<State>()(
     (set, get) => ({
       ...initialState,
       addPopulation: (amount) =>
-        set((s) => ({ population: s.population + amount })),
+        set((s) => ({
+          population: s.population + amount,
+          totalPopulation: s.totalPopulation + amount,
+        })),
       purchaseBuilding: (id) => {
         const b = getBuilding(id);
         if (!b) return;
@@ -94,12 +127,16 @@ export const useGameStore = create<State>()(
           const count = s.buildings[b.id] || 0;
           cps += b.baseProd * count;
         }
-        cps *= s.multipliers.population_cps;
+        cps *= s.prestigeMult * s.multipliers.population_cps;
         set({ cps });
       },
       tick: (delta) => {
         const gain = get().cps * delta;
-        if (gain > 0) set((s) => ({ population: s.population + gain }));
+        if (gain > 0)
+          set((s) => ({
+            population: s.population + gain,
+            totalPopulation: s.totalPopulation + gain,
+          }));
       },
       canAdvanceTier: () => {
         const s = get();
@@ -110,15 +147,58 @@ export const useGameStore = create<State>()(
         if (get().canAdvanceTier())
           set((s) => ({ tierLevel: s.tierLevel + 1 }));
       },
+      canPrestige: () => get().totalPopulation >= prestigeData.minPopulation,
+      projectPrestigeGain: () => {
+        const s = get();
+        const pointsAfter = computePrestigePoints(s.totalPopulation);
+        const multAfter = computePrestigeMult(pointsAfter);
+        return {
+          pointsNow: s.prestigePoints,
+          multNow: s.prestigeMult,
+          pointsAfter,
+          multAfter,
+          deltaMult: multAfter - s.prestigeMult,
+        };
+      },
+      prestige: () => {
+        if (!get().canPrestige()) return false;
+        const s = get();
+        const pointsAfter = computePrestigePoints(s.totalPopulation);
+        const multAfter = computePrestigeMult(pointsAfter);
+        set({
+          ...initialState,
+          totalPopulation: s.totalPopulation,
+          prestigePoints: pointsAfter,
+          prestigeMult: multAfter,
+        });
+        get().recompute();
+        saveGame();
+        return true;
+      },
     }),
     {
       name: 'suomidle',
       version: 3,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
-        if (version >= 3) return persistedState as Partial<State>;
-
         const old = persistedState as Record<string, unknown> | undefined;
+        if (version >= 3) {
+          return {
+            ...(old as Partial<State>),
+            totalPopulation:
+              typeof old?.totalPopulation === 'number'
+                ? (old.totalPopulation as number)
+                : Math.max(
+                    typeof old?.population === 'number' ? (old.population as number) : 0,
+                    0,
+                  ),
+            prestigePoints:
+              typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
+            prestigeMult:
+              typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+          };
+        }
+
         const counts: Record<string, number> = {};
         const raw =
           (old?.techCounts as unknown) !== undefined
@@ -153,13 +233,19 @@ export const useGameStore = create<State>()(
         }
 
         return {
-          population: typeof old?.population === 'number' ? old.population : 0,
-          tierLevel: typeof old?.tierLevel === 'number' ? old.tierLevel : 1,
+          population: typeof old?.population === 'number' ? (old.population as number) : 0,
+          totalPopulation: Math.max(
+            typeof old?.population === 'number' ? (old.population as number) : 0,
+            0,
+          ),
+          tierLevel: typeof old?.tierLevel === 'number' ? (old.tierLevel as number) : 1,
           buildings: (old?.buildings as Record<string, number>) ?? {},
           techCounts: counts,
           multipliers,
           cps: 0,
           clickPower: 1,
+          prestigePoints: 0,
+          prestigeMult: 1,
         };
       },
       onRehydrateStorage: () => (state: State | undefined) => {
@@ -181,6 +267,9 @@ export const saveGame = () => {
   delete rest.tick;
   delete rest.canAdvanceTier;
   delete rest.advanceTier;
+  delete (rest as any).canPrestige;
+  delete (rest as any).projectPrestigeGain;
+  delete (rest as any).prestige;
   const data = { state: rest, version: 3 };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };

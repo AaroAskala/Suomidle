@@ -39,3 +39,19 @@ export interface TierDef {
   tier: number;
   population: number;
 }
+
+export interface PrestigeFormula {
+  type: 'sqrt';
+  k: number;
+  multPerPoint: number;
+  base: number;
+  stacking: 'add';
+}
+
+export interface PrestigeDef {
+  id: string;
+  name: string;
+  icon: string;
+  minPopulation: number;
+  formula: PrestigeFormula;
+}
