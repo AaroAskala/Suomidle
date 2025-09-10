@@ -3,11 +3,9 @@ import {
   persist,
   createJSONStorage,
   type PersistOptions,
-  type StorageValue,
 } from 'zustand/middleware';
 import {
   buildings,
-  tech,
   getBuilding,
   getTech,
   getTier,
@@ -22,7 +20,7 @@ interface State {
   population: number;
   tierLevel: number;
   buildings: Record<string, number>;
-  techOwned: Set<string>;
+  techCounts: Record<string, number>;
   multipliers: Multipliers;
   cps: number;
   clickPower: number;
@@ -35,23 +33,20 @@ interface State {
   advanceTier: () => void;
 }
 
-interface PersistOptionsWithSerialization
-  extends PersistOptions<State, Partial<State>> {
-  serialize: (state: StorageValue<Partial<State>>) => string;
-  deserialize: (str: string) => StorageValue<Partial<State>>;
-  migrate?: (persistedState: unknown, version: number) => Partial<State>;
-}
+const initialState = {
+  population: 0,
+  tierLevel: 1,
+  buildings: {} as Record<string, number>,
+  techCounts: {} as Record<string, number>,
+  multipliers: { population_cps: 1 },
+  cps: 0,
+  clickPower: 1,
+};
 
 export const useGameStore = create<State>()(
   persist(
     (set, get) => ({
-      population: 0,
-      tierLevel: 1,
-      buildings: {},
-      techOwned: new Set<string>(),
-      multipliers: { population_cps: 1 },
-      cps: 0,
-      clickPower: 1,
+      ...initialState,
       addPopulation: (amount) =>
         set((s) => ({ population: s.population + amount })),
       purchaseBuilding: (id) => {
@@ -70,12 +65,14 @@ export const useGameStore = create<State>()(
       },
       purchaseTech: (id) => {
         const t = getTech(id);
+        if (!t) return;
         const s = get();
-        if (!t || s.techOwned.has(id)) return;
+        const count = s.techCounts[id] || 0;
+        const limit = t.limit ?? 1;
+        if (count >= limit) return;
         if (t.unlock?.tier && s.tierLevel < t.unlock.tier) return;
         if (s.population < t.cost) return;
-        const owned = new Set(s.techOwned);
-        owned.add(id);
+        const nextCounts = { ...s.techCounts, [id]: count + 1 };
         const multipliers = { ...s.multipliers };
         for (const eff of t.effects) {
           if (eff.target === 'population_cps') {
@@ -83,7 +80,11 @@ export const useGameStore = create<State>()(
             else multipliers.population_cps += eff.value;
           }
         }
-        set({ population: s.population - t.cost, techOwned: owned, multipliers });
+        set({
+          population: s.population - t.cost,
+          techCounts: nextCounts,
+          multipliers,
+        });
         get().recompute();
       },
       recompute: () => {
@@ -112,87 +113,75 @@ export const useGameStore = create<State>()(
     }),
     {
       name: 'suomidle',
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => localStorage),
-      serialize: (state: StorageValue<Partial<State>>): string =>
-        JSON.stringify({
-          ...state,
-          state: {
-            ...state.state,
-            techOwned: Array.from(state.state.techOwned ?? []),
-          },
-        }),
-      deserialize: (str: string): StorageValue<Partial<State>> => {
-        const data = JSON.parse(str);
-        const raw = data.state?.techOwned;
-        const owned =
-          raw instanceof Set
-            ? raw
-            : Array.isArray(raw)
-              ? new Set<string>(raw)
-              : raw && typeof raw === 'object'
-                ? new Set<string>(Object.keys(raw))
-                : new Set<string>();
-        return {
-          ...data,
-          state: {
-            ...data.state,
-            techOwned: owned,
-          },
-        } as StorageValue<Partial<State>>;
-      },
       migrate: (persistedState: unknown, version: number): Partial<State> => {
-        if (version >= 2) return persistedState as Partial<State>;
-        const old = persistedState as {
-          population?: number;
-          generators?: Record<string, number>;
-          upgrades?: string[];
-        };
-        const mapped: Record<string, number> = {};
-        if (old.generators) {
-          for (const [id, count] of Object.entries(old.generators)) {
-            if (buildings.find((b) => b.id === id)) mapped[id] = count;
+        if (version >= 3) return persistedState as Partial<State>;
+
+        const old = persistedState as Record<string, unknown> | undefined;
+        const counts: Record<string, number> = {};
+        const raw =
+          (old?.techCounts as unknown) !== undefined
+            ? (old?.techCounts as unknown)
+            : old?.techOwned;
+
+        if (raw instanceof Set) {
+          for (const id of raw) counts[id] = 1;
+        } else if (Array.isArray(raw)) {
+          for (const id of raw) counts[id] = 1;
+        } else if (raw && typeof raw === 'object') {
+          for (const [id, value] of Object.entries(raw as Record<string, unknown>)) {
+            const n = typeof value === 'number' ? value : 1;
+            counts[id] = n;
           }
         }
-        const owned = new Set<string>();
-        if (old.upgrades) {
-          for (const id of old.upgrades) {
-            if (tech.find((t) => t.id === id)) owned.add(id);
+
+        if (Object.values(counts).some((n) => n > 1)) {
+          return { ...initialState };
+        }
+
+        const multipliers: Multipliers = { population_cps: 1 };
+        for (const [id, n] of Object.entries(counts)) {
+          const t = getTech(id);
+          if (!t) continue;
+          for (const eff of t.effects) {
+            if (eff.target === 'population_cps') {
+              if (eff.type === 'mult') multipliers.population_cps *= eff.value ** n;
+              else multipliers.population_cps += eff.value * n;
+            }
           }
         }
+
         return {
-          population: old.population ?? 0,
-          tierLevel: 1,
-          buildings: mapped,
-          techOwned: owned,
-          multipliers: { population_cps: 1 },
+          population: typeof old?.population === 'number' ? old.population : 0,
+          tierLevel: typeof old?.tierLevel === 'number' ? old.tierLevel : 1,
+          buildings: (old?.buildings as Record<string, number>) ?? {},
+          techCounts: counts,
+          multipliers,
           cps: 0,
           clickPower: 1,
         };
       },
       onRehydrateStorage: () => (state: State | undefined) => {
         if (state) {
-          if (!(state.techOwned instanceof Set)) {
-            const current = state.techOwned as unknown;
-            state.techOwned = Array.isArray(current)
-              ? new Set(current)
-              : current && typeof current === 'object'
-                ? new Set(Object.keys(current as Record<string, unknown>))
-                : new Set<string>();
-          }
           state.recompute();
         }
       },
-    } as PersistOptionsWithSerialization,
+    } as PersistOptions<State, Partial<State>>,
   ),
 );
 
 export const saveGame = () => {
   const state = useGameStore.getState();
-  const payload = {
-    ...state,
-    techOwned: Array.from(state.techOwned),
-  };
-  const data = { state: payload, version: 2 };
+  const rest = { ...state } as Record<string, unknown>;
+  delete rest.addPopulation;
+  delete rest.purchaseBuilding;
+  delete rest.purchaseTech;
+  delete rest.recompute;
+  delete rest.tick;
+  delete rest.canAdvanceTier;
+  delete rest.advanceTier;
+  const data = { state: rest, version: 3 };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };
+

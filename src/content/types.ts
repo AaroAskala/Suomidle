@@ -28,6 +28,7 @@ export interface TechDef {
   icon: string;
   cost: number;
   effects: TechEffect[];
+  limit?: number;
   unlock?: {
     tier: number;
   };

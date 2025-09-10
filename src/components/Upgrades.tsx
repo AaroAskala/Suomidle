@@ -3,7 +3,7 @@ import { tech as techList } from '../content';
 
 export function Upgrades() {
   const population = useGameStore((s) => s.population);
-  const owned = useGameStore((s) => s.techOwned);
+  const counts = useGameStore((s) => s.techCounts);
   const buy = useGameStore((s) => s.purchaseTech);
   const tier = useGameStore((s) => s.tierLevel);
   return (
@@ -17,7 +17,9 @@ export function Upgrades() {
               {t.name} ({t.cost})
             </span>
             <button
-              disabled={population < t.cost || owned.has(t.id)}
+              disabled={
+                population < t.cost || (counts[t.id] || 0) >= (t.limit ?? 1)
+              }
               onClick={() => buy(t.id)}
             >
               Buy
