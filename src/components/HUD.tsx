@@ -7,7 +7,12 @@ export function HUD() {
   return (
     <div>
       <div>Lämpötila: {Math.floor(population)}</div>
-      <button onClick={() => addPopulation(click)}>Click</button>
+      <button
+        className="btn btn--primary"
+        onClick={() => addPopulation(click)}
+      >
+        Click
+      </button>
     </div>
   );
 }

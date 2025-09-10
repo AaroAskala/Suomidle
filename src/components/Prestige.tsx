@@ -20,7 +20,11 @@ export function Prestige() {
           Next Uusi sauna: {next.name} ({next.population})
         </div>
       )}
-      <button disabled={!canAdvance} onClick={() => advance()}>
+      <button
+        className="btn btn--primary"
+        disabled={!canAdvance}
+        onClick={() => advance()}
+      >
         Advance Uusi sauna
       </button>
       <div>Lämpötila: {Math.floor(population)}</div>

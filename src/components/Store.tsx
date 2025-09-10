@@ -18,7 +18,11 @@ export function Store() {
             <span>
               {b.name} ({count}){' '}
             </span>
-            <button disabled={population < price} onClick={() => buy(b.id)}>
+            <button
+              className="btn btn--primary"
+              disabled={population < price}
+              onClick={() => buy(b.id)}
+            >
               Buy {Math.round(price)}
             </button>
           </div>

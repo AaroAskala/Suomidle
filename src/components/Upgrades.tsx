@@ -17,6 +17,7 @@ export function Upgrades() {
               {t.name} ({t.cost})
             </span>
             <button
+              className="btn btn--primary"
               disabled={
                 population < t.cost || (counts[t.id] || 0) >= (t.limit ?? 1)
               }
