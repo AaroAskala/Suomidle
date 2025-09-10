@@ -1,1 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#1E88E5"/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <!-- Background gradient: cool-to-warm dusk -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4efe6"/>
+      <stop offset="70%" stop-color="#efe5d3"/>
+      <stop offset="100%" stop-color="#eadac2"/>
+    </linearGradient>
+
+    <!-- Subtle vignette -->
+    <radialGradient id="vignette" cx="50%" cy="60%" r="65%">
+      <stop offset="70%" stop-color="rgba(0,0,0,0)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.08)"/>
+    </radialGradient>
+
+    <!-- Ground gradient -->
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c9b693"/>
+      <stop offset="100%" stop-color="#b39c76"/>
+    </linearGradient>
+
+    <!-- Fire gradients (low intensity) -->
+    <radialGradient id="emberGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffdf7a" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ff8a00" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="flameLow" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#e25822"/>
+      <stop offset="60%" stop-color="#ff8f3d"/>
+      <stop offset="100%" stop-color="#ffd36b"/>
+    </linearGradient>
+
+    <!-- Heat shimmer (very subtle for Tier 1) -->
+    <linearGradient id="heat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,200,120,0.18)"/>
+      <stop offset="100%" stop-color="rgba(255,200,120,0)"/>
+    </linearGradient>
+
+    <!-- Spark style -->
+    <linearGradient id="spark" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#e25822"/>
+      <stop offset="100%" stop-color="#ffd36b"/>
+    </linearGradient>
+
+    <!-- Soft shadow filter for logs -->
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#vignette)"/>
+
+  <!-- Ground plane -->
+  <rect x="0" y="640" width="1600" height="260" fill="url(#ground)"/>
+
+  <!-- Embers glow -->
+  <circle cx="800" cy="650" r="160" fill="url(#emberGlow)"/>
+
+  <!-- Low flames (small, friendly) -->
+  <g transform="translate(800,610)">
+    <!-- heat shimmer columns -->
+    <rect x="-8" y="-130" width="16" height="130" fill="url(#heat)" opacity="0.25"/>
+    <rect x="28" y="-110" width="12" height="110" fill="url(#heat)" opacity="0.2"/>
+    <rect x="-42" y="-115" width="12" height="115" fill="url(#heat)" opacity="0.2"/>
+
+    <!-- flame shapes -->
+    <path d="M0,0
+             c 14,-38 -4,-70 -18,-90
+             c 20,16 36,36 42,66
+             c 6,30 -4,46 -24,58
+             c -18,-6 -32,-18 -36,-34
+             c -4,-16 2,-30 12,-40
+             z"
+          fill="url(#flameLow)" stroke="#803510" stroke-width="6" stroke-linejoin="round"/>
+
+    <path d="M-30,10
+             c 8,-26 -6,-48 -18,-62
+             c 14,8 28,24 30,42
+             c 2,18 -4,28 -14,34
+             z"
+          fill="url(#flameLow)" opacity="0.75" stroke="#803510" stroke-width="5" stroke-linejoin="round"/>
+
+    <path d="M30,12
+             c 8,-24 0,-42 -10,-56
+             c 8,6 18,20 20,34
+             c 2,14 -2,24 -10,30
+             z"
+          fill="url(#flameLow)" opacity="0.7" stroke="#803510" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Campfire logs -->
+  <g transform="translate(800,690)" filter="url(#softShadow)">
+    <g transform="rotate(-12)">
+      <rect x="-140" y="-22" rx="10" ry="10" width="160" height="44" fill="#7c4f2a" stroke="#4d311b" stroke-width="6"/>
+      <circle cx="-120" cy="0" r="10" fill="#5b3a21"/>
+      <circle cx="0" cy="0" r="10" fill="#5b3a21"/>
+    </g>
+    <g transform="rotate(18)">
+      <rect x="-20" y="-22" rx="10" ry="10" width="160" height="44" fill="#8b5a2b" stroke="#4d311b" stroke-width="6"/>
+      <circle cx="0" cy="0" r="10" fill="#5b3a21"/>
+      <circle cx="140" cy="0" r="10" fill="#5b3a21"/>
+    </g>
+  </g>
+
+  <!-- Small sparks (few for Tier 1) -->
+  <g fill="url(#spark)">
+    <circle cx="770" cy="520" r="3"/>
+    <circle cx="835" cy="545" r="2.5"/>
+    <circle cx="790" cy="500" r="2"/>
+    <circle cx="820" cy="485" r="2.2"/>
+  </g>
+
+  <!-- Label (optional, unobtrusive) -->
+  <g font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" font-size="24" opacity="0.5">
+    <text x="24" y="48">Tier 1 · Nuotio</text>
+  </g>
+</svg>
