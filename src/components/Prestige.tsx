@@ -10,20 +10,20 @@ export function Prestige() {
   const next = getTier(tierLevel + 1);
   return (
     <div>
-      <h2>Tiers</h2>
+      <h2>Uusi sauna</h2>
       <div>
-        Tier Level: {tierLevel}
+        Uusi sauna Level: {tierLevel}
         {current ? ` (${current.name})` : ''}
       </div>
       {next && (
         <div>
-          Next Tier: {next.name} ({next.population})
+          Next Uusi sauna: {next.name} ({next.population})
         </div>
       )}
       <button disabled={!canAdvance} onClick={() => advance()}>
-        Advance Tier
+        Advance Uusi sauna
       </button>
-      <div>Population: {Math.floor(population)}</div>
+      <div>Lämpötila: {Math.floor(population)}</div>
     </div>
   );
 }

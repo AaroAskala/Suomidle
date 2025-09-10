@@ -22,7 +22,7 @@ export function BuildingsGrid() {
             key={b.id}
             icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
             title={`${b.name} (${count})`}
-            subtitle={`Next: ${Math.round(price)} | +${cpsDelta.toFixed(2)} CPS`}
+            subtitle={`Next: ${Math.round(price)} | +${cpsDelta.toFixed(2)} LPS`}
             disabled={disabled}
             onClick={() => buy(b.id)}
           />

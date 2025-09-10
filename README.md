@@ -15,19 +15,19 @@ npm run build # create production build
 
 - Expand generator balance and progression
 - Add upgrades and multipliers
-- Prestige/reset system
+- Polta sauna/reset system
 - Achievements and statistics
 
-## Prestige (Polta sauna)
+## Polta sauna
 
-Reset your population, buildings, technologies and tier level for a permanent population-per-second multiplier.  Prestige points follow a square-root curve based on lifetime population:
+Reset your lämpötila, buildings, technologies and sauna level for a permanent lämpötila-per-second multiplier.  Polta sauna points follow a square-root curve based on lifetime lämpötila:
 
 ```
 points = floor( sqrt(totalPopulation / 100000) )
 multiplier = 1 + points * 0.10
 ```
 
-The prestige button unlocks at 10 000 total population and displays your current multiplier and projected gain.
+The Polta sauna button unlocks at 10 000 total lämpötila and displays your current multiplier and projected gain.
 
 ## License
 
