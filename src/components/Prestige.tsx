@@ -27,7 +27,7 @@ export function Prestige() {
       >
         Uusi sauna!
       </button>
-      <div>Lämpötila: {Math.floor(population)}</div>
+      <div className="hud hud__population">Lämpötila: {Math.floor(population)}</div>
     </div>
   );
 }
