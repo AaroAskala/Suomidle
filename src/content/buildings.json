@@ -67,5 +67,14 @@
     "costMult": 1.18,
     "baseProd": 900,
     "unlock": { "tier": 6 }
+  },
+  {
+    "id": "bordelli",
+    "name": "Bordelli",
+    "icon": "Bordelli.png",
+    "baseCost": 400000,
+    "costMult": 1.2,
+    "baseProd": 5000,
+    "unlock": { "tier": 7 }
   }
 ]

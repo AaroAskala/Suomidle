@@ -27,17 +27,18 @@ export function PrestigeCard() {
 
   const subtitle = canPrestige
     ? `Gain +${(deltaMult * 100).toFixed(0)}% → ${multAfter.toFixed(2)}×`
-    : `Unlock at ${prestigeData.minPopulation} population`;
+    : `Unlock at ${prestigeData.minPopulation} lämpötila`;
 
   return (
     <ImageCardButton
       icon={prestigeData.icon}
-      title={`Prestige: ${prestigeMult.toFixed(2)}×`}
+      title={`${prestigeData.name}: ${prestigeMult.toFixed(2)}×`}
       subtitle={subtitle}
       disabled={!canPrestige}
       onClick={() => {
         if (!canPrestige) return;
-        if (confirm('Reset progress and gain prestige multiplier?')) prestige();
+        if (confirm(`Reset progress and gain ${prestigeData.name} multiplier?`))
+          prestige();
       }}
     />
   );

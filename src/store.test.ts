@@ -19,14 +19,14 @@ describe('model v3', () => {
     useGameStore.getState().recompute();
   });
 
-  it('CPS increases when buying buildings', () => {
+  it('LPS increases when buying buildings', () => {
     useGameStore.setState({ population: 1000 });
     const before = useGameStore.getState().cps;
     useGameStore.getState().purchaseBuilding('sauna');
     expect(useGameStore.getState().cps).toBeGreaterThan(before);
   });
 
-  it("Tech 'vihta' multiplies CPS", () => {
+  it("Tech 'vihta' multiplies LPS", () => {
     useGameStore.setState({ population: 1000 });
     useGameStore.getState().purchaseBuilding('sauna');
     const before = useGameStore.getState().cps;
