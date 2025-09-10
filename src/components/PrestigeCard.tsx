@@ -39,6 +39,7 @@ export function PrestigeCard() {
       }}
     >
       <ImageCardButton
+        className="prestige-btn"
         icon={prestigeData.icon}
         title={`${prestigeData.name}: ${prestigeMult.toFixed(2)}×`}
         subtitle={subtitle}

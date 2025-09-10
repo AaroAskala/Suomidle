@@ -128,3 +128,19 @@ h1 {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
   text-align: center;
 }
+
+@media (max-width: 480px) {
+  .prestige-btn {
+    margin: 2px !important;
+    padding: 4px !important;
+  }
+
+  .prestige-btn img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .prestige-btn .card__text {
+    display: none;
+  }
+}

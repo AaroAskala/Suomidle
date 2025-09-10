@@ -5,6 +5,8 @@ interface ImageCardButtonProps {
   subtitle?: string;
   disabled?: boolean;
   onClick: () => void;
+  className?: string;
+  compact?: boolean;
 }
 
 export function ImageCardButton({
@@ -13,12 +15,16 @@ export function ImageCardButton({
   subtitle,
   disabled,
   onClick,
+  className,
+  compact,
 }: ImageCardButtonProps) {
   return (
     <button
-      className="btn btn--primary"
+      className={`btn btn--primary ${className ?? ''}`.trim()}
       onClick={onClick}
       disabled={disabled}
+      data-compact={compact ? '' : undefined}
+      aria-label={compact ? title : undefined}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -31,11 +37,18 @@ export function ImageCardButton({
         cursor: disabled ? 'default' : 'pointer',
       }}
     >
-      <img src={icon} alt={title} width={96} height={96} />
-      <div className="card__text">
-        <div>{title}</div>
-        {subtitle && <div>{subtitle}</div>}
-      </div>
+      <img
+        src={icon}
+        alt={title}
+        width={compact ? 48 : 96}
+        height={compact ? 48 : 96}
+      />
+      {!compact && (
+        <div className="card__text">
+          <div>{title}</div>
+          {subtitle && <div>{subtitle}</div>}
+        </div>
+      )}
     </button>
   );
 }
