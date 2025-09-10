@@ -32,8 +32,10 @@ export function ImageCardButton({
       }}
     >
       <img src={icon} alt={title} width={96} height={96} />
-      <div>{title}</div>
-      {subtitle && <div>{subtitle}</div>}
+      <div className="card__text">
+        <div>{title}</div>
+        {subtitle && <div>{subtitle}</div>}
+      </div>
     </button>
   );
 }
