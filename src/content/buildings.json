@@ -31,5 +31,41 @@
     "costMult": 1.16,
     "baseProd": 20,
     "unlock": { "tier": 2 }
+  },
+  {
+    "id": "baari",
+    "name": "Baari",
+    "icon": "Baari.png",
+    "baseCost": 12000,
+    "costMult": 1.15,
+    "baseProd": 35,
+    "unlock": { "tier": 3 }
+  },
+  {
+    "id": "cittari",
+    "name": "Cittari",
+    "icon": "Cittari.png",
+    "baseCost": 45000,
+    "costMult": 1.16,
+    "baseProd": 100,
+    "unlock": { "tier": 4 }
+  },
+  {
+    "id": "sateri",
+    "name": "Säteri",
+    "icon": "Säteri.png",
+    "baseCost": 90000,
+    "costMult": 1.16,
+    "baseProd": 220,
+    "unlock": { "tier": 5 }
+  },
+  {
+    "id": "kasino",
+    "name": "Kasino",
+    "icon": "Kasino.png",
+    "baseCost": 400000,
+    "costMult": 1.18,
+    "baseProd": 900,
+    "unlock": { "tier": 6 }
   }
 ]

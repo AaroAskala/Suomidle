@@ -1,6 +1,9 @@
 [
-  { "tier": 1, "name": "Sauna", "population": 0 },
-  { "tier": 2, "name": "Savusauna", "population": 2000 },
-  { "tier": 3, "name": "Suur-sauna", "population": 40000 },
-  { "tier": 4, "name": "Nation", "population": 1000000 }
+  { "tier": 1, "name": "Nuotio", "population": 0 },
+  { "tier": 2, "name": "Telttasauna", "population": 2000 },
+  { "tier": 3, "name": "Sähkösauna", "population": 40000 },
+  { "tier": 4, "name": "Puusauna", "population": 1000000 },
+  { "tier": 5, "name": "Savusauna", "population": 10000000 },
+  { "tier": 6, "name": "Maasavusauna", "population": 100000000 },
+  { "tier": 7, "name": "Perkele", "population": 6666666666666 }
 ]
