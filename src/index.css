@@ -1,6 +1,7 @@
 :root {
   --brand-primary: #646cff;
   --color-text: rgba(255, 255, 255, 0.87);
+  --color-button-text: #ffffff;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -50,7 +51,7 @@ h1 {
 
 .btn--primary {
   background-color: var(--brand-primary);
-  color: var(--color-text);
+  color: var(--color-button-text);
 }
 
 .btn--primary:hover,
