@@ -30,16 +30,25 @@ export function PrestigeCard() {
     : `Unlock at ${prestigeData.minPopulation} lämpötila`;
 
   return (
-    <ImageCardButton
-      icon={prestigeData.icon}
-      title={`${prestigeData.name}: ${prestigeMult.toFixed(2)}×`}
-      subtitle={subtitle}
-      disabled={!canPrestige}
-      onClick={() => {
-        if (!canPrestige) return;
-        if (confirm(`Reset progress and gain ${prestigeData.name} multiplier?`))
-          prestige();
+    <div
+      style={{
+        position: 'fixed',
+        top: '1rem',
+        right: '1rem',
+        zIndex: 1000,
       }}
-    />
+    >
+      <ImageCardButton
+        icon={prestigeData.icon}
+        title={`${prestigeData.name}: ${prestigeMult.toFixed(2)}×`}
+        subtitle={subtitle}
+        disabled={!canPrestige}
+        onClick={() => {
+          if (!canPrestige) return;
+          if (confirm(`Reset progress and gain ${prestigeData.name} multiplier?`))
+            prestige();
+        }}
+      />
+    </div>
   );
 }
