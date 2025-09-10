@@ -6,7 +6,8 @@
     "cost": 500,
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.25 }
-    ]
+    ],
+    "limit": 1
   },
   {
     "id": "kalja",
@@ -16,6 +17,7 @@
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.5 }
     ],
+    "limit": 1,
     "unlock": { "tier": 2 }
   },
   {
@@ -26,6 +28,7 @@
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.6 }
     ],
+    "limit": 1,
     "unlock": { "tier": 3 }
   },
   {
@@ -36,6 +39,7 @@
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.30 }
     ],
+    "limit": 1,
     "unlock": { "tier": 4 }
   },
   {
@@ -46,6 +50,7 @@
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.40 }
     ],
+    "limit": 1,
     "unlock": { "tier": 5 }
   },
   {
@@ -56,6 +61,7 @@
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.50 }
     ],
+    "limit": 1,
     "unlock": { "tier": 6 }
   },
   {
@@ -66,6 +72,7 @@
     "effects": [
       { "type": "mult", "target": "population_cps", "value": 1.70 }
     ],
+    "limit": 1,
     "unlock": { "tier": 7 }
   }
 ]
