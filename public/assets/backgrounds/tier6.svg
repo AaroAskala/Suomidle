@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <!-- Cave/earth wall gradient -->
+    <linearGradient id="caveWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b2a1a"/>
+      <stop offset="100%" stop-color="#1a120a"/>
+    </linearGradient>
+
+    <!-- Vignette -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
+      <stop offset="70%" stop-color="rgba(0,0,0,0)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.6)"/>
+    </radialGradient>
+
+    <!-- Stone stove -->
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#666"/>
+      <stop offset="100%" stop-color="#222"/>
+    </linearGradient>
+
+    <!-- Glowing inner light -->
+    <radialGradient id="innerGlow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#ffb347" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ff4500" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Heavy smoke -->
+    <radialGradient id="smoke" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="rgba(180,180,180,0.45)"/>
+      <stop offset="100%" stop-color="rgba(180,180,180,0)"/>
+    </radialGradient>
+
+    <!-- Heat shimmer -->
+    <linearGradient id="heat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,200,120,0.5)"/>
+      <stop offset="100%" stop-color="rgba(255,200,120,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cave background -->
+  <rect width="1600" height="900" fill="url(#caveWall)"/>
+  <rect width="1600" height="900" fill="url(#vignette)"/>
+
+  <!-- Ground (darker earth) -->
+  <rect y="720" width="1600" height="180" fill="#0d0804"/>
+
+  <!-- Earthy stone stove (bigger, rougher) -->
+  <g transform="translate(800,640)">
+    <ellipse cx="0" cy="0" rx="260" ry="100" fill="#2b2b2b" stroke="#111" stroke-width="8"/>
+    <ellipse cx="0" cy="-50" rx="220" ry="80" fill="#333"/>
+    <ellipse cx="0" cy="-100" rx="180" ry="60" fill="#2a2a2a"/>
+
+    <!-- Glowing stones -->
+    <g>
+      <ellipse cx="-90" cy="-100" rx="46" ry="26" fill="url(#stone)"/>
+      <ellipse cx="0" cy="-110" rx="50" ry="28" fill="url(#stone)"/>
+      <ellipse cx="90" cy="-102" rx="42" ry="24" fill="url(#stone)"/>
+      <ellipse cx="-30" cy="-80" rx="40" ry="22" fill="url(#stone)"/>
+      <ellipse cx="50" cy="-85" rx="36" ry="20" fill="url(#stone)"/>
+    </g>
+
+    <!-- Inner fiery glow -->
+    <circle cx="0" cy="-100" r="160" fill="url(#innerGlow)"/>
+  </g>
+
+  <!-- Rising smoke layers -->
+  <g opacity="0.55">
+    <ellipse cx="800" cy="400" rx="500" ry="240" fill="url(#smoke)"/>
+    <ellipse cx="820" cy="250" rx="380" ry="180" fill="url(#smoke)" opacity="0.45"/>
+    <ellipse cx="780" cy="120" rx="300" ry="140" fill="url(#smoke)" opacity="0.35"/>
+  </g>
+
+  <!-- Heat shimmer -->
+  <g transform="translate(800,360)">
+    <rect x="-40" y="-160" width="20" height="160" fill="url(#heat)" opacity="0.45"/>
+    <rect x="30" y="-140" width="18" height="140" fill="url(#heat)" opacity="0.4"/>
+  </g>
+
+  <!-- Label -->
+  <g font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" font-size="24" opacity="0.75" fill="#fff">
+    <text x="24" y="48">Tier 6 · Maasavusauna</text>
+  </g>
+</svg>

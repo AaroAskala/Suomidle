@@ -9,6 +9,7 @@ import { useGameStore } from './app/store';
 import './App.css';
 
 function App() {
+  const tierLevel = useGameStore((s) => s.tierLevel);
   useEffect(() => {
     startGameLoop();
     return () => {
@@ -18,6 +19,16 @@ function App() {
   useEffect(() => {
     useGameStore.getState().recompute();
   }, []);
+  useEffect(() => {
+    const body = document.body;
+    body.style.backgroundImage = `url(/assets/backgrounds/tier${tierLevel}.svg)`;
+    body.style.backgroundSize = 'cover';
+    body.style.backgroundPosition = 'center';
+    body.style.backgroundRepeat = 'no-repeat';
+    return () => {
+      body.style.backgroundImage = '';
+    };
+  }, [tierLevel]);
   return (
     <>
       <HUD />
