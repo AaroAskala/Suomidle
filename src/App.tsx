@@ -11,6 +11,8 @@ import './App.css';
 function App() {
   useEffect(() => {
     startGameLoop();
+  }, []);
+  useEffect(() => {
     useGameStore.getState().recompute();
   }, []);
   return (

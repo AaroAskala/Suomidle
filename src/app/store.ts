@@ -248,7 +248,7 @@ export const useGameStore = create<State>()(
           prestigeMult: 1,
         };
       },
-      onRehydrateStorage: () => () => {},
+      onRehydrateStorage: () => undefined,
     } as PersistOptions<State, Partial<State>>,
   ),
 );
