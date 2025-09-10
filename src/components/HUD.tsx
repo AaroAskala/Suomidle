@@ -5,9 +5,11 @@ export function HUD() {
   const addPopulation = useGameStore((s) => s.addPopulation);
   const click = useGameStore((s) => s.clickPower);
   return (
-    <div>
-      <div>Lämpötila: {Math.floor(population)}</div>
-      <button onClick={() => addPopulation(click)}>Click</button>
+    <div className="hud">
+      <div className="text--h2">Lämpötila: {Math.floor(population)}</div>
+      <button className="text--body" onClick={() => addPopulation(click)}>
+        Click
+      </button>
     </div>
   );
 }
