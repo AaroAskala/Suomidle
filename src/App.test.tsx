@@ -16,6 +16,7 @@ function resetStore() {
     clickPower: 1,
     prestigePoints: 0,
     prestigeMult: 1,
+    eraMult: 1,
   });
 }
 
