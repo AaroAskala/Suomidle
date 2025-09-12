@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore } from './app/store';
 
-describe('model v3', () => {
+describe('model v4', () => {
   beforeEach(() => {
     useGameStore.persist.clearStorage();
     useGameStore.setState({
@@ -15,6 +15,7 @@ describe('model v3', () => {
       clickPower: 1,
       prestigePoints: 0,
       prestigeMult: 1,
+      eraMult: 1,
     });
     useGameStore.getState().recompute();
   });
@@ -44,8 +45,9 @@ describe('model v3', () => {
         multipliers: { population_cps: 1 },
         cps: 0,
         clickPower: 1,
+        eraMult: 1,
       },
-      version: 3,
+      version: 4,
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
@@ -115,9 +117,10 @@ describe('model v3', () => {
         clickPower: 1,
         prestigePoints: 0,
         prestigeMult: 1,
+        eraMult: 1,
         lastSave: fiveSecondsAgo,
       },
-      version: 3,
+      version: 4,
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();

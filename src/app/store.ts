@@ -13,6 +13,8 @@ import {
   prestige as prestigeData,
 } from '../content';
 
+let needsEraPrompt = false;
+
 interface Multipliers {
   population_cps: number;
 }
@@ -28,6 +30,7 @@ interface State {
   clickPower: number;
   prestigePoints: number;
   prestigeMult: number;
+  eraMult: number;
   lastSave: number;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
@@ -45,6 +48,7 @@ interface State {
     deltaMult: number;
   };
   prestige: () => boolean;
+  changeEra: () => void;
 }
 
 const initialState = {
@@ -58,6 +62,7 @@ const initialState = {
   clickPower: 1,
   prestigePoints: 0,
   prestigeMult: 1,
+  eraMult: 1,
   lastSave: Date.now(),
 };
 
@@ -129,7 +134,7 @@ export const useGameStore = create<State>()(
           const count = s.buildings[b.id] || 0;
           cps += b.baseProd * count;
         }
-        cps *= s.prestigeMult * s.multipliers.population_cps;
+        cps *= s.prestigeMult * s.multipliers.population_cps * s.eraMult;
         set({ cps });
       },
       tick: (delta) => {
@@ -169,6 +174,7 @@ export const useGameStore = create<State>()(
         const multAfter = computePrestigeMult(pointsAfter);
         set({
           ...initialState,
+          eraMult: s.eraMult,
           totalPopulation: s.totalPopulation,
           prestigePoints: pointsAfter,
           prestigeMult: multAfter,
@@ -177,13 +183,43 @@ export const useGameStore = create<State>()(
         saveGame();
         return true;
       },
+      changeEra: () => {
+        const s = get();
+        set({
+          ...initialState,
+          eraMult: s.eraMult + 10,
+        });
+        get().recompute();
+        saveGame();
+      },
     }),
     {
       name: 'suomidle',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
         const old = persistedState as Record<string, unknown> | undefined;
+        if (version >= 4) {
+          return {
+            ...(old as Partial<State>),
+            totalPopulation:
+              typeof old?.totalPopulation === 'number'
+                ? (old.totalPopulation as number)
+                : Math.max(
+                    typeof old?.population === 'number' ? (old.population as number) : 0,
+                    0,
+                  ),
+            prestigePoints:
+              typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
+            prestigeMult:
+              typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+            eraMult: typeof old?.eraMult === 'number' ? (old.eraMult as number) : 1,
+            lastSave:
+              typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
+          };
+        }
+
+        needsEraPrompt = true;
         if (version >= 3) {
           return {
             ...(old as Partial<State>),
@@ -198,6 +234,7 @@ export const useGameStore = create<State>()(
               typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
             prestigeMult:
               typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+            eraMult: 1,
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
           };
@@ -250,6 +287,7 @@ export const useGameStore = create<State>()(
           clickPower: 1,
           prestigePoints: 0,
           prestigeMult: 1,
+          eraMult: 1,
           lastSave: Date.now(),
         };
       },
@@ -261,6 +299,21 @@ export const useGameStore = create<State>()(
         const delta = (now - last) / 1000;
         state.tick(delta);
         state.lastSave = now;
+        if (needsEraPrompt) {
+          const next = state.eraMult + 10;
+          const isJsDom =
+            typeof navigator !== 'undefined' && navigator.userAgent.includes('jsdom');
+          if (!isJsDom) {
+            if (
+              confirm(
+                `Suomen sauna maailma on muuttunut täysin, haluatko polttaa koko maailman, ja aloittaa alusta?\nUudessa maailmassa saat ${next}× bonuksen lämpötilaan!\n\nOK: Haluan nähdä kun maailma palaa\nCancel: Haluan jatkaa nykyisillä`,
+              )
+            ) {
+              state.changeEra();
+            }
+          }
+          needsEraPrompt = false;
+        }
       },
     } as PersistOptions<State, Partial<State>>,
   ),
@@ -281,7 +334,8 @@ export const saveGame = () => {
   delete rest.canPrestige;
   delete rest.projectPrestigeGain;
   delete rest.prestige;
-  const data = { state: rest, version: 3 };
+  delete rest.changeEra;
+  const data = { state: rest, version: 4 };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };
 
