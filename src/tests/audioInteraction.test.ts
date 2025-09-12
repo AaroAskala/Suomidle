@@ -3,6 +3,7 @@ import { useSettingsStore } from '../app/settingsStore';
 
 describe('audio interaction gating', () => {
   beforeEach(() => {
+    useSettingsStore.persist.clearStorage();
     useSettingsStore.setState({
       hasInteracted: false,
       queue: [],
