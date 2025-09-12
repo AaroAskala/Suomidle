@@ -2,8 +2,10 @@
   { "tier": 1, "name": "Nuotio", "population": 0 },
   { "tier": 2, "name": "Telttasauna", "population": 2000 },
   { "tier": 3, "name": "Sähkösauna", "population": 40000 },
-  { "tier": 4, "name": "Puusauna", "population": 1000000 },
-  { "tier": 5, "name": "Savusauna", "population": 10000000 },
-  { "tier": 6, "name": "Maasavusauna", "population": 100000000 },
-  { "tier": 7, "name": "Perkele", "population": 6666666666666 }
+  { "tier": 4, "name": "Puusauna", "population": 8000000 },
+  { "tier": 5, "name": "Savusauna", "population": 200000000 },
+  { "tier": 6, "name": "Maasavusauna", "population": 5000000000 },
+  { "tier": 7, "name": "Helvetinliekki", "population": 6666666666666 },
+  { "tier": 8, "name": "Pirunkiuas", "population": 666666666666666 },
+  { "tier": 9, "name": "Perkele", "population": 66666666666666666 }
 ]

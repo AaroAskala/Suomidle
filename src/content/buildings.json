@@ -1,80 +1,42 @@
 [
-  {
-    "id": "sauna",
-    "name": "Sauna",
-    "icon": "Sauna.png",
-    "baseCost": 10,
-    "costMult": 1.15,
-    "baseProd": 0.1
-  },
-  {
-    "id": "kylakauppa",
-    "name": "Kyläkauppa",
-    "icon": "Kyläkauppa.png",
-    "baseCost": 100,
-    "costMult": 1.15,
-    "baseProd": 1
-  },
-  {
-    "id": "alko",
-    "name": "Alko",
-    "icon": "Alko.png",
-    "baseCost": 1000,
-    "costMult": 1.15,
-    "baseProd": 6
-  },
-  {
-    "id": "ensiapu",
-    "name": "Ensiapu",
-    "icon": "Ensiapu.png",
-    "baseCost": 5000,
-    "costMult": 1.16,
-    "baseProd": 20,
-    "unlock": { "tier": 2 }
-  },
-  {
-    "id": "baari",
-    "name": "Baari",
-    "icon": "Baari.png",
-    "baseCost": 12000,
-    "costMult": 1.15,
-    "baseProd": 35,
-    "unlock": { "tier": 3 }
-  },
-  {
-    "id": "cittari",
-    "name": "Cittari",
-    "icon": "Cittari.png",
-    "baseCost": 45000,
-    "costMult": 1.16,
-    "baseProd": 100,
-    "unlock": { "tier": 4 }
-  },
-  {
-    "id": "sateri",
-    "name": "Säteri",
-    "icon": "Säteri.png",
-    "baseCost": 90000,
-    "costMult": 1.16,
-    "baseProd": 220,
-    "unlock": { "tier": 5 }
-  },
-  {
-    "id": "kasino",
-    "name": "Kasino",
-    "icon": "Kasino.png",
-    "baseCost": 400000,
-    "costMult": 1.18,
-    "baseProd": 900,
-    "unlock": { "tier": 6 }
-  },
-  {
-    "id": "bordelli",
-    "name": "Bordelli",
-    "icon": "Bordelli.png",
-    "baseCost": 400000,
-    "costMult": 1.2,
-    "baseProd": 5000,
-    "unlock": { "tier": 7 }
-  }
+  { "id": "sauna", "name": "Sauna", "icon": "Sauna.png",
+    "baseCost": 10, "costMult": 1.15, "baseProd": 1 },
+
+  { "id": "kylakauppa", "name": "Kyläkauppa", "icon": "Kyläkauppa.png",
+    "baseCost": 100, "costMult": 1.15, "baseProd": 5 },
+
+  { "id": "alko", "name": "Alko", "icon": "Alko.png",
+    "baseCost": 1000, "costMult": 1.15, "baseProd": 25 },
+
+  { "id": "ensiapu", "name": "Ensiapu", "icon": "Ensiapu.png",
+    "baseCost": 10000, "costMult": 1.16, "baseProd": 100,
+    "unlock": { "tier": 2 } },
+
+  { "id": "baari", "name": "Baari", "icon": "Baari.png",
+    "baseCost": 100000, "costMult": 1.15, "baseProd": 500,
+    "unlock": { "tier": 3 } },
+
+  { "id": "cittari", "name": "Cittari", "icon": "Cittari.png",
+    "baseCost": 10000000, "costMult": 1.15, "baseProd": 20000,
+    "unlock": { "tier": 4 } },
+
+  { "id": "sateri", "name": "Säteri", "icon": "Säteri.png",
+    "baseCost": 1000000000, "costMult": 1.15, "baseProd": 400000,
+    "unlock": { "tier": 5 } },
+
+  { "id": "kasino", "name": "Kasino", "icon": "Kasino.png",
+    "baseCost": 100000000000, "costMult": 1.15, "baseProd": 10000000,
+    "unlock": { "tier": 6 } },
+
+  { "id": "kirkko", "name": "Kirkko", "icon": "Kirkko.png",
+    "baseCost": 1000000000000, "costMult": 1.15, "baseProd": 250000000,
+    "unlock": { "tier": 7 } },
+
+  { "id": "vankila", "name": "Vankila", "icon": "Vankila.png",
+    "baseCost": 10000000000000, "costMult": 1.15, "baseProd": 5000000000,
+    "unlock": { "tier": 8 } },
+
+  { "id": "bordelli", "name": "Bordelli", "icon": "Bordelli.png",
+    "baseCost": 100000000000000, "costMult": 1.15, "baseProd": 100000000000,
+    "unlock": { "tier": 9 } }
 ]
