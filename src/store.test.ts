@@ -125,4 +125,31 @@ describe('model v3', () => {
     expect(state.population).toBeCloseTo(110);
     expect(state.totalPopulation).toBeCloseTo(110);
   });
+
+  it('rehydrating twice in quick succession only grants offline gains once', async () => {
+    const fiveSecondsAgo = Date.now() - 5000;
+    const payload = {
+      state: {
+        population: 100,
+        totalPopulation: 100,
+        tierLevel: 1,
+        buildings: { kylakauppa: 2 },
+        techCounts: {},
+        multipliers: { population_cps: 1 },
+        cps: 0,
+        clickPower: 1,
+        prestigePoints: 0,
+        prestigeMult: 1,
+        lastSave: fiveSecondsAgo,
+      },
+      version: 3,
+    };
+    localStorage.setItem('suomidle', JSON.stringify(payload));
+    await useGameStore.persist.rehydrate();
+    const first = useGameStore.getState().population;
+    await useGameStore.persist.rehydrate();
+    const second = useGameStore.getState().population;
+    expect(first).toBeCloseTo(110, 0);
+    expect(second).toBeCloseTo(first, 0);
+  });
 });
