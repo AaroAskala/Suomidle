@@ -8,9 +8,9 @@
   { "tier": 7, "name": "Helvetinliekki", "population": 6666666666666 },
   { "tier": 8, "name": "Pirunkiuas", "population": 666666666666666 },
   { "tier": 9, "name": "Perkele", "population": 66666666666666666 },
-  { "tier": 10, "name": "Ydinreaktorikiuas", "population": 9999999999999999999999999 },
-  { "tier": 11, "name": "Fuusioreaktorikiuas", "population": 999999999999999999999999999999 },
-  { "tier": 12, "name": "Antimateriareaktorikiuas", "population": 999999999999999999999999999999999 },
+  { "tier": 10, "name": "Ydinreaktorikiuas", "population": 999999999999999999999999999 },
+  { "tier": 11, "name": "Fuusioreaktorikiuas", "population": 9999999999999999999999999999999999 },
+  { "tier": 12, "name": "Antimateriareaktorikiuas", "population": 999999999999999999999999999999999999999 },
   { "tier": 13, "name": "Aurinko", "population": 9999999999999999999999999999999999999999999999999999999 }
 
 ]
