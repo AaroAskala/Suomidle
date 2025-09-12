@@ -4,6 +4,7 @@ import { BuildingsGrid } from './components/BuildingsGrid';
 import { TechGrid } from './components/TechGrid';
 import { Prestige } from './components/Prestige';
 import { PrestigeCard } from './components/PrestigeCard';
+import { Settings } from './components/Settings';
 import { startGameLoop, stopGameLoop } from './app/gameLoop';
 import { useGameStore } from './app/store';
 import './App.css';
@@ -50,6 +51,7 @@ function App() {
           Tap to start
         </div>
       )}
+      <Settings />
       <HUD />
       <PrestigeCard />
       <BuildingsGrid />

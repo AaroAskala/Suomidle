@@ -3,7 +3,13 @@ import { useSettingsStore } from '../app/settingsStore';
 
 describe('audio interaction gating', () => {
   beforeEach(() => {
-    useSettingsStore.setState({ hasInteracted: false, queue: [] });
+    useSettingsStore.setState({
+      hasInteracted: false,
+      queue: [],
+      audios: [],
+      soundEnabled: true,
+      volume: 1,
+    });
   });
 
   it('does not play audio before interaction', () => {
