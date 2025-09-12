@@ -13,7 +13,7 @@ import {
   prestige as prestigeData,
 } from '../content';
 
-export const BigBeautifulBalancePath = 6;
+export const BigBeautifulBalancePath = 7;
 let needsEraPrompt = false;
 
 interface Multipliers {
