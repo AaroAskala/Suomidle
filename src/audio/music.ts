@@ -1,6 +1,7 @@
 // Import all tier music tracks from the public assets directory so Vite
 // bundles them and makes them available at runtime.
 const trackImports = import.meta.glob('/public/assets/music/tier*.mp3');
+import { useSettingsStore } from '../app/settingsStore';
 
 class MusicController {
   private currentTier: number | null = null;
@@ -36,8 +37,7 @@ class MusicController {
 
     this.audio = await this.loadTrack(tier);
     this.audio.currentTime = 0;
-    // Attempt to play; ignore errors (e.g. autoplay restrictions)
-    this.audio.play().catch(() => {});
+    useSettingsStore.getState().enqueueAudio(this.audio);
   }
 }
 
