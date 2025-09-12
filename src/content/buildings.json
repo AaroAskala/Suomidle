@@ -50,5 +50,10 @@
 
   { "id": "parlamenttitalo", "name": "Parlamenttitalo", "icon": "Parlamenttitalo.png",
     "baseCost": 999999999999999999999999999999, "costMult": 1.15, "baseProd": 10000000000000000000000,
-    "unlock": { "tier": 12 } }
+    "unlock": { "tier": 12 } },
+
+  { "id": "placeholder", "name": "TätäEiMissäänNimessäPitäisiNähdä!", "icon": "Sauna.png",
+    "baseCost": 1, "costMult": 1.15, "baseProd": 1,
+    "unlock": { "tier": 13 } }
 ]
+
