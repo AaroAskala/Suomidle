@@ -28,6 +28,7 @@ interface State {
   clickPower: number;
   prestigePoints: number;
   prestigeMult: number;
+  lastSave: number;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -57,6 +58,7 @@ const initialState = {
   clickPower: 1,
   prestigePoints: 0,
   prestigeMult: 1,
+  lastSave: Date.now(),
 };
 
 export const computePrestigePoints = (totalPop: number) => {
@@ -196,6 +198,8 @@ export const useGameStore = create<State>()(
               typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
             prestigeMult:
               typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+            lastSave:
+              typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
           };
         }
 
@@ -246,14 +250,25 @@ export const useGameStore = create<State>()(
           clickPower: 1,
           prestigePoints: 0,
           prestigeMult: 1,
+          lastSave: Date.now(),
         };
       },
-      onRehydrateStorage: () => undefined,
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const now = Date.now();
+        const last = state.lastSave ?? now;
+        state.recompute();
+        const delta = (now - last) / 1000;
+        state.tick(delta);
+        state.lastSave = now;
+      },
     } as PersistOptions<State, Partial<State>>,
   ),
 );
 
 export const saveGame = () => {
+  const now = Date.now();
+  useGameStore.setState({ lastSave: now });
   const state = useGameStore.getState();
   const rest = { ...state } as Record<string, unknown>;
   delete rest.addPopulation;
