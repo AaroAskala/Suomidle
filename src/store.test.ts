@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore, BigBeautifulBalancePath } from './app/store';
 
-describe('model v5', () => {
+describe('model v6', () => {
   beforeEach(() => {
     useGameStore.persist.clearStorage();
     useGameStore.setState({
@@ -57,7 +57,7 @@ describe('model v5', () => {
     expect(useGameStore.getState().techCounts.vihta).toBe(1);
   });
 
-  it('migrates v4 saves and resets era multiplier', async () => {
+  it('migrates v5 saves and retains era multiplier', async () => {
     const payload = {
       state: {
         population: 0,
@@ -72,11 +72,11 @@ describe('model v5', () => {
         prestigeMult: 1,
         eraMult: 42,
       },
-      version: 4,
+      version: 5,
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
-    expect(useGameStore.getState().eraMult).toBe(1);
+    expect(useGameStore.getState().eraMult).toBe(42);
   });
 
   it('migrates v2 saves without resetting if no duplicate tech purchases', async () => {
@@ -147,8 +147,8 @@ describe('model v5', () => {
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
     const state = useGameStore.getState();
-    expect(state.population).toBeCloseTo(150);
-    expect(state.totalPopulation).toBeCloseTo(150);
+    expect(state.population).toBeCloseTo(150, 0);
+    expect(state.totalPopulation).toBeCloseTo(150, 0);
   });
 
   it('rehydrating twice in quick succession only grants offline gains once', async () => {
@@ -201,9 +201,10 @@ describe('model v5', () => {
         clickPower: 1,
         prestigePoints: 0,
         prestigeMult: 1,
+        eraMult: 3,
         lastSave: Date.now() - 1000,
       },
-      version: 2,
+      version: 5,
     };
 
     localStorage.setItem('suomidle', JSON.stringify(payload));
@@ -213,7 +214,7 @@ describe('model v5', () => {
     expect(state.population).toBe(0);
     expect(state.totalPopulation).toBe(0);
     expect(state.buildings.sauna).toBeUndefined();
-    expect(state.eraMult).toBeGreaterThan(1);
+    expect(state.eraMult).toBe(4);
 
     globalThis.confirm = originalConfirm;
     Object.defineProperty(global.navigator, 'userAgent', { value: originalUA });

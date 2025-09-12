@@ -13,7 +13,7 @@ import {
   prestige as prestigeData,
 } from '../content';
 
-export const BigBeautifulBalancePath = 5;
+export const BigBeautifulBalancePath = 6;
 let needsEraPrompt = false;
 
 interface Multipliers {
@@ -235,7 +235,8 @@ export const useGameStore = create<State>()(
               typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
             prestigeMult:
               typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
-            eraMult: 1,
+            eraMult:
+              typeof old?.eraMult === 'number' ? (old.eraMult as number) : 1,
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
           };
