@@ -31,7 +31,7 @@ function App() {
     };
   }, [tierLevel]);
   useEffect(() => {
-    playTierMusic(tierLevel);
+    void playTierMusic(tierLevel);
   }, [tierLevel]);
   return (
     <>
