@@ -1,5 +1,6 @@
 const cache: Record<string, Promise<HTMLAudioElement>> = {};
 const sfxImports = import.meta.glob('/assets/sfx/*.mp3');
+import { useSettingsStore } from '../app/settingsStore';
 
 export const playSfx = async (name: string): Promise<HTMLAudioElement> => {
   let promise = cache[name];
@@ -16,7 +17,6 @@ export const playSfx = async (name: string): Promise<HTMLAudioElement> => {
   }
   const audio = await promise;
   audio.currentTime = 0;
-  // Attempt to play; ignore errors (e.g. autoplay restrictions)
-  audio.play().catch(() => {});
+  useSettingsStore.getState().enqueueAudio(audio);
   return audio;
 };

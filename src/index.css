@@ -154,3 +154,53 @@ h1 {
     margin-top: 0.25rem;
   }
 }
+
+/* Settings button and menu */
+.settings {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+}
+
+.burger-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-elevated);
+  border: none;
+  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.burger-button .line {
+  width: 70%;
+  height: 3px;
+  background: var(--color-text);
+}
+
+.settings-menu {
+  margin-top: 0.5rem;
+  background: var(--surface-elevated);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .burger-button {
+    width: 28px;
+    height: 28px;
+    gap: 3px;
+  }
+  .burger-button .line {
+    height: 2px;
+  }
+}
