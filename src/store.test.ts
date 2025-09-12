@@ -17,6 +17,7 @@ describe('model v6', () => {
       prestigeMult: 1,
       eraMult: 1,
       lastMajorVersion: BigBeautifulBalancePath,
+      eraPromptAcknowledged: true,
     });
     useGameStore.getState().recompute();
   });
@@ -212,13 +213,14 @@ describe('model v6', () => {
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
-
     expect(prompted).toBe(1);
     expect(useGameStore.getState().lastMajorVersion).toBe(BigBeautifulBalancePath);
+    expect(useGameStore.getState().eraPromptAcknowledged).toBe(true);
 
     globalThis.confirm = originalConfirm;
     Object.defineProperty(global.navigator, 'userAgent', { value: originalUA });
   });
+
 
   it('resets progress when confirming major version reset prompt', async () => {
     // Simulate a browser environment where the era-change prompt is shown
