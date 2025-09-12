@@ -1,4 +1,6 @@
-const trackImports = import.meta.glob('/assets/music/tier*.mp3');
+// Import all tier music tracks from the public assets directory so Vite
+// bundles them and makes them available at runtime.
+const trackImports = import.meta.glob('/public/assets/music/tier*.mp3');
 
 class MusicController {
   private currentTier: number | null = null;
@@ -8,7 +10,8 @@ class MusicController {
   private loadTrack(tier: number): Promise<HTMLAudioElement> {
     let track = this.cache.get(tier);
     if (!track) {
-      const importer = trackImports[`/assets/music/tier${tier}.mp3`];
+      // Use the same key format as the glob above when selecting the importer
+      const importer = trackImports[`/public/assets/music/tier${tier}.mp3`];
       if (!importer) {
         return Promise.reject(new Error(`Unknown track for tier ${tier}`));
       }
