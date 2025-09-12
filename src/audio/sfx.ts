@@ -1,13 +1,16 @@
 const cache: Record<string, Promise<HTMLAudioElement>> = {};
+const sfxImports = import.meta.glob('/assets/sfx/*.mp3');
 
-export const playSfx = async (name: string) => {
+export const playSfx = async (name: string): Promise<HTMLAudioElement> => {
   let promise = cache[name];
   if (!promise) {
-    promise = import(
-      /* @vite-ignore */ `${import.meta.env.BASE_URL}assets/sfx/${name}.mp3`
-    ).then((mod) => {
-      const { default: src } = mod as { default: string };
-      return new Audio(src);
+    const importer = sfxImports[`/assets/sfx/${name}.mp3`];
+    if (!importer) {
+      return Promise.reject(new Error(`Unknown sfx: ${name}`));
+    }
+    promise = importer().then((mod) => {
+      const { default: url } = mod as { default: string };
+      return new Audio(url);
     });
     cache[name] = promise;
   }
@@ -15,4 +18,5 @@ export const playSfx = async (name: string) => {
   audio.currentTime = 0;
   // Attempt to play; ignore errors (e.g. autoplay restrictions)
   audio.play().catch(() => {});
+  return audio;
 };

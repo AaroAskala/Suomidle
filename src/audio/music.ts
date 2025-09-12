@@ -1,3 +1,5 @@
+const trackImports = import.meta.glob('/assets/music/tier*.mp3');
+
 class MusicController {
   private currentTier: number | null = null;
   private audio: HTMLAudioElement | null = null;
@@ -6,11 +8,13 @@ class MusicController {
   private loadTrack(tier: number): Promise<HTMLAudioElement> {
     let track = this.cache.get(tier);
     if (!track) {
-      track = import(
-        /* @vite-ignore */ `${import.meta.env.BASE_URL}assets/music/tier${tier}.mp3`
-      ).then((mod) => {
-        const { default: src } = mod as { default: string };
-        const audio = new Audio(src);
+      const importer = trackImports[`/assets/music/tier${tier}.mp3`];
+      if (!importer) {
+        return Promise.reject(new Error(`Unknown track for tier ${tier}`));
+      }
+      track = importer().then((mod) => {
+        const { default: url } = mod as { default: string };
+        const audio = new Audio(url);
         audio.loop = true;
         return audio;
       });
