@@ -4,13 +4,16 @@ import { BuildingsGrid } from './components/BuildingsGrid';
 import { TechGrid } from './components/TechGrid';
 import { Prestige } from './components/Prestige';
 import { PrestigeCard } from './components/PrestigeCard';
+import { Settings } from './components/Settings';
 import { startGameLoop, stopGameLoop } from './app/gameLoop';
 import { useGameStore } from './app/store';
 import './App.css';
-import { playTierMusic } from './audio/music';
+import { playTierMusic, setMusicVolume, stopMusic } from './audio/music';
 
 function App() {
   const tierLevel = useGameStore((s) => s.tierLevel);
+  const volume = useGameStore((s) => s.volume);
+  const soundEnabled = useGameStore((s) => s.soundEnabled);
   useEffect(() => {
     startGameLoop();
     return () => {
@@ -31,10 +34,16 @@ function App() {
     };
   }, [tierLevel]);
   useEffect(() => {
-    void playTierMusic(tierLevel);
-  }, [tierLevel]);
+    if (soundEnabled && volume > 0) {
+      void playTierMusic(tierLevel);
+      setMusicVolume(volume);
+    } else {
+      stopMusic();
+    }
+  }, [tierLevel, soundEnabled, volume]);
   return (
     <>
+      <Settings />
       <HUD />
       <PrestigeCard />
       <BuildingsGrid />

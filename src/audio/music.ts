@@ -1,6 +1,7 @@
 // Import all tier music tracks from the public assets directory so Vite
 // bundles them and makes them available at runtime.
 const trackImports = import.meta.glob('/public/assets/music/tier*.mp3');
+import { useGameStore } from '../app/store';
 
 class MusicController {
   private currentTier: number | null = null;
@@ -27,7 +28,15 @@ class MusicController {
   }
 
   async playForTier(tier: number) {
-    if (this.currentTier === tier) return;
+    const { soundEnabled, volume } = useGameStore.getState();
+    if (!soundEnabled || volume === 0) {
+      this.stop();
+      return;
+    }
+    if (this.currentTier === tier) {
+      this.setVolume(volume);
+      return;
+    }
     this.currentTier = tier;
 
     if (this.audio) {
@@ -36,11 +45,26 @@ class MusicController {
 
     this.audio = await this.loadTrack(tier);
     this.audio.currentTime = 0;
+    this.audio.volume = volume;
     // Attempt to play; ignore errors (e.g. autoplay restrictions)
     this.audio.play().catch(() => {});
+  }
+
+  setVolume(volume: number) {
+    if (this.audio) {
+      this.audio.volume = volume;
+    }
+  }
+
+  stop() {
+    if (this.audio) {
+      this.audio.pause();
+    }
   }
 }
 
 const controller = new MusicController();
 
 export const playTierMusic = (tier: number) => controller.playForTier(tier);
+export const setMusicVolume = (volume: number) => controller.setVolume(volume);
+export const stopMusic = () => controller.stop();

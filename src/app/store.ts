@@ -29,6 +29,10 @@ interface State {
   prestigePoints: number;
   prestigeMult: number;
   lastSave: number;
+  soundEnabled: boolean;
+  volume: number;
+  setSoundEnabled: (enabled: boolean) => void;
+  setVolume: (volume: number) => void;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -59,6 +63,8 @@ const initialState = {
   prestigePoints: 0,
   prestigeMult: 1,
   lastSave: Date.now(),
+  soundEnabled: true,
+  volume: 1,
 };
 
 export const computePrestigePoints = (totalPop: number) => {
@@ -79,6 +85,8 @@ export const useGameStore = create<State>()(
   persist(
     (set, get) => ({
       ...initialState,
+      setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
+      setVolume: (volume) => set({ volume }),
       addPopulation: (amount) =>
         set((s) => ({
           population: s.population + amount,
@@ -180,10 +188,21 @@ export const useGameStore = create<State>()(
     }),
     {
       name: 'suomidle',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
         const old = persistedState as Record<string, unknown> | undefined;
+        if (version >= 4) {
+          return {
+            ...(old as Partial<State>),
+            soundEnabled:
+              typeof old?.soundEnabled === 'boolean'
+                ? (old.soundEnabled as boolean)
+                : true,
+            volume: typeof old?.volume === 'number' ? (old.volume as number) : 1,
+          };
+        }
+
         if (version >= 3) {
           return {
             ...(old as Partial<State>),
@@ -200,6 +219,8 @@ export const useGameStore = create<State>()(
               typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
+            soundEnabled: true,
+            volume: 1,
           };
         }
 
@@ -251,6 +272,8 @@ export const useGameStore = create<State>()(
           prestigePoints: 0,
           prestigeMult: 1,
           lastSave: Date.now(),
+          soundEnabled: true,
+          volume: 1,
         };
       },
       onRehydrateStorage: () => (state) => {
@@ -281,7 +304,9 @@ export const saveGame = () => {
   delete rest.canPrestige;
   delete rest.projectPrestigeGain;
   delete rest.prestige;
-  const data = { state: rest, version: 3 };
+  delete rest.setSoundEnabled;
+  delete rest.setVolume;
+  const data = { state: rest, version: 4 };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };
 
