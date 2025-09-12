@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useGameStore } from './app/store';
+import { useGameStore, BigBeautifulBalancePath } from './app/store';
 
-describe('model v4', () => {
+describe('model v5', () => {
   beforeEach(() => {
     useGameStore.persist.clearStorage();
     useGameStore.setState({
@@ -47,7 +47,7 @@ describe('model v4', () => {
         clickPower: 1,
         eraMult: 1,
       },
-      version: 4,
+      version: BigBeautifulBalancePath,
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
@@ -55,6 +55,28 @@ describe('model v4', () => {
     expect(counts.vihta).toBe(1);
     useGameStore.getState().purchaseTech('vihta');
     expect(useGameStore.getState().techCounts.vihta).toBe(1);
+  });
+
+  it('migrates v4 saves and resets era multiplier', async () => {
+    const payload = {
+      state: {
+        population: 0,
+        totalPopulation: 0,
+        tierLevel: 1,
+        buildings: {},
+        techCounts: {},
+        multipliers: { population_cps: 1 },
+        cps: 0,
+        clickPower: 1,
+        prestigePoints: 0,
+        prestigeMult: 1,
+        eraMult: 42,
+      },
+      version: 4,
+    };
+    localStorage.setItem('suomidle', JSON.stringify(payload));
+    await useGameStore.persist.rehydrate();
+    expect(useGameStore.getState().eraMult).toBe(1);
   });
 
   it('migrates v2 saves without resetting if no duplicate tech purchases', async () => {
@@ -78,7 +100,7 @@ describe('model v4', () => {
     expect(state.buildings.sauna).toBe(1);
     expect(state.techCounts.vihta).toBe(1);
     expect(state.multipliers.population_cps).toBeCloseTo(1.25);
-    expect(state.cps).toBeCloseTo(0.125);
+    expect(state.cps).toBeCloseTo(1.25);
   });
 
   it('resets save if migrated techCounts contain duplicates', async () => {
@@ -120,12 +142,12 @@ describe('model v4', () => {
         eraMult: 1,
         lastSave: fiveSecondsAgo,
       },
-      version: 4,
+      version: BigBeautifulBalancePath,
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
     const state = useGameStore.getState();
-    expect(state.population).toBeCloseTo(110);
-    expect(state.totalPopulation).toBeCloseTo(110);
+    expect(state.population).toBeCloseTo(150);
+    expect(state.totalPopulation).toBeCloseTo(150);
   });
 });

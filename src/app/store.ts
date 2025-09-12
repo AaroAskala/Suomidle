@@ -13,6 +13,7 @@ import {
   prestige as prestigeData,
 } from '../content';
 
+export const BigBeautifulBalancePath = 5;
 let needsEraPrompt = false;
 
 interface Multipliers {
@@ -195,11 +196,11 @@ export const useGameStore = create<State>()(
     }),
     {
       name: 'suomidle',
-      version: 4,
+      version: BigBeautifulBalancePath,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
         const old = persistedState as Record<string, unknown> | undefined;
-        if (version >= 4) {
+        if (version >= BigBeautifulBalancePath) {
           return {
             ...(old as Partial<State>),
             totalPopulation:
@@ -335,7 +336,7 @@ export const saveGame = () => {
   delete rest.projectPrestigeGain;
   delete rest.prestige;
   delete rest.changeEra;
-  const data = { state: rest, version: 4 };
+  const data = { state: rest, version: BigBeautifulBalancePath };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };
 
