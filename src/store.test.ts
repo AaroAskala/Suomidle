@@ -165,16 +165,17 @@ describe('model v5', () => {
         clickPower: 1,
         prestigePoints: 0,
         prestigeMult: 1,
+        eraMult: 1,
         lastSave: fiveSecondsAgo,
       },
-      version: 3,
+      version: BigBeautifulBalancePath,
     };
     localStorage.setItem('suomidle', JSON.stringify(payload));
     await useGameStore.persist.rehydrate();
     const first = useGameStore.getState().population;
     await useGameStore.persist.rehydrate();
     const second = useGameStore.getState().population;
-    expect(first).toBeCloseTo(110, 0);
-    expect(second).toBeCloseTo(first, 0);
+    expect(first).toBeCloseTo(150);
+    expect(second).toBeCloseTo(first);
   });
 });

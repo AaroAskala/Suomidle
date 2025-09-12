@@ -299,7 +299,7 @@ export const useGameStore = create<State>()(
         state.recompute();
         const delta = (now - last) / 1000;
         state.tick(delta);
-        state.lastSave = now;
+        useGameStore.setState({ lastSave: now });
         if (needsEraPrompt) {
           const next = state.eraMult + 10;
           const isJsDom =
