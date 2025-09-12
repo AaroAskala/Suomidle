@@ -15,6 +15,7 @@ describe('polta sauna', () => {
       clickPower: 1,
       prestigePoints: 0,
       prestigeMult: 1,
+      eraMult: 1,
     });
     useGameStore.getState().recompute();
   });
@@ -51,5 +52,22 @@ describe('polta sauna', () => {
     expect(s.totalPopulation).toBe(100000);
     expect(s.prestigePoints).toBe(1);
     expect(s.prestigeMult).toBeCloseTo(1.1);
+  });
+
+  it('era reset wipes progress and increases era multiplier', () => {
+    useGameStore.setState({
+      population: 500,
+      totalPopulation: 12345,
+      prestigePoints: 3,
+      prestigeMult: 1.3,
+      eraMult: 1,
+    });
+    useGameStore.getState().changeEra();
+    const s = useGameStore.getState();
+    expect(s.population).toBe(0);
+    expect(s.totalPopulation).toBe(0);
+    expect(s.prestigePoints).toBe(0);
+    expect(s.prestigeMult).toBe(1);
+    expect(s.eraMult).toBe(11);
   });
 });
