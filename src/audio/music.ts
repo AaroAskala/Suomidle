@@ -1,6 +1,8 @@
+import { useGameStore } from '../app/store';
+
 class MusicController {
   private currentTier: number | null = null;
-  private audio: HTMLAudioElement | null = null;
+  public audio: HTMLAudioElement | null = null;
   private cache = new Map<number, Promise<HTMLAudioElement>>();
 
   private loadTrack(tier: number): Promise<HTMLAudioElement> {
@@ -20,20 +22,25 @@ class MusicController {
   }
 
   async playForTier(tier: number) {
-    if (this.currentTier === tier) return;
-    this.currentTier = tier;
-
-    if (this.audio) {
-      this.audio.pause();
+    if (this.currentTier !== tier) {
+      this.currentTier = tier;
+      if (this.audio) this.audio.pause();
+      this.audio = await this.loadTrack(tier);
+      this.audio.currentTime = 0;
     }
+    this.applySettings();
+  }
 
-    this.audio = await this.loadTrack(tier);
-    this.audio.currentTime = 0;
-    // Attempt to play; ignore errors (e.g. autoplay restrictions)
-    this.audio.play().catch(() => {});
+  applySettings() {
+    if (!this.audio) return;
+    const { soundEnabled, volume } = useGameStore.getState();
+    this.audio.volume = volume;
+    if (!soundEnabled || volume === 0) this.audio.pause();
+    else this.audio.play().catch(() => {});
   }
 }
 
 const controller = new MusicController();
 
 export const playTierMusic = (tier: number) => controller.playForTier(tier);
+export const updateMusicSettings = () => controller.applySettings();

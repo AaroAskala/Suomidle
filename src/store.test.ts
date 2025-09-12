@@ -15,6 +15,8 @@ describe('model v3', () => {
       clickPower: 1,
       prestigePoints: 0,
       prestigeMult: 1,
+      soundEnabled: true,
+      volume: 1,
     });
     useGameStore.getState().recompute();
   });

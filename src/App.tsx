@@ -8,6 +8,7 @@ import { startGameLoop, stopGameLoop } from './app/gameLoop';
 import { useGameStore } from './app/store';
 import './App.css';
 import { playTierMusic } from './audio/music';
+import { Settings } from './components/Settings';
 
 function App() {
   const tierLevel = useGameStore((s) => s.tierLevel);
@@ -35,6 +36,7 @@ function App() {
   }, [tierLevel]);
   return (
     <>
+      <Settings />
       <HUD />
       <PrestigeCard />
       <BuildingsGrid />

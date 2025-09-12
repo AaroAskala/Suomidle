@@ -28,6 +28,8 @@ interface State {
   clickPower: number;
   prestigePoints: number;
   prestigeMult: number;
+  soundEnabled: boolean;
+  volume: number;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -44,6 +46,8 @@ interface State {
     deltaMult: number;
   };
   prestige: () => boolean;
+  setSoundEnabled: (enabled: boolean) => void;
+  setVolume: (volume: number) => void;
 }
 
 const initialState = {
@@ -57,6 +61,8 @@ const initialState = {
   clickPower: 1,
   prestigePoints: 0,
   prestigeMult: 1,
+  soundEnabled: true,
+  volume: 1,
 };
 
 export const computePrestigePoints = (totalPop: number) => {
@@ -175,6 +181,8 @@ export const useGameStore = create<State>()(
         saveGame();
         return true;
       },
+      setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
+      setVolume: (volume) => set({ volume }),
     }),
     {
       name: 'suomidle',
@@ -196,6 +204,9 @@ export const useGameStore = create<State>()(
               typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
             prestigeMult:
               typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+            soundEnabled:
+              typeof old?.soundEnabled === 'boolean' ? (old.soundEnabled as boolean) : true,
+            volume: typeof old?.volume === 'number' ? (old.volume as number) : 1,
           };
         }
 
@@ -246,6 +257,9 @@ export const useGameStore = create<State>()(
           clickPower: 1,
           prestigePoints: 0,
           prestigeMult: 1,
+          soundEnabled:
+            typeof old?.soundEnabled === 'boolean' ? (old.soundEnabled as boolean) : true,
+          volume: typeof old?.volume === 'number' ? (old.volume as number) : 1,
         };
       },
       onRehydrateStorage: () => undefined,
@@ -266,6 +280,8 @@ export const saveGame = () => {
   delete rest.canPrestige;
   delete rest.projectPrestigeGain;
   delete rest.prestige;
+  delete rest.setSoundEnabled;
+  delete rest.setVolume;
   const data = { state: rest, version: 3 };
   localStorage.setItem('suomidle', JSON.stringify(data));
 };
