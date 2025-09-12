@@ -1,5 +1,6 @@
 import { useGameStore } from '../app/store';
 import { buildings, getBuildingCost } from '../content';
+import { formatNumber } from '../utils/format';
 import { ImageCardButton } from './ImageCardButton';
 
 export function BuildingsGrid() {
@@ -21,8 +22,8 @@ export function BuildingsGrid() {
           <ImageCardButton
             key={b.id}
             icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
-            title={`${b.name} (${count})`}
-            subtitle={`Next: ${Math.round(price)} | +${cpsDelta.toFixed(2)} LPS`}
+            title={`${b.name} (${formatNumber(count)})`}
+            subtitle={`Next: ${formatNumber(price)} | +${formatNumber(cpsDelta)} LPS`}
             disabled={disabled}
             onClick={() => buy(b.id)}
           />

@@ -1,5 +1,6 @@
 import { useGameStore } from '../app/store';
 import { tech as techList } from '../content';
+import { formatNumber } from '../utils/format';
 
 export function Upgrades() {
   const population = useGameStore((s) => s.population);
@@ -14,7 +15,7 @@ export function Upgrades() {
         return (
           <div key={t.id}>
             <span>
-              {t.name} ({t.cost})
+              {t.name} ({formatNumber(t.cost)})
             </span>
             <button
               className="btn btn--primary"

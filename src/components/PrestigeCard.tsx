@@ -6,6 +6,7 @@ import {
   useGameStore,
 } from '../app/store';
 import { prestige as prestigeData } from '../content';
+import { formatNumber } from '../utils/format';
 
 export function PrestigeCard() {
   const prestigePoints = useGameStore((s) => s.prestigePoints);
@@ -26,8 +27,8 @@ export function PrestigeCard() {
   }, [prestigePoints, prestigeMult, totalPopulation]);
 
   const subtitle = canPrestige
-    ? `Gain +${(deltaMult * 100).toFixed(0)}% → ${multAfter.toFixed(2)}×`
-    : `Unlock at ${prestigeData.minPopulation} lämpötila`;
+    ? `Gain +${formatNumber(deltaMult * 100)}% → ${formatNumber(multAfter)}×`
+    : `Unlock at ${formatNumber(prestigeData.minPopulation)} lämpötila`;
 
   return (
     <div
@@ -41,7 +42,7 @@ export function PrestigeCard() {
       <ImageCardButton
         className="prestige-btn"
         icon={prestigeData.icon}
-        title={`${prestigeData.name}: ${prestigeMult.toFixed(2)}×`}
+        title={`${prestigeData.name}: ${formatNumber(prestigeMult)}×`}
         subtitle={subtitle}
         disabled={!canPrestige}
         onClick={() => {
