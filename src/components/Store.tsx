@@ -1,5 +1,6 @@
 import { useGameStore } from '../app/store';
 import { buildings, getBuildingCost } from '../content';
+import { formatNumber } from '../utils/format';
 
 export function Store() {
   const buy = useGameStore((s) => s.purchaseBuilding);
@@ -16,14 +17,14 @@ export function Store() {
         return (
           <div key={b.id}>
             <span>
-              {b.name} ({count}){' '}
+              {b.name} ({formatNumber(count)}){' '}
             </span>
             <button
               className="btn btn--primary"
               disabled={population < price}
               onClick={() => buy(b.id)}
             >
-              Buy {Math.round(price)}
+              Buy {formatNumber(price)}
             </button>
           </div>
         );

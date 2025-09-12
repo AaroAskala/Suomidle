@@ -1,5 +1,6 @@
 import { useGameStore } from '../app/store';
 import { getTier } from '../content';
+import { formatNumber } from '../utils/format';
 
 export function Prestige() {
   const tierLevel = useGameStore((s) => s.tierLevel);
@@ -11,12 +12,12 @@ export function Prestige() {
     <div className="hud hud__card">
       <h2 className="text--h2">Uusi sauna</h2>
       <div className="text--body">
-        Sauna Taso: {tierLevel}
+        Sauna Taso: {formatNumber(tierLevel)}
         {current ? ` (${current.name})` : ''}
       </div>
       {next && (
         <div className="text--body">
-          Next Sauna: {next.name} ({next.population})
+          Next Sauna: {next.name} ({formatNumber(next.population)})
         </div>
       )}
       <button

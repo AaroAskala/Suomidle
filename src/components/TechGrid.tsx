@@ -1,5 +1,6 @@
 import { useGameStore } from '../app/store';
 import { tech } from '../content';
+import { formatNumber } from '../utils/format';
 import { ImageCardButton } from './ImageCardButton';
 
 export function TechGrid() {
@@ -18,7 +19,7 @@ export function TechGrid() {
         const disabled = isOwned || locked || population < t.cost;
         const subtitle = `${isOwned ? 'Owned' : locked ? 'Locked' : ''}${
           isOwned || locked ? ' - ' : ''
-        }Cost: ${Math.round(t.cost)}`;
+        }Cost: ${formatNumber(t.cost)}`;
         return (
           <ImageCardButton
             key={t.id}

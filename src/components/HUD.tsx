@@ -1,5 +1,5 @@
 import { useGameStore } from '../app/store';
-import { formatNumber } from '../utils';
+import { formatNumber } from '../utils/format';
 
 export function HUD() {
   const population = useGameStore((s) => s.population);
@@ -9,7 +9,7 @@ export function HUD() {
   return (
     <div>
       <div className="hud hud__population">
-        Lämpötila: {Math.floor(population)} | LPS: {formatNumber(cps)}
+        Lämpötila: {formatNumber(population)} | LPS: {formatNumber(cps)}
       </div>
       <button
         className="btn btn--primary"
