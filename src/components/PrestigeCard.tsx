@@ -26,6 +26,8 @@ export function PrestigeCard() {
     };
   }, [prestigePoints, prestigeMult, totalPopulation]);
 
+  const prestigePercent = (prestigeMult - 1) * 100;
+
   const subtitle = canPrestige
     ? `Gain +${formatNumber(deltaMult * 100)}% → ${formatNumber(multAfter)}×`
     : `Unlock at ${formatNumber(prestigeData.minPopulation)} lämpötila`;
@@ -37,6 +39,9 @@ export function PrestigeCard() {
         top: '1rem',
         right: '1rem',
         zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}
     >
       <ImageCardButton
@@ -47,10 +52,19 @@ export function PrestigeCard() {
         disabled={!canPrestige}
         onClick={() => {
           if (!canPrestige) return;
-          if (confirm(`Reset progress and gain ${prestigeData.name} multiplier?`))
+          if (
+            confirm(
+              `Reset progress and gain +${formatNumber(
+                deltaMult * 100,
+              )}% ${prestigeData.name} multiplier?`,
+            )
+          )
             prestige();
         }}
       />
+      <div className="prestige-mobile-info">
+        {`Polta sauna: +${formatNumber(prestigePercent)}%`}
+      </div>
     </div>
   );
 }
