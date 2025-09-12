@@ -36,4 +36,12 @@ describe('HUD', () => {
     render(<HUD />);
     expect(screen.getByText(/LPS: 5/)).toBeInTheDocument();
   });
+
+  it('click gains at least 1% of cps, rounded', () => {
+    useGameStore.setState({ buildings: { sauna: 250 } });
+    useGameStore.getState().recompute();
+    render(<HUD />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(useGameStore.getState().population).toBe(3);
+  });
 });

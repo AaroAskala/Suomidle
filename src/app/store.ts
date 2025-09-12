@@ -136,7 +136,8 @@ export const useGameStore = create<State>()(
           cps += b.baseProd * count;
         }
         cps *= s.prestigeMult * s.multipliers.population_cps * s.eraMult;
-        set({ cps });
+        const clickPower = Math.max(1, Math.round(cps / 100));
+        set({ cps, clickPower });
       },
       tick: (delta) => {
         const gain = get().cps * delta;
