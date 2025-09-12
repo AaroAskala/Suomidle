@@ -38,5 +38,22 @@
 
   { "id": "bordelli", "name": "Bordelli", "icon": "Bordelli.png",
     "baseCost": 100000000000000, "costMult": 1.15, "baseProd": 100000000000,
-    "unlock": { "tier": 9 } }
+    "unlock": { "tier": 9 } },
+
+  { "id": "kampus", "name": "Kampus", "icon": "Kampus.png",
+    "baseCost": 999999999999999999999999, "costMult": 1.15, "baseProd": 20000000000000,
+    "unlock": { "tier": 10 } },
+
+  { "id": "tehdas", "name": "Tehdas", "icon": "Tehdas.png",
+    "baseCost": 999999999999999999999999999, "costMult": 1.15, "baseProd": 5000000000000000,
+    "unlock": { "tier": 11 } },
+
+  { "id": "parlamenttitalo", "name": "Parlamenttitalo", "icon": "Parlamenttitalo.png",
+    "baseCost": 999999999999999999999999999999, "costMult": 1.15, "baseProd": 10000000000000000000000,
+    "unlock": { "tier": 12 } },
+
+  { "id": "placeholder", "name": "TätäEiMissäänNimessäPitäisiNähdä!", "icon": "Sauna.png",
+    "baseCost": 1, "costMult": 1.15, "baseProd": 1,
+    "unlock": { "tier": 13 } }
 ]
+

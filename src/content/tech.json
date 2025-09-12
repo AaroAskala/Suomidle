@@ -32,18 +32,46 @@
   },
 
   { "id": "burana", "name": "Burana", "icon": "Burana.png",
-    "cost": 800000000000,
+    "cost": 15000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.0 }],
     "limit": 1, "unlock": { "tier": 7 }
   },
   { "id": "saunatuoksu", "name": "Saunatuoksu", "icon": "Saunatuoksu.png",
-    "cost": 16000000000000,
+    "cost": 1500000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.2 }],
     "limit": 1, "unlock": { "tier": 8 }
   },
   { "id": "saunaklonkku", "name": "Saunaklonkku", "icon": "Saunaklonkku.png",
-    "cost": 1600000000000000,
+    "cost": 150000000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.5 }],
     "limit": 1, "unlock": { "tier": 9 }
+  },
+  {
+    "id": "uraanikivet",
+    "name": "Uraanikivet",
+    "icon": "Uraanikivet.png",
+    "cost": 99999999999999999999999,
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 4.0 }],
+    "limit": 1,
+    "unlock": { "tier": 10 }
+  },
+  {
+    "id": "kamehameha",
+    "name": "Kamehameha",
+    "icon": "Kamehameha.png",
+    "cost": 99999999999999999999999999,
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 4.5 }],
+    "limit": 1,
+    "unlock": { "tier": 11 }
+  },
+  {
+    "id": "hawkingin_loylygeneraattori",
+    "name": "Hawkingin Löylygeneraattori",
+    "icon": "Hawkingin_Loylygeneraattori.png",
+    "cost": 99999999999999999999999999999,
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 5.0 }],
+    "limit": 1,
+    "unlock": { "tier": 12 }
   }
+
 ]

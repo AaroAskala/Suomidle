@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#081a2f"/>
+      <stop offset="45%" stop-color="#0b2d55"/>
+      <stop offset="100%" stop-color="#0a1e36"/>
+    </linearGradient>
+
+    <!-- Electric glow -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Cyan neon glow -->
+    <filter id="neon" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.5" result="n1"/>
+      <feColorMatrix in="n1" type="matrix"
+        values="0 0 0 0 0
+                0 0 0 0 0.85
+                0 0 0 0 1
+                0 0 0 1 0" result="n2"/>
+      <feMerge>
+        <feMergeNode in="n2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Circuit pattern (tileable) -->
+    <pattern id="circuit" patternUnits="userSpaceOnUse" width="240" height="240">
+      <rect width="240" height="240" fill="none"/>
+      <!-- horizontal traces -->
+      <path d="M0 48 H240 M0 120 H240 M0 192 H240" stroke="#6fc3ff" stroke-opacity="0.06" stroke-width="3"/>
+      <!-- vertical traces -->
+      <path d="M48 0 V240 M120 0 V240 M192 0 V240" stroke="#6fc3ff" stroke-opacity="0.06" stroke-width="3"/>
+      <!-- rounded corners -->
+      <path d="M48 48 h48 a16 16 0 0 1 16 16 v56 a16 16 0 0 0 16 16 h56"
+            fill="none" stroke="#9ae8ff" stroke-opacity="0.08" stroke-width="2"/>
+      <!-- via dots -->
+      <g fill="#b7f3ff" fill-opacity="0.2">
+        <circle cx="48" cy="48" r="3"/><circle cx="120" cy="120" r="3"/>
+        <circle cx="192" cy="192" r="3"/><circle cx="192" cy="48" r="3"/>
+        <circle cx="48" cy="192" r="3"/>
+      </g>
+    </pattern>
+
+    <!-- Flame gradients -->
+    <radialGradient id="plasma" cx="50%" cy="60%" r="60%">
+      <stop offset="0%" stop-color="#aef9ff" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#37d6ff" stop-opacity="0.9"/>
+      <stop offset="75%" stop-color="#1280ff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#0b2d55" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#0fb9ff"/>
+      <stop offset="60%" stop-color="#49e3ff"/>
+      <stop offset="100%" stop-color="#b7f3ff"/>
+    </linearGradient>
+
+    <!-- Zigzag bolt -->
+    <path id="bolt" d="M0 0 L14 -40 L6 -40 L20 -78 L8 -78 L26 -120" />
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+
+  <!-- Subtle circuit layer -->
+  <rect width="1920" height="1080" fill="url(#circuit)"/>
+
+  <!-- Core plasma glow -->
+  <circle cx="960" cy="780" r="520" fill="url(#plasma)" filter="url(#glow)"/>
+
+  <!-- Stylized technology fire (layered flame shapes) -->
+  <g filter="url(#neon)" opacity="0.95">
+    <path d="M960,1020
+             C930,930 920,840 960,760
+             C1000,680 1100,640 1130,520
+             C1160,400 1080,300 1000,250
+             C1080,360 1040,450 960,520
+             C880,590 820,680 820,780
+             C820,900 890,980 960,1020 Z"
+          fill="url(#flame)"/>
+    <path d="M1030,1000
+             C1000,930 1010,860 1060,800
+             C1110,740 1180,700 1190,620
+             C1200,540 1150,470 1110,440
+             C1150,520 1110,590 1050,640
+             C990,690 970,760 980,820
+             C990,900 1010,960 1030,1000 Z"
+          fill="url(#flame)" fill-opacity="0.9"/>
+    <path d="M900,980
+             C880,920 880,850 910,800
+             C940,750 980,720 990,670
+             C1000,620 970,560 940,540
+             C970,600 950,650 910,690
+             C870,730 850,780 850,830
+             C850,900 875,950 900,980 Z"
+          fill="url(#flame)" fill-opacity="0.85"/>
+  </g>
+
+  <!-- Electric bolts -->
+  <g stroke="#b7f3ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" filter="url(#neon)">
+    <use href="#bolt" x="720" y="760"/>
+    <use href="#bolt" x="1240" y="740" transform="scale(1,-1) translate(0,-1560)"/>
+    <use href="#bolt" x="980" y="660" transform="scale(1.1,1.1)"/>
+  </g>
+
+  <!-- Spark particles -->
+  <g fill="#e7fbff" opacity="0.8">
+    <circle cx="320" cy="260" r="2"/>
+    <circle cx="410" cy="200" r="1.8"/>
+    <circle cx="1500" cy="300" r="2.2"/>
+    <circle cx="1680" cy="180" r="1.6"/>
+    <circle cx="1400" cy="500" r="2"/>
+    <circle cx="300" cy="700" r="1.6"/>
+    <circle cx="1620" cy="860" r="2"/>
+  </g>
+
+  <!-- Vignette for depth -->
+  <rect width="1920" height="1080" fill="url(#bg)" opacity="0.25"/>
+</svg>
