@@ -33,6 +33,7 @@ interface State {
   prestigeMult: number;
   eraMult: number;
   lastSave: number;
+  lastMajorVersion: number;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -65,6 +66,7 @@ const initialState = {
   prestigeMult: 1,
   eraMult: 1,
   lastSave: Date.now(),
+  lastMajorVersion: BigBeautifulBalancePath,
 };
 
 export const computePrestigePoints = (totalPop: number) => {
@@ -201,6 +203,9 @@ export const useGameStore = create<State>()(
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
         const old = persistedState as Record<string, unknown> | undefined;
+        const lastMajorVersion =
+          typeof old?.lastMajorVersion === 'number' ? (old.lastMajorVersion as number) : 0;
+        if (lastMajorVersion < BigBeautifulBalancePath) needsEraPrompt = true;
         if (version >= BigBeautifulBalancePath) {
           return {
             ...(old as Partial<State>),
@@ -218,6 +223,7 @@ export const useGameStore = create<State>()(
             eraMult: typeof old?.eraMult === 'number' ? (old.eraMult as number) : 1,
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
+            lastMajorVersion,
           };
         }
 
@@ -240,6 +246,7 @@ export const useGameStore = create<State>()(
               typeof old?.eraMult === 'number' ? (old.eraMult as number) : 1,
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
+            lastMajorVersion,
           };
         }
 
@@ -292,6 +299,7 @@ export const useGameStore = create<State>()(
           prestigeMult: 1,
           eraMult: 1,
           lastSave: Date.now(),
+          lastMajorVersion,
         };
       },
       onRehydrateStorage: () => (state) => {
@@ -302,6 +310,7 @@ export const useGameStore = create<State>()(
         const delta = Math.max(0, Math.floor((now - last) / 1000));
         state.tick(delta);
         useGameStore.setState({ lastSave: now });
+        if (state.lastMajorVersion < BigBeautifulBalancePath) needsEraPrompt = true;
         if (needsEraPrompt) {
           const next = state.eraMult + 1;
           const isJsDom =
@@ -321,8 +330,10 @@ export const useGameStore = create<State>()(
               state.changeEra();
             }
           }
+          useGameStore.setState({ lastMajorVersion: BigBeautifulBalancePath });
           needsEraPrompt = false;
         }
+        saveGame();
       },
     } as PersistOptions<State, Partial<State>>,
   ),

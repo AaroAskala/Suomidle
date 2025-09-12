@@ -16,6 +16,7 @@ describe('model v6', () => {
       prestigePoints: 0,
       prestigeMult: 1,
       eraMult: 1,
+      lastMajorVersion: BigBeautifulBalancePath,
     });
     useGameStore.getState().recompute();
   });
@@ -176,6 +177,47 @@ describe('model v6', () => {
     const second = useGameStore.getState().population;
     expect(first).toBeCloseTo(150, 0);
     expect(second).toBeCloseTo(first, 0);
+  });
+
+  it('prompts when lastMajorVersion is outdated despite current version', async () => {
+    const originalUA = navigator.userAgent;
+    Object.defineProperty(global.navigator, 'userAgent', {
+      value: 'test',
+      configurable: true,
+    });
+
+    let prompted = 0;
+    const originalConfirm = globalThis.confirm;
+    globalThis.confirm = () => {
+      prompted++;
+      return false;
+    };
+
+    const payload = {
+      state: {
+        population: 0,
+        totalPopulation: 0,
+        tierLevel: 1,
+        buildings: {},
+        techCounts: {},
+        multipliers: { population_cps: 1 },
+        cps: 0,
+        clickPower: 1,
+        prestigePoints: 0,
+        prestigeMult: 1,
+        eraMult: 1,
+        lastMajorVersion: BigBeautifulBalancePath - 1,
+      },
+      version: BigBeautifulBalancePath,
+    };
+    localStorage.setItem('suomidle', JSON.stringify(payload));
+    await useGameStore.persist.rehydrate();
+
+    expect(prompted).toBe(1);
+    expect(useGameStore.getState().lastMajorVersion).toBe(BigBeautifulBalancePath);
+
+    globalThis.confirm = originalConfirm;
+    Object.defineProperty(global.navigator, 'userAgent', { value: originalUA });
   });
 
   it('resets progress when confirming major version reset prompt', async () => {
