@@ -188,7 +188,7 @@ export const useGameStore = create<State>()(
         const s = get();
         set({
           ...initialState,
-          eraMult: s.eraMult + 10,
+          eraMult: s.eraMult + 1,
         });
         get().recompute();
         saveGame();
@@ -299,15 +299,21 @@ export const useGameStore = create<State>()(
         state.recompute();
         const delta = (now - last) / 1000;
         state.tick(delta);
-        state.lastSave = now;
+        saveGame();
         if (needsEraPrompt) {
-          const next = state.eraMult + 10;
+          const next = state.eraMult + 1;
           const isJsDom =
             typeof navigator !== 'undefined' && navigator.userAgent.includes('jsdom');
           if (!isJsDom) {
             if (
               confirm(
-                `Suomen sauna maailma on muuttunut täysin, haluatko polttaa koko maailman, ja aloittaa alusta?\nUudessa maailmassa saat ${next}× bonuksen lämpötilaan!\n\nOK: Haluan nähdä kun maailma palaa\nCancel: Haluan jatkaa nykyisillä`,
+                [
+                  'Suomen sauna maailma on muuttunut täysin, haluatko polttaa koko maailman, ja aloittaa alusta?',
+                  `Uudessa maailmassa saat ${next}× bonuksen lämpötilaan!`,
+                  '',
+                  'OK: Haluan nähdä kun maailma palaa',
+                  'Cancel: Haluan jatkaa nykyisillä',
+                ].join('\n'),
               )
             ) {
               state.changeEra();

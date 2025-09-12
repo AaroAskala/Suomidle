@@ -174,7 +174,48 @@ describe('model v5', () => {
     const first = useGameStore.getState().population;
     await useGameStore.persist.rehydrate();
     const second = useGameStore.getState().population;
-    expect(first).toBeCloseTo(110, 0);
+    expect(first).toBeCloseTo(150, 0);
     expect(second).toBeCloseTo(first, 0);
+  });
+
+  it('resets progress when confirming major version reset prompt', async () => {
+    // Simulate a browser environment where the era-change prompt is shown
+    const originalUA = navigator.userAgent;
+    Object.defineProperty(global.navigator, 'userAgent', {
+      value: 'test',
+      configurable: true,
+    });
+
+    const originalConfirm = globalThis.confirm;
+    globalThis.confirm = () => true;
+
+    const payload = {
+      state: {
+        population: 100,
+        totalPopulation: 100,
+        tierLevel: 3,
+        buildings: { sauna: 5 },
+        techCounts: {},
+        multipliers: { population_cps: 1 },
+        cps: 0,
+        clickPower: 1,
+        prestigePoints: 0,
+        prestigeMult: 1,
+        lastSave: Date.now() - 1000,
+      },
+      version: 2,
+    };
+
+    localStorage.setItem('suomidle', JSON.stringify(payload));
+    await useGameStore.persist.rehydrate();
+
+    const state = useGameStore.getState();
+    expect(state.population).toBe(0);
+    expect(state.totalPopulation).toBe(0);
+    expect(state.buildings.sauna).toBeUndefined();
+    expect(state.eraMult).toBeGreaterThan(1);
+
+    globalThis.confirm = originalConfirm;
+    Object.defineProperty(global.navigator, 'userAgent', { value: originalUA });
   });
 });

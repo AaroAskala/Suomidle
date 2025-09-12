@@ -68,6 +68,13 @@ describe('polta sauna', () => {
     expect(s.totalPopulation).toBe(0);
     expect(s.prestigePoints).toBe(0);
     expect(s.prestigeMult).toBe(1);
-    expect(s.eraMult).toBe(11);
+    expect(s.eraMult).toBe(2);
+  });
+
+  it('era multiplier stacks additively', () => {
+    useGameStore.getState().changeEra();
+    useGameStore.getState().changeEra();
+    const s = useGameStore.getState();
+    expect(s.eraMult).toBe(3);
   });
 });
