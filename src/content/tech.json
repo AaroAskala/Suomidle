@@ -45,5 +45,32 @@
     "cost": 1600000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.5 }],
     "limit": 1, "unlock": { "tier": 9 }
+  },
+  {
+    "id": "uraanikivet",
+    "name": "Uraanikivet",
+    "icon": "Uraanikivet.png",
+    "cost": 99999999999999999999999,
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 4.0 }],
+    "limit": 1,
+    "unlock": { "tier": 10 }
+  },
+  {
+    "id": "kamehameha",
+    "name": "Kamehameha",
+    "icon": "Kamehameha.png",
+    "cost": 99999999999999999999999999,
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 4.5 }],
+    "limit": 1,
+    "unlock": { "tier": 11 }
+  },
+  {
+    "id": "hawkingin_loylygeneraattori",
+    "name": "Hawkingin Löylygeneraattori",
+    "icon": "Hawkingin_Loylygeneraattori.png",
+    "cost": 99999999999999999999999999999,
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 5.0 }],
+    "limit": 1,
+    "unlock": { "tier": 12 }
   }
 ]
