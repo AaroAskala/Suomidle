@@ -129,6 +129,11 @@ h1 {
   text-align: center;
 }
 
+.prestige-mobile-info {
+  display: none;
+  font-size: 0.8rem;
+}
+
 @media (max-width: 480px) {
   .prestige-btn {
     margin: 2px !important;
@@ -142,5 +147,10 @@ h1 {
 
   .prestige-btn .card__text {
     display: none;
+  }
+
+  .prestige-mobile-info {
+    display: block;
+    margin-top: 0.25rem;
   }
 }
