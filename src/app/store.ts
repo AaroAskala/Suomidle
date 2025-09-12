@@ -34,6 +34,7 @@ interface State {
   eraMult: number;
   lastSave: number;
   lastMajorVersion: number;
+  eraPromptAcknowledged: boolean;
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -67,6 +68,7 @@ const initialState = {
   eraMult: 1,
   lastSave: Date.now(),
   lastMajorVersion: BigBeautifulBalancePath,
+  eraPromptAcknowledged: true,
 };
 
 export const computePrestigePoints = (totalPop: number) => {
@@ -203,8 +205,10 @@ export const useGameStore = create<State>()(
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
         const old = persistedState as Record<string, unknown> | undefined;
-        const lastMajorVersion =
+        const acknowledged = old?.eraPromptAcknowledged === true;
+        let lastMajorVersion =
           typeof old?.lastMajorVersion === 'number' ? (old.lastMajorVersion as number) : 0;
+        if (!acknowledged) lastMajorVersion = BigBeautifulBalancePath - 1;
         if (lastMajorVersion < BigBeautifulBalancePath) needsEraPrompt = true;
         if (version >= BigBeautifulBalancePath) {
           return {
@@ -224,6 +228,7 @@ export const useGameStore = create<State>()(
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
             lastMajorVersion,
+            eraPromptAcknowledged: acknowledged,
           };
         }
 
@@ -247,6 +252,7 @@ export const useGameStore = create<State>()(
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
             lastMajorVersion,
+            eraPromptAcknowledged: acknowledged,
           };
         }
 
@@ -300,6 +306,7 @@ export const useGameStore = create<State>()(
           eraMult: 1,
           lastSave: Date.now(),
           lastMajorVersion,
+          eraPromptAcknowledged: acknowledged,
         };
       },
       onRehydrateStorage: () => (state) => {
@@ -310,7 +317,18 @@ export const useGameStore = create<State>()(
         const delta = Math.max(0, Math.floor((now - last) / 1000));
         state.tick(delta);
         useGameStore.setState({ lastSave: now });
-        if (state.lastMajorVersion < BigBeautifulBalancePath) needsEraPrompt = true;
+        let acknowledged = state.eraPromptAcknowledged;
+        try {
+          const raw = localStorage.getItem('suomidle');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (!('eraPromptAcknowledged' in (parsed.state ?? {}))) acknowledged = false;
+          }
+        } catch {
+          acknowledged = false;
+        }
+        if (state.lastMajorVersion < BigBeautifulBalancePath || !acknowledged)
+          needsEraPrompt = true;
         if (needsEraPrompt) {
           const next = state.eraMult + 1;
           const isJsDom =
@@ -330,7 +348,10 @@ export const useGameStore = create<State>()(
               state.changeEra();
             }
           }
-          useGameStore.setState({ lastMajorVersion: BigBeautifulBalancePath });
+          useGameStore.setState({
+            lastMajorVersion: BigBeautifulBalancePath,
+            eraPromptAcknowledged: true,
+          });
           needsEraPrompt = false;
         }
         saveGame();
