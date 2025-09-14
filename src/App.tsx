@@ -10,6 +10,7 @@ import { useGameStore } from './app/store';
 import './App.css';
 import { playTierMusic } from './audio/music';
 import { useSettingsStore } from './app/settingsStore';
+import { Sauna } from './ui/sauna';
 
 function App() {
   const tierLevel = useGameStore((s) => s.tierLevel);
@@ -51,6 +52,7 @@ function App() {
           Tap to start
         </div>
       )}
+      <Sauna />
       <Settings />
       <HUD />
       <PrestigeCard />

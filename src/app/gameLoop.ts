@@ -1,4 +1,5 @@
 import { useGameStore, saveGame } from './store';
+import { useSaunaStore } from '../sim/sauna';
 
 let last = 0;
 let sinceSave = 0;
@@ -12,6 +13,7 @@ export function startGameLoop() {
     const delta = (now - last) / 1000;
     last = now;
     useGameStore.getState().tick(delta);
+    useSaunaStore.getState().tick(delta);
     sinceSave += delta;
     if (sinceSave >= 5) {
       saveGame();
