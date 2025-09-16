@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import Decimal from 'decimal.js';
 import {
   canPoltaMaailma,
@@ -9,6 +9,7 @@ import {
   purchase,
 } from '../maailma';
 import type { GameState, MaailmaState } from '../../state/schema';
+import { setTelemetryClient } from '../../telemetry';
 
 type GameStateOverrides = Partial<Omit<GameState, 'maailma' | 'multipliers'>> & {
   multipliers?: Partial<GameState['multipliers']>;
@@ -20,6 +21,7 @@ const createGameState = (overrides: GameStateOverrides = {}): GameState => {
     tuhka: '0',
     totalTuhkaEarned: '0',
     purchases: {},
+    totalResets: 0,
   };
 
   const baseState: GameState = {
@@ -61,6 +63,10 @@ const createGameState = (overrides: GameStateOverrides = {}): GameState => {
     maailma: mergedMaailma,
   };
 };
+
+afterEach(() => {
+  setTelemetryClient(null);
+});
 
 describe('maailma system', () => {
   it('uses log-tier formula for tuhka awards', () => {
@@ -243,5 +249,74 @@ describe('maailma system', () => {
     expect(afterSecondReset.maailma.totalTuhkaEarned).toBe(expectedTotal);
     expect(afterSecondReset.maailma.purchases).toEqual(afterFirstReset.maailma.purchases);
     expect(afterSecondReset.maailma.purchases).not.toBe(afterFirstReset.maailma.purchases);
+  });
+
+  it('emits telemetry when burning the world', () => {
+    const emit = vi.fn();
+    setTelemetryClient({ emit });
+
+    const purchases = {
+      tuhkan_viisaus: { id: 'tuhkan_viisaus', level: 2 },
+      ikuiset_hiillokset: { id: 'ikuiset_hiillokset', level: 1 },
+    } satisfies MaailmaState['purchases'];
+
+    const state = createGameState({
+      tierLevel: 9,
+      prestigeMult: 3,
+      maailma: {
+        tuhka: '15',
+        totalTuhkaEarned: '25',
+        totalResets: 2,
+        purchases,
+      },
+    });
+
+    const award = getTuhkaAwardPreview(state);
+    expect(award.gt(0)).toBe(true);
+
+    const result = poltaMaailmaConfirm(state);
+
+    expect(result.maailma.totalResets).toBe(3);
+    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith(
+      'polta_maailma',
+      expect.objectContaining({
+        highestTier: 9,
+        saunaMultiplier: result.prestigeMult,
+        tuhkaAward: award.toFixed(),
+        purchases: {
+          tuhkan_viisaus: 2,
+          ikuiset_hiillokset: 1,
+        },
+        totalResets: 3,
+      }),
+    );
+  });
+
+  it('emits telemetry when purchasing maailma upgrades', () => {
+    const emit = vi.fn();
+    setTelemetryClient({ emit });
+
+    const initial: MaailmaState = {
+      tuhka: '50',
+      totalTuhkaEarned: '0',
+      purchases: {},
+      totalResets: 0,
+    };
+
+    const result = purchase(initial, 'tuhkan_viisaus');
+
+    expect(result.tuhka).toBe('45');
+    expect(result.purchases.tuhkan_viisaus?.level).toBe(1);
+    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith(
+      'maailma_purchase',
+      expect.objectContaining({
+        itemId: 'tuhkan_viisaus',
+        level: 1,
+        cost: '5',
+        remainingTuhka: '45',
+      }),
+    );
   });
 });
