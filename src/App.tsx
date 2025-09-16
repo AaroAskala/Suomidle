@@ -11,6 +11,7 @@ import './App.css';
 import { playTierMusic } from './audio/music';
 import { useSettingsStore } from './app/settingsStore';
 import { MaailmaShop } from './ui/MaailmaShop';
+import { PoltaMaailmaButton } from './ui/PoltaMaailmaButton';
 
 function App() {
   const tierLevel = useGameStore((s) => s.tierLevel);
@@ -59,6 +60,7 @@ function App() {
       <TechGrid />
       <Prestige />
       <MaailmaShop />
+      <PoltaMaailmaButton />
     </>
   );
 }
