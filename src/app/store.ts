@@ -20,7 +20,15 @@ interface Multipliers {
   population_cps: number;
 }
 
-interface State {
+type MaailmaState = {
+  tuhka: string;
+  purchases: string[];
+  totalTuhkaEarned: string;
+  totalResets: number;
+  era: number;
+} & Record<string, unknown>;
+
+interface BaseState {
   population: number;
   totalPopulation: number;
   tierLevel: number;
@@ -35,6 +43,10 @@ interface State {
   lastSave: number;
   lastMajorVersion: number;
   eraPromptAcknowledged: boolean;
+  maailma: MaailmaState;
+}
+
+interface Actions {
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
@@ -54,7 +66,19 @@ interface State {
   changeEra: () => void;
 }
 
-const initialState = {
+type State = BaseState & Actions;
+
+const STORAGE_KEY = 'suomidle';
+
+const createInitialMaailmaState = (): MaailmaState => ({
+  tuhka: '0',
+  purchases: [],
+  totalTuhkaEarned: '0',
+  totalResets: 0,
+  era: 0,
+});
+
+const createInitialBaseState = (): BaseState => ({
   population: 0,
   totalPopulation: 0,
   tierLevel: 1,
@@ -69,6 +93,137 @@ const initialState = {
   lastSave: Date.now(),
   lastMajorVersion: BigBeautifulBalancePath,
   eraPromptAcknowledged: true,
+  maailma: createInitialMaailmaState(),
+});
+
+const normalizeMaailma = (value: unknown): MaailmaState => {
+  const defaults = createInitialMaailmaState();
+  if (!value || typeof value !== 'object') {
+    return { ...defaults, purchases: [...defaults.purchases] };
+  }
+
+  const source = value as Record<string, unknown>;
+  const tuhkaRaw = source.tuhka;
+  const tuhka =
+    typeof tuhkaRaw === 'string'
+      ? tuhkaRaw
+      : typeof tuhkaRaw === 'number'
+        ? tuhkaRaw.toString()
+        : defaults.tuhka;
+
+  const purchasesRaw = source.purchases;
+  const purchases = Array.isArray(purchasesRaw)
+    ? purchasesRaw.filter((item): item is string => typeof item === 'string')
+    : defaults.purchases;
+
+  const totalTuhkaEarnedRaw = source.totalTuhkaEarned;
+  const totalTuhkaEarned =
+    typeof totalTuhkaEarnedRaw === 'string'
+      ? totalTuhkaEarnedRaw
+      : typeof totalTuhkaEarnedRaw === 'number'
+        ? totalTuhkaEarnedRaw.toString()
+        : defaults.totalTuhkaEarned;
+
+  const totalResetsRaw = source.totalResets;
+  const totalResets =
+    typeof totalResetsRaw === 'number' && Number.isFinite(totalResetsRaw)
+      ? Math.max(0, Math.floor(totalResetsRaw))
+      : defaults.totalResets;
+
+  const eraRaw = source.era;
+  const eraValue =
+    typeof eraRaw === 'number' && Number.isFinite(eraRaw)
+      ? Math.floor(eraRaw)
+      : defaults.era;
+  const era = eraValue > 0 ? 0 : eraValue;
+
+  const normalized: MaailmaState = {
+    ...source,
+    tuhka,
+    purchases: [...purchases],
+    totalTuhkaEarned,
+    totalResets,
+    era,
+  } as MaailmaState;
+
+  return normalized;
+};
+
+const areMaailmaFieldsEqual = (a: MaailmaState, b: MaailmaState) =>
+  a.tuhka === b.tuhka &&
+  a.totalTuhkaEarned === b.totalTuhkaEarned &&
+  a.totalResets === b.totalResets &&
+  a.era === b.era &&
+  a.purchases.length === b.purchases.length &&
+  a.purchases.every((id, index) => id === b.purchases[index]);
+
+interface PersistedStorageValue {
+  version?: number;
+  state?: Record<string, unknown>;
+  save?: Record<string, unknown>;
+}
+
+const readPersistedStorage = (): PersistedStorageValue | null => {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      return parsed as PersistedStorageValue;
+    }
+  } catch {
+    // Ignore malformed saves.
+  }
+  return null;
+};
+
+const writePersistedStorage = (value: PersistedStorageValue) => {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+};
+
+const sanitizeState = (state: State): BaseState => {
+  const {
+    addPopulation: _addPopulation,
+    purchaseBuilding: _purchaseBuilding,
+    purchaseTech: _purchaseTech,
+    recompute: _recompute,
+    tick: _tick,
+    canAdvanceTier: _canAdvanceTier,
+    advanceTier: _advanceTier,
+    canPrestige: _canPrestige,
+    projectPrestigeGain: _projectPrestigeGain,
+    prestige: _prestige,
+    changeEra: _changeEra,
+    ...rest
+  } = state;
+  const base = rest as BaseState;
+  const maailma = normalizeMaailma(base.maailma);
+  return { ...base, maailma };
+};
+
+const buildPersistedData = (
+  state: BaseState,
+  previousSave?: Record<string, unknown>,
+) => {
+  const maailma = normalizeMaailma(state.maailma);
+  return {
+    version: BigBeautifulBalancePath,
+    state: { ...state, maailma },
+    save: { ...(previousSave ?? {}), maailma },
+  } satisfies PersistedStorageValue & {
+    version: number;
+    state: BaseState;
+    save: Record<string, unknown>;
+  };
+};
+
+const buildLocalSavePayload = (state: State, timestamp: number) => {
+  const sanitized = sanitizeState(state);
+  const baseState: BaseState = { ...sanitized, lastSave: timestamp };
+  const previousSave = readPersistedStorage()?.save as Record<string, unknown> | undefined;
+  return buildPersistedData(baseState, previousSave);
 };
 
 export const computePrestigePoints = (totalPop: number) => {
@@ -88,7 +243,7 @@ export const computePrestigeMult = (points: number) => {
 export const useGameStore = create<State>()(
   persist(
     (set, get) => ({
-      ...initialState,
+      ...createInitialBaseState(),
       addPopulation: (amount) =>
         set((s) => ({
           population: s.population + amount,
@@ -179,11 +334,12 @@ export const useGameStore = create<State>()(
         const pointsAfter = computePrestigePoints(s.totalPopulation);
         const multAfter = computePrestigeMult(pointsAfter);
         set({
-          ...initialState,
+          ...createInitialBaseState(),
           eraMult: s.eraMult,
           totalPopulation: s.totalPopulation,
           prestigePoints: pointsAfter,
           prestigeMult: multAfter,
+          maailma: normalizeMaailma(s.maailma),
         });
         get().recompute();
         saveGame();
@@ -192,15 +348,16 @@ export const useGameStore = create<State>()(
       changeEra: () => {
         const s = get();
         set({
-          ...initialState,
+          ...createInitialBaseState(),
           eraMult: s.eraMult + 1,
+          maailma: normalizeMaailma(s.maailma),
         });
         get().recompute();
         saveGame();
       },
     }),
     {
-      name: 'suomidle',
+      name: STORAGE_KEY,
       version: BigBeautifulBalancePath,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState: unknown, version: number): Partial<State> => {
@@ -210,6 +367,14 @@ export const useGameStore = create<State>()(
           typeof old?.lastMajorVersion === 'number' ? (old.lastMajorVersion as number) : 0;
         if (!acknowledged) lastMajorVersion = BigBeautifulBalancePath - 1;
         if (lastMajorVersion < BigBeautifulBalancePath) needsEraPrompt = true;
+        const storedPersisted = readPersistedStorage();
+        const storedState = storedPersisted?.state as Record<string, unknown> | undefined;
+        const storedSave = storedPersisted?.save as Record<string, unknown> | undefined;
+        const maailma = normalizeMaailma(
+          (old as { maailma?: unknown })?.maailma ??
+            storedSave?.maailma ??
+            storedState?.maailma,
+        );
         if (version >= BigBeautifulBalancePath) {
           return {
             ...(old as Partial<State>),
@@ -229,6 +394,7 @@ export const useGameStore = create<State>()(
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
             lastMajorVersion,
             eraPromptAcknowledged: acknowledged,
+            maailma,
           };
         }
 
@@ -253,6 +419,7 @@ export const useGameStore = create<State>()(
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
             lastMajorVersion,
             eraPromptAcknowledged: acknowledged,
+            maailma,
           };
         }
 
@@ -274,7 +441,7 @@ export const useGameStore = create<State>()(
         }
 
         if (Object.values(counts).some((n) => n > 1)) {
-          return { ...initialState };
+          return { ...createInitialBaseState(), maailma };
         }
 
         const multipliers: Multipliers = { population_cps: 1 };
@@ -307,22 +474,61 @@ export const useGameStore = create<State>()(
           lastSave: Date.now(),
           lastMajorVersion,
           eraPromptAcknowledged: acknowledged,
+          maailma,
         };
       },
       onRehydrateStorage: () => (state) => {
         if (!state) return;
         const now = Date.now();
         const last = state.lastSave ?? now;
+        const normalizedMaailma = normalizeMaailma(state.maailma);
+        state.maailma = normalizedMaailma;
         state.recompute();
         const delta = Math.max(0, Math.floor((now - last) / 1000));
         state.tick(delta);
-        useGameStore.setState({ lastSave: now });
+        useGameStore.setState({ lastSave: now, maailma: normalizedMaailma });
         let acknowledged = state.eraPromptAcknowledged;
         try {
-          const raw = localStorage.getItem('suomidle');
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (!('eraPromptAcknowledged' in (parsed.state ?? {}))) acknowledged = false;
+          if (typeof localStorage !== 'undefined') {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw) as PersistedStorageValue;
+              const parsedState = parsed.state as Record<string, unknown> | undefined;
+              const parsedSave = parsed.save as Record<string, unknown> | undefined;
+              if (!('eraPromptAcknowledged' in (parsedState ?? {}))) acknowledged = false;
+              const parsedStateMaailma = parsedState?.maailma;
+              const parsedSaveMaailma = parsedSave?.maailma;
+              const storedMaailma = normalizeMaailma(
+                parsedSaveMaailma ?? parsedStateMaailma ?? normalizedMaailma,
+              );
+              if (!areMaailmaFieldsEqual(storedMaailma, state.maailma)) {
+                state.maailma = storedMaailma;
+                useGameStore.setState({ maailma: storedMaailma });
+              }
+              const hasStateMaailma =
+                parsedState !== undefined &&
+                Object.prototype.hasOwnProperty.call(parsedState, 'maailma');
+              const hasSaveMaailma =
+                parsedSave !== undefined &&
+                Object.prototype.hasOwnProperty.call(parsedSave, 'maailma');
+              const stateDiffers =
+                parsedStateMaailma !== undefined &&
+                !areMaailmaFieldsEqual(
+                  normalizeMaailma(parsedStateMaailma),
+                  state.maailma,
+                );
+              const saveDiffers =
+                parsedSaveMaailma !== undefined &&
+                !areMaailmaFieldsEqual(normalizeMaailma(parsedSaveMaailma), state.maailma);
+              if (!hasStateMaailma || !hasSaveMaailma || stateDiffers || saveDiffers) {
+                writePersistedStorage({
+                  ...parsed,
+                  version: parsed.version ?? BigBeautifulBalancePath,
+                  state: { ...(parsedState ?? {}), maailma: state.maailma },
+                  save: { ...(parsedSave ?? {}), maailma: state.maailma },
+                });
+              }
+            }
           }
         } catch {
           acknowledged = false;
@@ -362,21 +568,15 @@ export const useGameStore = create<State>()(
 
 export const saveGame = () => {
   const now = Date.now();
-  useGameStore.setState({ lastSave: now });
   const state = useGameStore.getState();
-  const rest = { ...state } as Record<string, unknown>;
-  delete rest.addPopulation;
-  delete rest.purchaseBuilding;
-  delete rest.purchaseTech;
-  delete rest.recompute;
-  delete rest.tick;
-  delete rest.canAdvanceTier;
-  delete rest.advanceTier;
-  delete rest.canPrestige;
-  delete rest.projectPrestigeGain;
-  delete rest.prestige;
-  delete rest.changeEra;
-  const data = { state: rest, version: BigBeautifulBalancePath };
-  localStorage.setItem('suomidle', JSON.stringify(data));
+  const payload = buildLocalSavePayload(state, now);
+  useGameStore.setState({ lastSave: now, maailma: payload.state.maailma });
+  writePersistedStorage(payload);
+};
+
+export const getCloudSavePayload = () => {
+  const state = useGameStore.getState();
+  const sanitized = sanitizeState(state);
+  return buildPersistedData(sanitized);
 };
 
