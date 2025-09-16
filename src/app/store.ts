@@ -198,6 +198,17 @@ const sanitizeState = (state: State): BaseState => {
     changeEra: _changeEra,
     ...rest
   } = state;
+  void _addPopulation;
+  void _purchaseBuilding;
+  void _purchaseTech;
+  void _recompute;
+  void _tick;
+  void _canAdvanceTier;
+  void _advanceTier;
+  void _canPrestige;
+  void _projectPrestigeGain;
+  void _prestige;
+  void _changeEra;
   const base = rest as BaseState;
   const maailma = normalizeMaailma(base.maailma);
   return { ...base, maailma };
