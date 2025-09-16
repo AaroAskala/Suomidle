@@ -12,6 +12,7 @@ import {
   getBuildingCost,
   prestige as prestigeData,
 } from '../content';
+import { applyPermanentBonuses } from '../effects/applyPermanentBonuses';
 
 export const BigBeautifulBalancePath = 7;
 let needsEraPrompt = false;
@@ -219,10 +220,12 @@ const buildPersistedData = (
   previousSave?: Record<string, unknown>,
 ) => {
   const maailma = normalizeMaailma(state.maailma);
+  const save = { ...(previousSave ?? {}), maailma } as Record<string, unknown>;
+  applyPermanentBonuses(save as Parameters<typeof applyPermanentBonuses>[0]);
   return {
     version: BigBeautifulBalancePath,
     state: { ...state, maailma },
-    save: { ...(previousSave ?? {}), maailma },
+    save,
   } satisfies PersistedStorageValue & {
     version: number;
     state: BaseState;
@@ -527,6 +530,9 @@ export const useGameStore = create<State>()(
               const parsed = JSON.parse(raw) as PersistedStorageValue;
               const parsedState = parsed.state as Record<string, unknown> | undefined;
               const parsedSave = parsed.save as Record<string, unknown> | undefined;
+              if (parsedSave) {
+                applyPermanentBonuses(parsedSave as Parameters<typeof applyPermanentBonuses>[0]);
+              }
               if (!('eraPromptAcknowledged' in (parsedState ?? {}))) acknowledged = false;
               const parsedStateMaailma = parsedState?.maailma;
               const parsedSaveMaailma = parsedSave?.maailma;
@@ -553,11 +559,13 @@ export const useGameStore = create<State>()(
                 parsedSaveMaailma !== undefined &&
                 !areMaailmaFieldsEqual(normalizeMaailma(parsedSaveMaailma), state.maailma);
               if (!hasStateMaailma || !hasSaveMaailma || stateDiffers || saveDiffers) {
+                const nextSave = { ...(parsedSave ?? {}), maailma: state.maailma } as Record<string, unknown>;
+                applyPermanentBonuses(nextSave as Parameters<typeof applyPermanentBonuses>[0]);
                 writePersistedStorage({
                   ...parsed,
                   version: parsed.version ?? BigBeautifulBalancePath,
                   state: { ...(parsedState ?? {}), maailma: state.maailma },
-                  save: { ...(parsedSave ?? {}), maailma: state.maailma },
+                  save: nextSave,
                 });
               }
             }
