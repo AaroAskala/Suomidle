@@ -185,19 +185,30 @@ const writePersistedStorage = (value: PersistedStorageValue) => {
 
 const sanitizeState = (state: State): BaseState => {
   const {
-    addPopulation: _addPopulation,
-    purchaseBuilding: _purchaseBuilding,
-    purchaseTech: _purchaseTech,
-    recompute: _recompute,
-    tick: _tick,
-    canAdvanceTier: _canAdvanceTier,
-    advanceTier: _advanceTier,
-    canPrestige: _canPrestige,
-    projectPrestigeGain: _projectPrestigeGain,
-    prestige: _prestige,
-    changeEra: _changeEra,
+    addPopulation,
+    purchaseBuilding,
+    purchaseTech,
+    recompute,
+    tick,
+    canAdvanceTier,
+    advanceTier,
+    canPrestige,
+    projectPrestigeGain,
+    prestige,
+    changeEra,
     ...rest
   } = state;
+  void addPopulation;
+  void purchaseBuilding;
+  void purchaseTech;
+  void recompute;
+  void tick;
+  void canAdvanceTier;
+  void advanceTier;
+  void canPrestige;
+  void projectPrestigeGain;
+  void prestige;
+  void changeEra;
   const base = rest as BaseState;
   const maailma = normalizeMaailma(base.maailma);
   return { ...base, maailma };
@@ -225,6 +236,27 @@ const buildLocalSavePayload = (state: State, timestamp: number) => {
   const previousSave = readPersistedStorage()?.save as Record<string, unknown> | undefined;
   return buildPersistedData(baseState, previousSave);
 };
+
+const toBigInt = (value: unknown): bigint => {
+  if (typeof value === 'bigint') return value;
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const truncated = value < 0 ? Math.ceil(value) : Math.floor(value);
+    return BigInt(truncated);
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') return 0n;
+    try {
+      return BigInt(trimmed);
+    } catch {
+      return 0n;
+    }
+  }
+  return 0n;
+};
+
+const getSafeCount = (value: unknown, fallback = 0) =>
+  typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : fallback;
 
 export const computePrestigePoints = (totalPop: number) => {
   if (prestigeData.formula.type === 'sqrt') {
@@ -572,6 +604,71 @@ export const saveGame = () => {
   const payload = buildLocalSavePayload(state, now);
   useGameStore.setState({ lastSave: now, maailma: payload.state.maailma });
   writePersistedStorage(payload);
+};
+
+export interface TuhkaAwardPreview {
+  current: bigint;
+  totalEarned: bigint;
+  award: bigint;
+  availableAfter: bigint;
+  totalEarnedAfter: bigint;
+}
+
+export const getTuhkaAwardPreview = (): TuhkaAwardPreview => {
+  const state = useGameStore.getState();
+  const tierLevel = Math.max(1, state.tierLevel);
+  const totalPopulation = Math.max(0, state.totalPopulation);
+  const eraMult = Math.max(1, state.eraMult);
+  const totalResets = getSafeCount(state.maailma.totalResets);
+  const current = toBigInt(state.maailma.tuhka);
+  const totalEarned = toBigInt(state.maailma.totalTuhkaEarned);
+
+  const tierFactor = tierLevel + Math.log10(totalPopulation + 10);
+  const resetsFactor = Math.log10(totalResets + 10) + Math.log10(eraMult + 1);
+  const rawAward = Number.isFinite(tierFactor) && Number.isFinite(resetsFactor)
+    ? Math.sqrt(Math.max(0, tierFactor * resetsFactor))
+    : 0;
+  const award = BigInt(Math.max(0, Math.floor(rawAward)));
+
+  return {
+    current,
+    totalEarned,
+    award,
+    availableAfter: current + award,
+    totalEarnedAfter: totalEarned + award,
+  };
+};
+
+export interface PoltaMaailmaResult {
+  awarded: bigint;
+  availableTuhka: bigint;
+  totalTuhkaEarned: bigint;
+}
+
+export const poltaMaailmaConfirm = (): PoltaMaailmaResult => {
+  const preview = getTuhkaAwardPreview();
+  const nextTuhka = preview.availableAfter.toString();
+  const nextTotal = preview.totalEarnedAfter.toString();
+
+  useGameStore.setState((state) => {
+    const totalResets = getSafeCount(state.maailma.totalResets);
+    return {
+      maailma: {
+        ...state.maailma,
+        tuhka: nextTuhka,
+        totalTuhkaEarned: nextTotal,
+        totalResets: totalResets + 1,
+      },
+    };
+  });
+
+  useGameStore.getState().changeEra();
+
+  return {
+    awarded: preview.award,
+    availableTuhka: preview.availableAfter,
+    totalTuhkaEarned: preview.totalEarnedAfter,
+  };
 };
 
 export const getCloudSavePayload = () => {
