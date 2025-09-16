@@ -41,4 +41,5 @@ export interface GameState {
 export interface SaveGame {
   version: number;
   state: GameState;
+  maailma: MaailmaState;
 }
