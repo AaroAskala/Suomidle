@@ -10,6 +10,7 @@ import { useGameStore } from './app/store';
 import './App.css';
 import { playTierMusic } from './audio/music';
 import { useSettingsStore } from './app/settingsStore';
+import { MaailmaShop } from './ui/MaailmaShop';
 import { PoltaMaailmaButton } from './ui/PoltaMaailmaButton';
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
       <BuildingsGrid />
       <TechGrid />
       <Prestige />
+      <MaailmaShop />
       <PoltaMaailmaButton />
     </>
   );
