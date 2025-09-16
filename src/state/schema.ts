@@ -14,6 +14,8 @@ export interface MaailmaState {
   totalTuhkaEarned: DecimalString;
   /** Mapping of Maailma purchase id to its purchase details. */
   purchases: Record<string, MaailmaPurchase>;
+  /** Lifetime count of Maailma resets performed. */
+  totalResets?: number;
 }
 
 export interface MultipliersState {

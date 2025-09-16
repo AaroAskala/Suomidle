@@ -6,6 +6,7 @@ import type {
   MaailmaPurchase,
   MaailmaState,
 } from '../state/schema';
+import { telemetry } from '../telemetry';
 
 interface HardResetOptions {
   includeSaunaMultiplier?: boolean;
@@ -72,6 +73,12 @@ const cloneMaailmaPurchases = (purchases: Record<string, MaailmaPurchase>): Reco
   Object.fromEntries(
     Object.entries(purchases).map(([key, purchase]) => [key, { ...purchase }]),
   );
+
+const createPurchaseSnapshot = (purchases: Record<string, MaailmaPurchase>): Record<string, number> =>
+  Object.fromEntries(Object.entries(purchases).map(([id, purchase]) => [id, purchase.level]));
+
+const getSafeTotalResets = (value: unknown): number =>
+  typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 
 const hardResetEverything = (state: GameState, options: HardResetOptions = {}): GameState => {
   const { includeSaunaMultiplier = false } = options;
@@ -190,6 +197,7 @@ export const poltaMaailmaConfirm = (state: GameState): GameState => {
   const award = getTuhkaAwardPreview(state);
   if (award.lte(0)) return state;
 
+  const previousTotalResets = getSafeTotalResets(state.maailma.totalResets);
   const resetState = hardResetEverything(state, { includeSaunaMultiplier: true });
   const withBonuses = reapplyPermanentBonuses(resetState);
   const clonedPurchases = cloneMaailmaPurchases(withBonuses.maailma.purchases);
@@ -197,11 +205,25 @@ export const poltaMaailmaConfirm = (state: GameState): GameState => {
     ...withBonuses.maailma,
     purchases: clonedPurchases,
   }, award);
-
-  return {
-    ...withBonuses,
-    maailma: updatedMaailma,
+  const nextTotalResets = previousTotalResets + 1;
+  const finalMaailma: MaailmaState = {
+    ...updatedMaailma,
+    totalResets: nextTotalResets,
   };
+  const result: GameState = {
+    ...withBonuses,
+    maailma: finalMaailma,
+  };
+
+  telemetry.emit('polta_maailma', {
+    highestTier: state.tierLevel,
+    saunaMultiplier: result.prestigeMult,
+    tuhkaAward: decimalToDecimalString(award),
+    purchases: createPurchaseSnapshot(clonedPurchases),
+    totalResets: nextTotalResets,
+  });
+
+  return result;
 };
 
 export const getShopCatalog = () => shopCatalog;
@@ -244,9 +266,21 @@ export const purchase = (maailma: MaailmaState, id: string): MaailmaState => {
   const nextPurchases = cloneMaailmaPurchases(maailma.purchases);
   nextPurchases[id] = { id, level: nextLevel };
 
-  return {
+  const remainingString = decimalToDecimalString(remaining);
+  const costString = decimalToDecimalString(cost);
+
+  const nextState: MaailmaState = {
     ...maailma,
-    tuhka: decimalToDecimalString(remaining),
+    tuhka: remainingString,
     purchases: nextPurchases,
   };
+
+  telemetry.emit('maailma_purchase', {
+    itemId: id,
+    level: nextLevel,
+    cost: costString,
+    remainingTuhka: remainingString,
+  });
+
+  return nextState;
 };
