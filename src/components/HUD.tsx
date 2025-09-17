@@ -9,7 +9,8 @@ export function HUD() {
   return (
     <div>
       <div className="hud hud__population">
-        Lämpötila: {formatNumber(population)} | LPS: {formatNumber(cps)}
+        Lämpötila: {formatNumber(population, { maximumFractionDigits: 0 })} | LPS:{' '}
+        {formatNumber(cps)}
       </div>
       <button
         className="btn btn--primary"
