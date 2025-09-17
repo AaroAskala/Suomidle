@@ -97,6 +97,15 @@ const createInitialBaseState = (): BaseState => ({
   maailma: createInitialMaailmaState(),
 });
 
+const createProgressResetState = (state: State, maailmaOverride?: MaailmaState): BaseState => {
+  const base = createInitialBaseState();
+  return {
+    ...base,
+    eraMult: state.eraMult,
+    maailma: normalizeMaailma(maailmaOverride ?? state.maailma),
+  };
+};
+
 const normalizeMaailma = (value: unknown): MaailmaState => {
   const defaults = createInitialMaailmaState();
   if (!value || typeof value !== 'object') {
@@ -382,10 +391,10 @@ export const useGameStore = create<State>()(
       },
       changeEra: () => {
         const s = get();
+        const resetState = createProgressResetState(s);
         set({
-          ...createInitialBaseState(),
-          eraMult: s.eraMult + 1,
-          maailma: normalizeMaailma(s.maailma),
+          ...resetState,
+          eraMult: resetState.eraMult + 1,
         });
         get().recompute();
         saveGame();
@@ -658,19 +667,32 @@ export const poltaMaailmaConfirm = (): PoltaMaailmaResult => {
   const nextTuhka = preview.availableAfter.toString();
   const nextTotal = preview.totalEarnedAfter.toString();
 
+  let updatedMaailma: MaailmaState | undefined;
+
   useGameStore.setState((state) => {
     const totalResets = getSafeCount(state.maailma.totalResets);
+    updatedMaailma = normalizeMaailma({
+      ...state.maailma,
+      tuhka: nextTuhka,
+      totalTuhkaEarned: nextTotal,
+      totalResets: totalResets + 1,
+    });
+    const resetState = createProgressResetState(state, updatedMaailma);
     return {
-      maailma: {
-        ...state.maailma,
-        tuhka: nextTuhka,
-        totalTuhkaEarned: nextTotal,
-        totalResets: totalResets + 1,
-      },
+      ...resetState,
+      maailma: updatedMaailma,
     };
   });
 
-  useGameStore.getState().changeEra();
+  if (updatedMaailma) {
+    const saveForBonuses = { maailma: updatedMaailma } as Parameters<
+      typeof applyPermanentBonuses
+    >[0];
+    applyPermanentBonuses(saveForBonuses);
+  }
+
+  useGameStore.getState().recompute();
+  saveGame();
 
   return {
     awarded: preview.award,
