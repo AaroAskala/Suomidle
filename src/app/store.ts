@@ -199,10 +199,17 @@ const createInitialBaseState = (): BaseState => {
 
 const createProgressResetState = (state: State, maailmaOverride?: MaailmaState): BaseState => {
   const base = createInitialBaseState();
+  const maailma = normalizeMaailma(maailmaOverride ?? state.maailma);
+  const permanent = computePermanentBonusesFromMaailma(maailma);
+  const prestigeMult = Math.max(base.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
+  const lampotilaRate = Math.max(0, permanent.lampotilaRateMult);
   return {
     ...base,
     eraMult: state.eraMult,
-    maailma: normalizeMaailma(maailmaOverride ?? state.maailma),
+    maailma,
+    modifiers: { ...(base.modifiers ?? { permanent }), permanent },
+    prestigeMult,
+    lampotilaRate,
   };
 };
 
