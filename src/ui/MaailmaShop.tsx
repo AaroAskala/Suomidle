@@ -9,10 +9,9 @@ import {
 import { useGameStore } from '../app/store';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import shopData from '../data/maailma_shop.json' assert { type: 'json' };
-import { formatNumber } from '../utils/format';
+import { useLocale } from '../i18n/useLocale';
 
 const { currency, shop: shopItems } = shopData;
-const currencyLabel = currency.short_fi ?? currency.name_fi;
 
 interface Ember {
   id: number;
@@ -30,18 +29,8 @@ type EmberStyle = CSSProperties & {
   '--maailma-ember-drift'?: string;
 };
 
-const STACK_MODE_LABELS = {
-  add: 'Additiivinen',
-  mult: 'Kertautuva',
-} as const;
-
-const STACK_MODE_TOOLTIPS = {
-  add: 'Bonukset summataan yhteen jokaisella tasolla.',
-  mult: 'Bonukset kertautuvat keskenään jokaisella tasolla.',
-} as const satisfies Record<keyof typeof STACK_MODE_LABELS, string>;
-
-const formatDecimalNumber = (value: number) =>
-  Number.isInteger(value) ? value.toString() : value.toFixed(2);
+const formatDecimalNumber = (value: number, localeFormatter: (input: number, options?: Intl.NumberFormatOptions) => string) =>
+  Number.isInteger(value) ? localeFormatter(value) : localeFormatter(value, { maximumFractionDigits: 2 });
 
 const getNextCost = (item: (typeof shopItems)[number], level: number) => {
   if (item.cost_tuhka.length === 0 || level >= item.max_level) {
@@ -52,6 +41,7 @@ const getNextCost = (item: (typeof shopItems)[number], level: number) => {
 };
 
 export function MaailmaShop() {
+  const { t, formatNumber } = useLocale();
   const tuhkaString = useGameStore((state) => state.maailma.tuhka);
   const purchaseHistory = useGameStore((state) => state.maailma.purchases);
   const purchaseUpgrade = useGameStore((state) => state.purchaseMaailmaUpgrade);
@@ -123,31 +113,37 @@ export function MaailmaShop() {
     return null;
   }
 
+  const currencyShort = t('maailma.currency.short', {
+    defaultValue: currency.short_fi ?? currency.name_fi,
+  });
+  const currencyFormula = currency.accrual_formula_fi
+    ? t('maailma.currency.formula', { formula: currency.accrual_formula_fi })
+    : undefined;
+
   return (
     <CollapsibleSection
-      title="Maailman kauppa"
+      title={t('maailma.title')}
       className="maailma-shop"
       headerClassName="maailma-shop__header"
       titleClassName="maailma-shop__title text--h2"
       sectionRef={containerRef}
       headerContent={
-        <div
-          className="maailma-shop__balance"
-          title={currency.accrual_formula_fi || undefined}
-        >
-          {currencyLabel}:&nbsp;
-          <span className="maailma-shop__balance-value">{formatNumber(tuhkaValue)}</span>
+        <div className="maailma-shop__balance" title={currencyFormula}>
+          {t('maailma.balance', { currency: currencyShort })}
+          <span className="maailma-shop__balance-value">
+            {formatNumber(tuhkaValue, { maximumFractionDigits: 0 })}
+          </span>
         </div>
       }
     >
       <table className="maailma-shop__table">
-          <thead>
-            <tr>
-              <th scope="col">Parannus</th>
-              <th scope="col">Taso</th>
-              <th scope="col">Seuraava hinta</th>
+        <thead>
+          <tr>
+            <th scope="col">{t('maailma.table.upgrade')}</th>
+            <th scope="col">{t('maailma.table.level')}</th>
+            <th scope="col">{t('maailma.table.nextCost')}</th>
             <th scope="col" className="maailma-shop__action-header">
-              Toiminto
+              {t('maailma.table.action')}
             </th>
           </tr>
         </thead>
@@ -161,23 +157,26 @@ export function MaailmaShop() {
             const stackMode = item.effect.stack_mode;
             const stackLabel =
               stackMode === 'add'
-                ? STACK_MODE_LABELS.add
+                ? t('maailma.stackMode.add')
                 : stackMode === 'mult'
-                  ? STACK_MODE_LABELS.mult
+                  ? t('maailma.stackMode.mult')
                   : undefined;
             const stackTooltip =
               stackMode === 'add'
-                ? STACK_MODE_TOOLTIPS.add
+                ? t('maailma.stackModeTooltip.add')
                 : stackMode === 'mult'
-                  ? STACK_MODE_TOOLTIPS.mult
+                  ? t('maailma.stackModeTooltip.mult')
                   : undefined;
             const floorValue =
               typeof item.effect.floor === 'number' ? item.effect.floor : undefined;
             const buttonTitle = maxed
-              ? 'Maksimitaso saavutettu'
+              ? t('maailma.tooltip.max')
               : affordable
-                ? 'Osta seuraava taso'
-                : 'Ei tarpeeksi Tuhkaa';
+                ? t('maailma.tooltip.buy')
+                : t('maailma.tooltip.insufficient', { currency: currencyShort });
+            const upgradeName = t(`maailma.upgrades.${item.id}.name` as const, {
+              defaultValue: item.name_fi,
+            });
 
             return (
               <tr
@@ -185,36 +184,46 @@ export function MaailmaShop() {
                 className={`maailma-shop__row${maxed ? ' maailma-shop__row--maxed' : ''}`}
               >
                 <td className="maailma-shop__item">
-                  <div className="maailma-shop__name">{item.name_fi}</div>
-                  <div className="maailma-shop__description">{item.description_fi}</div>
+                  <div className="maailma-shop__name">
+                    {upgradeName}
+                  </div>
+                  <div className="maailma-shop__description">
+                    {t(`maailma.upgrades.${item.id}.description` as const, {
+                      defaultValue: item.description_fi,
+                    })}
+                  </div>
                   {(stackLabel || floorValue !== undefined) && (
                     <div className="maailma-shop__meta">
                       {stackLabel && (
                         <span className="maailma-shop__tooltip" title={stackTooltip}>
-                          Pinoutuminen: {stackLabel}
+                          {t('maailma.stackModeLabel', { mode: stackLabel })}
                         </span>
                       )}
                       {floorValue !== undefined && (
                         <span
                           className="maailma-shop__tooltip"
-                          title={`Vaikutus ei voi laskea arvoa alle ${formatDecimalNumber(floorValue)}.`}
+                          title={t('maailma.floorTooltip', {
+                            value: formatDecimalNumber(floorValue, formatNumber),
+                          })}
                         >
-                          Lattia: {formatDecimalNumber(floorValue)}
+                          {t('maailma.floorLabel', {
+                            value: formatDecimalNumber(floorValue, formatNumber),
+                          })}
                         </span>
                       )}
                     </div>
                   )}
                 </td>
                 <td className="maailma-shop__level">
-                  <span className="maailma-shop__level-current">{level}</span>
+                  <span className="maailma-shop__level-current">{formatNumber(level, { maximumFractionDigits: 0 })}</span>
                   <span className="maailma-shop__level-divider">/</span>
-                  <span className="maailma-shop__level-max">{item.max_level}</span>
+                  <span className="maailma-shop__level-max">{formatNumber(item.max_level, { maximumFractionDigits: 0 })}</span>
                 </td>
                 <td className="maailma-shop__cost">
                   {nextCost !== undefined ? (
                     <>
-                      {formatNumber(nextCost)}
-                      <span className="maailma-shop__currency"> {currencyLabel}</span>
+                      {formatNumber(nextCost, { maximumFractionDigits: 0 })}
+                      <span className="maailma-shop__currency"> {currencyShort}</span>
                     </>
                   ) : (
                     <span className="maailma-shop__cost--maxed">—</span>
@@ -227,8 +236,9 @@ export function MaailmaShop() {
                     disabled={disabled}
                     title={buttonTitle}
                     onClick={(event) => attemptPurchase(event, item)}
+                    aria-label={disabled ? buttonTitle : t('maailma.buyAction', { name: upgradeName })}
                   >
-                    {maxed ? 'Maksimi' : 'Osta'}
+                    {maxed ? t('maailma.maxedLabel') : t('actions.buy')}
                   </button>
                 </td>
               </tr>
