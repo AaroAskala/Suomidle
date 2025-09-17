@@ -39,15 +39,6 @@ const STACK_MODE_TOOLTIPS = {
   mult: 'Bonukset kertautuvat keskenään jokaisella tasolla.',
 } as const satisfies Record<keyof typeof STACK_MODE_LABELS, string>;
 
-const formatDecimalString = (value: number) => {
-  if (!Number.isFinite(value)) return '0';
-  const safe = Math.max(0, value);
-  const fixed = safe.toFixed(6);
-  const trimmed = fixed.replace(/\.0+$/, '').replace(/\.([0-9]*?)0+$/, '.$1');
-  const cleaned = trimmed.endsWith('.') ? trimmed.slice(0, -1) : trimmed;
-  return cleaned.length > 0 ? cleaned : '0';
-};
-
 const formatDecimalNumber = (value: number) =>
   Number.isInteger(value) ? value.toString() : value.toFixed(2);
 
@@ -62,6 +53,7 @@ const getNextCost = (item: (typeof shopItems)[number], level: number) => {
 export function MaailmaShop() {
   const tuhkaString = useGameStore((state) => state.maailma.tuhka);
   const purchaseHistory = useGameStore((state) => state.maailma.purchases);
+  const purchaseUpgrade = useGameStore((state) => state.purchaseMaailmaUpgrade);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [embers, setEmbers] = useState<Ember[]>([]);
   const emberTimeouts = useRef<number[]>([]);
@@ -112,25 +104,7 @@ export function MaailmaShop() {
     const centerX = buttonRect.left + buttonRect.width / 2;
     const centerY = buttonRect.top + buttonRect.height / 2;
 
-    let purchased = false;
-    useGameStore.setState((state) => {
-      const { maailma } = state;
-      const numericTuhka = Number.parseFloat(maailma.tuhka);
-      if (!Number.isFinite(numericTuhka)) return {};
-      const level = maailma.purchases.filter((id) => id === item.id).length;
-      if (level >= item.max_level) return {};
-      const nextCost = getNextCost(item, level);
-      if (nextCost === undefined || numericTuhka < nextCost) return {};
-      purchased = true;
-      return {
-        maailma: {
-          ...maailma,
-          tuhka: formatDecimalString(numericTuhka - nextCost),
-          purchases: [...maailma.purchases, item.id],
-        },
-      };
-    });
-
+    const purchased = purchaseUpgrade(item.id);
     if (purchased) {
       spawnEmber(centerX, centerY);
     }
