@@ -4,8 +4,12 @@
 ### Added
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
+- Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
 ### Changed
 - Update the page title to display "suomidle" in browser tabs.
+
+### Fixed
+- Prevent the GitHub Pages workflow from deleting the root build when assembling the combined artifact.
