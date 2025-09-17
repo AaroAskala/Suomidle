@@ -93,6 +93,69 @@ h1 {
   font-size: 1rem;
 }
 
+.collapsible {
+  width: 100%;
+}
+
+.collapsible__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.collapsible__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.collapsible__toggle:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+
+.collapsible__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.collapsible__title {
+  font-weight: 600;
+}
+
+.collapsible__header-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.collapsible__content {
+  margin-top: 0.75rem;
+}
+
+.collapsible__content[hidden] {
+  display: none;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     --color-text: #213547;
@@ -224,6 +287,10 @@ h1 {
   flex-wrap: wrap;
   position: relative;
   z-index: 1;
+}
+
+.maailma-shop .collapsible__content {
+  margin-top: 0;
 }
 
 .maailma-shop__title {
