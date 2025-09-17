@@ -204,3 +204,257 @@ h1 {
     height: 2px;
   }
 }
+
+.maailma-shop {
+  position: relative;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  max-width: min(960px, 95vw);
+  background: color-mix(in srgb, var(--surface-elevated) 92%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.maailma-shop__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.maailma-shop__title {
+  margin: 0;
+}
+
+.maailma-shop__balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 65%, transparent);
+  font-weight: 600;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.maailma-shop__balance-value {
+  font-weight: 700;
+}
+
+.maailma-shop__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.maailma-shop__table th,
+.maailma-shop__table td {
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.maailma-shop__table th {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 75%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 18%, transparent);
+}
+
+.maailma-shop__row {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.maailma-shop__row:nth-child(odd) {
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+}
+
+.maailma-shop__row:nth-child(even) {
+  background: color-mix(in srgb, var(--surface) 35%, transparent);
+}
+
+.maailma-shop__row:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--surface-elevated) 80%, transparent);
+}
+
+.maailma-shop__row--maxed {
+  opacity: 0.65;
+}
+
+.maailma-shop__item {
+  max-width: 420px;
+}
+
+.maailma-shop__name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.maailma-shop__description {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.maailma-shop__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.maailma-shop__tooltip {
+  border-bottom: 1px dotted currentColor;
+  cursor: help;
+  padding-bottom: 1px;
+}
+
+.maailma-shop__level {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.maailma-shop__level-divider {
+  opacity: 0.65;
+}
+
+.maailma-shop__cost {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.maailma-shop__currency {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.maailma-shop__cost--maxed {
+  opacity: 0.6;
+}
+
+.maailma-shop__action,
+.maailma-shop__action-header {
+  text-align: center;
+}
+
+.maailma-shop__buy {
+  min-width: 120px;
+  box-shadow: 0 6px 18px rgba(255, 140, 0, 0.4);
+}
+
+.maailma-shop__buy:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.maailma-shop__embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.maailma-shop__ember {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 210, 150, 0.95) 0%, rgba(255, 132, 40, 0.8) 55%, rgba(255, 132, 40, 0) 100%);
+  box-shadow: 0 0 18px rgba(255, 160, 50, 0.75);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  animation-name: maailma-shop-ember;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+}
+
+@keyframes maailma-shop-ember {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(var(--maailma-ember-scale, 1));
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--maailma-ember-drift, 0px)),
+        calc(-50% - var(--maailma-ember-rise, 56px))
+      )
+      scale(0.25);
+  }
+}
+
+@media (max-width: 960px) {
+  .maailma-shop {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .maailma-shop {
+    padding: 1rem;
+  }
+  .maailma-shop__table {
+    display: block;
+    overflow-x: auto;
+  }
+  .maailma-shop__table thead {
+    display: none;
+  }
+  .maailma-shop__table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .maailma-shop__row,
+  .maailma-shop__row:nth-child(even),
+  .maailma-shop__row:nth-child(odd) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--surface) 55%, transparent);
+  }
+  .maailma-shop__item,
+  .maailma-shop__level,
+  .maailma-shop__cost,
+  .maailma-shop__action {
+    text-align: left;
+  }
+  .maailma-shop__level {
+    justify-content: flex-start;
+  }
+  .maailma-shop__cost {
+    font-size: 1rem;
+  }
+  .maailma-shop__action {
+    margin-top: 0.25rem;
+  }
+  .maailma-shop__buy {
+    width: 100%;
+  }
+}
