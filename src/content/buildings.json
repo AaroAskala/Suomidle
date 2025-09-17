@@ -1,61 +1,164 @@
 [
-  { "id": "sauna", "name": "Sauna", "icon": "Sauna.png",
-    "baseCost": 10, "costMult": 1.15, "baseProd": 1 },
-
-  { "id": "kylakauppa", "name": "Kyläkauppa", "icon": "Kyläkauppa.png",
-    "baseCost": 100, "costMult": 1.15, "baseProd": 5 },
-
-  { "id": "alko", "name": "Alko", "icon": "Alko.png",
-    "baseCost": 1000, "costMult": 1.15, "baseProd": 25 },
-
-  { "id": "ensiapu", "name": "Ensiapu", "icon": "Ensiapu.png",
-    "baseCost": 10000, "costMult": 1.16, "baseProd": 100,
-    "unlock": { "tier": 2 } },
-
-  { "id": "baari", "name": "Baari", "icon": "Baari.png",
-    "baseCost": 100000, "costMult": 1.15, "baseProd": 500,
-    "unlock": { "tier": 3 } },
-
-  { "id": "cittari", "name": "Cittari", "icon": "Cittari.png",
-    "baseCost": 10000000, "costMult": 1.15, "baseProd": 20000,
-    "unlock": { "tier": 4 } },
-
-  { "id": "sateri", "name": "Säteri", "icon": "Säteri.png",
-    "baseCost": 1000000000, "costMult": 1.15, "baseProd": 400000,
-    "unlock": { "tier": 5 } },
-
-  { "id": "kasino", "name": "Kasino", "icon": "Kasino.png",
-    "baseCost": 100000000000, "costMult": 1.15, "baseProd": 10000000,
-    "unlock": { "tier": 6 } },
-
-  { "id": "kirkko", "name": "Kirkko", "icon": "Kirkko.png",
-    "baseCost": 1000000000000, "costMult": 1.15, "baseProd": 250000000,
-    "unlock": { "tier": 7 } },
-
-  { "id": "vankila", "name": "Vankila", "icon": "Vankila.png",
-    "baseCost": 10000000000000, "costMult": 1.15, "baseProd": 5000000000,
-    "unlock": { "tier": 8 } },
-
-  { "id": "bordelli", "name": "Bordelli", "icon": "Bordelli.png",
-    "baseCost": 100000000000000, "costMult": 1.15, "baseProd": 100000000000,
-    "unlock": { "tier": 9 } },
-
-  { "id": "kampus", "name": "Kampus", "icon": "Kampus.png",
-    "baseCost": 999999999999999999999999999, "costMult": 1.15, "baseProd": 2000000000000,
-    "unlock": { "tier": 10 } },
-
-  { "id": "tehdas", "name": "Tehdas", "icon": "Tehdas.png",
-    "baseCost": 9999999999999999999999999999999999, "costMult": 1.15, "baseProd": 500000000000000,
-    "unlock": { "tier": 11 } },
-
-  { "id": "parlamenttitalo", "name": "Parlamenttitalo", "icon": "Parlamenttitalo.png",
-    "baseCost": 999999999999999999999999999999999999999, "costMult": 1.15, "baseProd": 1000000000000000000000,
-    "unlock": { "tier": 12 } },
-
-  { "id": "placeholder", "name": "TätäEiMissäänNimessäPitäisiNähdä!", "icon": "Sauna.png",
-    "baseCost": 1, "costMult": 1.15, "baseProd": 1,
-    "unlock": { "tier": 13 } }
+  {
+    "id": "sauna",
+    "name": "Sauna",
+    "iconKey": "sauna",
+    "baseCost": 10,
+    "costMult": 1.15,
+    "baseProd": 1,
+    "description": "Rakentaa ensimmäisen lämmitettävän saunan ja houkuttelee kyläläiset löylyihin.",
+    "flavorText": "Puukiuas ritisee ja lauteet vinkuvat kotikutoinen tahtia."
+  },
+  {
+    "id": "kylakauppa",
+    "name": "Kyläkauppa",
+    "iconKey": "kylakauppa",
+    "baseCost": 100,
+    "costMult": 1.15,
+    "baseProd": 5,
+    "description": "Avaa kyläkaupan, joka myy löylytarvikkeita ja kasvattaa kävijämäärää.",
+    "flavorText": "Kauppias muistaa jokaisen asiakkaan nimeltä ja kahvi on aina valmista."
+  },
+  {
+    "id": "alko",
+    "name": "Alko",
+    "iconKey": "alko",
+    "baseCost": 1000,
+    "costMult": 1.15,
+    "baseProd": 25,
+    "description": "Perustaa erikoisliikkeen, joka tarjoaa löylyjen kaveriksi parhaat juomat.",
+    "flavorText": "Hyllyt notkuvat etikettejä, joissa on sopivasti paikallista huumoria."
+  },
+  {
+    "id": "ensiapu",
+    "name": "Ensiapu",
+    "iconKey": "ensiapu",
+    "baseCost": 10000,
+    "costMult": 1.16,
+    "baseProd": 100,
+    "description": "Rahoittaa ensiapupisteen, joka pitää löylyttelijät toimintakykyisinä.",
+    "flavorText": "Rakkolaastarit ja kylmäpussit säilytetään saunan viileimmässä nurkassa.",
+    "unlock": { "tier": 2 }
+  },
+  {
+    "id": "baari",
+    "name": "Baari",
+    "iconKey": "baari",
+    "baseCost": 100000,
+    "costMult": 1.15,
+    "baseProd": 500,
+    "description": "Rakentaa löylyn jälkeisen rentoutumiskeitaan kaupungin ytimeen.",
+    "flavorText": "DJ soittaa kotimaisia klassikoita ja baarimikko tuntee jokaisen juoman tarinan.",
+    "unlock": { "tier": 3 }
+  },
+  {
+    "id": "cittari",
+    "name": "Cittari",
+    "iconKey": "cittari",
+    "baseCost": 10000000,
+    "costMult": 1.15,
+    "baseProd": 20000,
+    "description": "Laajentaa toiminnan suurmarketin tasolle ja tehostaa logistiikkaa.",
+    "flavorText": "Käytävät venyvät horisonttiin ja tarjouksia on jokaisessa nurkassa.",
+    "unlock": { "tier": 4 }
+  },
+  {
+    "id": "sateri",
+    "name": "Säteri",
+    "iconKey": "sateri",
+    "baseCost": 1000000000,
+    "costMult": 1.15,
+    "baseProd": 400000,
+    "description": "Muuntaa kartanon löylyimperiumin päämajaksi ja hallitsee koko kylää.",
+    "flavorText": "Kristallikruunuissa hehkuu hiillos ja salongit täyttyvät löylynjohtajista.",
+    "unlock": { "tier": 5 }
+  },
+  {
+    "id": "kasino",
+    "name": "Kasino",
+    "iconKey": "kasino",
+    "baseCost": 100000000000,
+    "costMult": 1.15,
+    "baseProd": 10000000,
+    "description": "Avaa neonhohtoisen viihdekeskuksen tuottamaan lisävaroja jokaiselta kävijältä.",
+    "flavorText": "Ruletin kiekko pyörii ja löylyn tuoksu seuraa joka pöytään.",
+    "unlock": { "tier": 6 }
+  },
+  {
+    "id": "kirkko",
+    "name": "Kirkko",
+    "iconKey": "kirkko",
+    "baseCost": 1000000000000,
+    "costMult": 1.15,
+    "baseProd": 250000000,
+    "description": "Pyhittää löylyn levon ja kerää siunausta tuotannon tueksi.",
+    "flavorText": "Kellotornista kajahtaa kutsu löylyille ja penkit täyttyvät hetkessä.",
+    "unlock": { "tier": 7 }
+  },
+  {
+    "id": "vankila",
+    "name": "Vankila",
+    "iconKey": "vankila",
+    "baseCost": 10000000000000,
+    "costMult": 1.15,
+    "baseProd": 5000000000,
+    "description": "Rakentaa valvotun tuotantolaitoksen, joka pitää lämmön tasaisesti liikkeessä.",
+    "flavorText": "Vartijoiden löylykierrot ovat kellontarkkoja ja sellien kiukaat pysyvät kuumina.",
+    "unlock": { "tier": 8 }
+  },
+  {
+    "id": "bordelli",
+    "name": "Bordelli",
+    "iconKey": "bordelli",
+    "baseCost": 100000000000000,
+    "costMult": 1.15,
+    "baseProd": 100000000000,
+    "description": "Perustaa punaisen valon alueen eksklusiivisille löylypaketeille.",
+    "flavorText": "Samettiverhot ja värilliset valot kietovat asiakkaat lempeään sumuun.",
+    "unlock": { "tier": 9 }
+  },
+  {
+    "id": "kampus",
+    "name": "Kampus",
+    "iconKey": "kampus",
+    "baseCost": 999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 2000000000000,
+    "description": "Rakentaa akatemian, jossa tutkitaan maailman kuumimpia löylyinnovaatioita.",
+    "flavorText": "Opiskelijat kirjoittavat gradunsa höyryn kondensaatiosta ja saunasuunnittelusta.",
+    "unlock": { "tier": 10 }
+  },
+  {
+    "id": "tehdas",
+    "name": "Tehdas",
+    "iconKey": "tehdas",
+    "baseCost": 9999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 500000000000000,
+    "description": "Automatisoi löylyn tuotannon massiivisilla tuotantolinjoilla.",
+    "flavorText": "Savupiipuista kohoaa höyryä ja valvontahuoneen mittarit hehkuvat punaisina.",
+    "unlock": { "tier": 11 }
+  },
+  {
+    "id": "parlamenttitalo",
+    "name": "Parlamenttitalo",
+    "iconKey": "parlamenttitalo",
+    "baseCost": 999999999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 1000000000000000000000,
+    "description": "Keskittää päätöksenteon ja säätää löylyä koskevat lait omaksi eduksi.",
+    "flavorText": "Edustajat pyyhkivät otsaansa ja hyväksyvät yksimielisesti lisää löylyä.",
+    "unlock": { "tier": 12 }
+  },
+  {
+    "id": "placeholder",
+    "name": "TätäEiMissäänNimessäPitäisiNähdä!",
+    "iconKey": "sauna",
+    "baseCost": 1,
+    "costMult": 1.15,
+    "baseProd": 1,
+    "description": "Debug-rakennus, joka varmistaa että ikonit toimivat myös poikkeustapauksissa.",
+    "flavorText": "Jos näet tämän, löyly on todella karannut käsistä.",
+    "unlock": { "tier": 13 }
+  }
 ]
-
-
-

@@ -1,16 +1,18 @@
 export interface Resource {
   id: string;
   name: string;
-  icon?: string;
+  iconKey?: string;
 }
 
 export interface BuildingDef {
   id: string;
   name: string;
-  icon: string;
+  iconKey: string;
   baseCost: number;
   costMult: number;
   baseProd: number;
+  description?: string;
+  flavorText?: string;
   unlock?: {
     tier: number;
   };
@@ -25,10 +27,12 @@ export interface TechEffect {
 export interface TechDef {
   id: string;
   name: string;
-  icon: string;
+  iconKey: string;
   cost: number;
   effects: TechEffect[];
   limit?: number;
+  description?: string;
+  flavorText?: string;
   unlock?: {
     tier: number;
   };
@@ -51,7 +55,7 @@ export interface PrestigeFormula {
 export interface PrestigeDef {
   id: string;
   name: string;
-  icon: string;
+  iconKey?: string;
   minPopulation: number;
   formula: PrestigeFormula;
 }

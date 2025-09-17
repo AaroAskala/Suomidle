@@ -1,79 +1,133 @@
 [
-  { "id": "vihta", "name": "Vihta", "icon": "Vihta.png",
+  {
+    "id": "vihta",
+    "name": "Vihta",
+    "iconKey": "vihta",
     "cost": 500,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.25 }],
-    "limit": 1
+    "limit": 1,
+    "description": "Tuoreet lehvät lisäävät löylyn kosteutta ja tehostavat jokaista heittoa.",
+    "flavorText": "Koivun tuoksu tarttuu hiuksiin ja ilmassa leijailee pehmeä vihreä sumu."
   },
-  { "id": "kalja", "name": "Kalja", "icon": "Kalja.png",
+  {
+    "id": "kalja",
+    "name": "Kalja",
+    "iconKey": "kalja",
     "cost": 10000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.6 }],
-    "limit": 1, "unlock": { "tier": 2 }
+    "limit": 1,
+    "unlock": { "tier": 2 },
+    "description": "Tarjoaa kylmän huurteisen jokaiselle löylyttelijälle ja nostaa tunnelmaa.",
+    "flavorText": "Tuoppi helmeilee ja lauteilla kuuluu tyytyväistä hörpiskelyä."
   },
-  { "id": "kossu", "name": "Kossu", "icon": "Kossu.png",
+  {
+    "id": "kossu",
+    "name": "Kossu",
+    "iconKey": "kossu",
     "cost": 200000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.8 }],
-    "limit": 1, "unlock": { "tier": 3 }
+    "limit": 1,
+    "unlock": { "tier": 3 },
+    "description": "Lisää rohkeutta ja uskallusta heittää löylyä entistä hurjemmin.",
+    "flavorText": "Lasin kilahdus saa kiukaan laulamaan entistä korkeammalla nuotilla."
   },
-
-  { "id": "kiulu_ja_kauha", "name": "Kiulu ja Kauha", "icon": "Kiulu_ja_Kauha.png",
+  {
+    "id": "kiulu_ja_kauha",
+    "name": "Kiulu ja Kauha",
+    "iconKey": "kiulu_ja_kauha",
     "cost": 20000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.5 }],
-    "limit": 1, "unlock": { "tier": 4 }
+    "limit": 1,
+    "unlock": { "tier": 4 },
+    "description": "Täydellinen löylykalupari varmistaa, ettei yksikään pisara mene hukkaan.",
+    "flavorText": "Kauhan kaari on kuin koreografia, ja kiulu hohtaa vesipisaroista."
   },
-  { "id": "saunalakki", "name": "Saunalakki", "icon": "Saunalakki.png",
+  {
+    "id": "saunalakki",
+    "name": "Saunalakki",
+    "iconKey": "saunalakki",
     "cost": 400000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.8 }],
-    "limit": 1, "unlock": { "tier": 5 }
+    "limit": 1,
+    "unlock": { "tier": 5 },
+    "description": "Suojaa kuumuudelta ja antaa voimia viihtyä löylyissä pidempään.",
+    "flavorText": "Huopainen lippa varjostaa silmät ja kuumuus tuntuu vain lempeältä halaukselta."
   },
-  { "id": "lampomittari", "name": "Lämpömittari", "icon": "Lämpömittari.png",
+  {
+    "id": "lampomittari",
+    "name": "Lämpömittari",
+    "iconKey": "lampomittari",
     "cost": 8000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.0 }],
-    "limit": 1, "unlock": { "tier": 6 }
+    "limit": 1,
+    "unlock": { "tier": 6 },
+    "description": "Paljastaa oikean hetken lisätä vettä ja pitää löylyn täydellisessä balanssissa.",
+    "flavorText": "Punainen elohopea kipuaa taivaaseen ja yleisö hurraa lämpöennätyksille."
   },
-
-  { "id": "burana", "name": "Burana", "icon": "Burana.png",
+  {
+    "id": "burana",
+    "name": "Burana",
+    "iconKey": "burana",
     "cost": 15000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.0 }],
-    "limit": 1, "unlock": { "tier": 7 }
+    "limit": 1,
+    "unlock": { "tier": 7 },
+    "description": "Pitää pienet kolotukset loitolla ja mahdollistaa pidemmät löylykierrokset.",
+    "flavorText": "Tabletit kilahtavat purkista ja kipu pakenee höyryyn."
   },
-  { "id": "saunatuoksu", "name": "Saunatuoksu", "icon": "Saunatuoksu.png",
+  {
+    "id": "saunatuoksu",
+    "name": "Saunatuoksu",
+    "iconKey": "saunatuoksu",
     "cost": 1500000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.2 }],
-    "limit": 1, "unlock": { "tier": 8 }
+    "limit": 1,
+    "unlock": { "tier": 8 },
+    "description": "Höyryttää metsän, järven ja juhannuksen tuoksut samaan löylyyn.",
+    "flavorText": "Yksi korkillinen ja koko sauna muuttuu aarniometsäksi."
   },
-  { "id": "saunaklonkku", "name": "Saunaklonkku", "icon": "Saunaklonkku.png",
+  {
+    "id": "saunaklonkku",
+    "name": "Saunaklonkku",
+    "iconKey": "saunaklonkku",
     "cost": 150000000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.5 }],
-    "limit": 1, "unlock": { "tier": 9 }
+    "limit": 1,
+    "unlock": { "tier": 9 },
+    "description": "Lisää laudelautoja ja tuo jokaiselle kävijälle oman paikan.",
+    "flavorText": "Tuore puu tuoksuu ja jokainen viilu on käsin veistetty."
   },
   {
     "id": "uraanikivet",
     "name": "Uraanikivet",
-    "icon": "Uraanikivet.png",
+    "iconKey": "uraanikivet",
     "cost": 9999999999999999999999999999,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 4.0 }],
     "limit": 1,
-    "unlock": { "tier": 10 }
+    "unlock": { "tier": 10 },
+    "description": "Radioaktiivisesti hehkuvat kivet sytyttävät kiukaan kosmiseen loistoon.",
+    "flavorText": "Hämärässä vihreä hohde piirtää lauteille uusia varjoja."
   },
   {
     "id": "kamehameha",
     "name": "Kamehameha",
-    "icon": "Kamehameha.png",
+    "iconKey": "kamehameha",
     "cost": 99999999999999999999999999999999999,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 4.5 }],
     "limit": 1,
-    "unlock": { "tier": 11 }
+    "unlock": { "tier": 11 },
+    "description": "Keskittää löylyn energian yhdeksi valtavaksi aaloksi, joka kiertää koko maailman.",
+    "flavorText": "Keskipakoisvoima saa kiukaan laulamaan kuin supernova."
   },
   {
     "id": "hawkingin_loylygeneraattori",
     "name": "Hawkingin Löylygeneraattori",
-    "icon": "Hawkingin_Loylygeneraattori.png",
+    "iconKey": "hawkingin_loylygeneraattori",
     "cost": 9999999999999999999999999999999999999999,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 5.0 }],
     "limit": 1,
-    "unlock": { "tier": 12 }
+    "unlock": { "tier": 12 },
+    "description": "Valjastaa kvanttifysiikan salaisuudet äärettömän tehokkaaseen löylynluontiin.",
+    "flavorText": "Generaattorin sisällä pyörii miniatyyrinen musta aukko, joka hengittää pelkkää höyryä."
   }
-
 ]
-
-

@@ -34,7 +34,7 @@ describe('HUD', () => {
   it('renders LPS when cps is set', () => {
     useGameStore.setState({ cps: 5 });
     render(<HUD />);
-    expect(screen.getByText(/LPS: 5/)).toBeInTheDocument();
+    expect(screen.getByText((content) => /5\s*LPS/.test(content))).toBeInTheDocument();
   });
 
   it('click gains at least 1% of cps, rounded', () => {

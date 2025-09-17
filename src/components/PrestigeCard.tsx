@@ -29,8 +29,8 @@ export function PrestigeCard() {
   const prestigePercent = (prestigeMult - 1) * 100;
 
   const subtitle = canPrestige
-    ? `Gain +${formatNumber(deltaMult * 100)}% → ${formatNumber(multAfter)}×`
-    : `Unlock at ${formatNumber(prestigeData.minPopulation)} lämpötila`;
+    ? `+${formatNumber(deltaMult * 100)}% → ${formatNumber(multAfter)}×`
+    : `Aukeaa ${formatNumber(prestigeData.minPopulation)} lämpötilassa`;
 
   return (
     <div
@@ -46,9 +46,11 @@ export function PrestigeCard() {
     >
       <ImageCardButton
         className="prestige-btn"
-        icon={prestigeData.icon}
+        iconKey={prestigeData.iconKey}
         title={`${prestigeData.name}: ${formatNumber(prestigeMult)}×`}
         subtitle={subtitle}
+        status={canPrestige ? 'ready' : 'unaffordable'}
+        tone="accent"
         disabled={!canPrestige}
         onClick={() => {
           if (!canPrestige) return;
