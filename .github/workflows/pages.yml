@@ -77,7 +77,9 @@ jobs:
 
           # Root site
           if [ -d combined/_root ]; then
-            rsync -a --delete combined/_root/ combined/
+            # Remove stale root-level files while keeping the dev build intact
+            find combined -mindepth 1 -maxdepth 1 ! -name dev ! -name _root -exec rm -rf {} +
+            rsync -a combined/_root/ combined/
             rm -rf combined/_root
           fi
 
