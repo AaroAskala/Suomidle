@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import { create } from 'zustand';
 import {
   persist,
@@ -70,6 +71,7 @@ interface Actions {
 type State = BaseState & Actions;
 
 const STORAGE_KEY = 'suomidle';
+const decimalZero = new Decimal(0);
 
 const createInitialMaailmaState = (): MaailmaState => ({
   tuhka: '0',
@@ -633,19 +635,30 @@ export interface TuhkaAwardPreview {
 
 export const getTuhkaAwardPreview = (): TuhkaAwardPreview => {
   const state = useGameStore.getState();
-  const tierLevel = Math.max(1, state.tierLevel);
-  const totalPopulation = Math.max(0, state.totalPopulation);
-  const eraMult = Math.max(1, state.eraMult);
-  const totalResets = getSafeCount(state.maailma.totalResets);
   const current = toBigInt(state.maailma.tuhka);
   const totalEarned = toBigInt(state.maailma.totalTuhkaEarned);
+  const rawTier = new Decimal(state.tierLevel ?? 0);
+  const tier = rawTier.isFinite() ? Decimal.max(rawTier, decimalZero) : decimalZero;
+  const rawMultiplier = new Decimal(state.prestigeMult ?? 0);
+  const multiplier = rawMultiplier.isFinite()
+    ? Decimal.max(rawMultiplier, decimalZero)
+    : decimalZero;
 
-  const tierFactor = tierLevel + Math.log10(totalPopulation + 10);
-  const resetsFactor = Math.log10(totalResets + 10) + Math.log10(eraMult + 1);
-  const rawAward = Number.isFinite(tierFactor) && Number.isFinite(resetsFactor)
-    ? Math.sqrt(Math.max(0, tierFactor * resetsFactor))
-    : 0;
-  const award = BigInt(Math.max(0, Math.floor(rawAward)));
+  let awardDecimal = decimalZero;
+  if (tier.gt(0)) {
+    const logTerm = Decimal.log10(multiplier.plus(1));
+    if (logTerm.isFinite() && logTerm.gt(0)) {
+      const product = tier.mul(logTerm);
+      if (product.isFinite() && product.gt(0)) {
+        awardDecimal = product.sqrt().floor();
+      }
+    }
+  }
+
+  const award =
+    awardDecimal.isFinite() && awardDecimal.gte(0)
+      ? BigInt(awardDecimal.toFixed(0))
+      : 0n;
 
   return {
     current,

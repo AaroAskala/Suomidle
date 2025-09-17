@@ -28,21 +28,17 @@ export function PoltaMaailmaButton() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const tierLevel = useGameStore((s) => s.tierLevel);
-  const eraMult = useGameStore((s) => s.eraMult);
-  const totalPopulation = useGameStore((s) => s.totalPopulation);
+  const prestigeMult = useGameStore((s) => s.prestigeMult);
   const tuhka = useGameStore((s) => s.maailma.tuhka);
   const totalTuhkaEarned = useGameStore((s) => s.maailma.totalTuhkaEarned);
-  const totalResets = useGameStore((s) => s.maailma.totalResets);
 
   const preview: TuhkaAwardPreview = useMemo(() => {
     void tierLevel;
-    void eraMult;
-    void totalPopulation;
+    void prestigeMult;
     void tuhka;
     void totalTuhkaEarned;
-    void totalResets;
     return getTuhkaAwardPreview();
-  }, [tierLevel, eraMult, totalPopulation, tuhka, totalTuhkaEarned, totalResets]);
+  }, [tierLevel, prestigeMult, tuhka, totalTuhkaEarned]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
