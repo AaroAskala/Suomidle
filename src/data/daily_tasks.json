@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "reset_timezone": "Europe/Helsinki",
+  "daily_rotation": {
+    "tasks_per_day": 3,
+    "allow_duplicates_same_day": false,
+    "reroll_cost_population": 0,
+    "reroll_limit_per_day": 1,
+    "selection": {
+      "use_weights": true,
+      "min_tier": 0,
+      "max_active_per_category": 1
+    }
+  },
+  "reward_templates": {
+    "small_temp_boost": { "type": "temp_gain_mult", "value": 0.15, "duration_s": 600, "cooldown_s": 0 },
+    "medium_temp_boost": { "type": "temp_gain_mult", "value": 0.25, "duration_s": 900, "cooldown_s": 0 },
+    "large_temp_boost": { "type": "temp_gain_mult", "value": 0.40, "duration_s": 1200, "cooldown_s": 0 }
+  },
+  "tasks": [
+    {
+      "id": "loyly_100",
+      "title_fi": "Heitä löylyä 100 kertaa",
+      "desc_fi": "Heitä yhteensä 100 löylyä tänään.",
+      "category": "actions",
+      "condition": { "type": "counter", "event": "loyly_throw", "target": 100 },
+      "reward": "small_temp_boost",
+      "weight": 10,
+      "min_tier": 0,
+      "max_per_day": 1
+    },
+    {
+      "id": "loyly_250",
+      "title_fi": "Heitä löylyä 250 kertaa",
+      "desc_fi": "Heitä yhteensä 250 löylyä tänään.",
+      "category": "actions",
+      "condition": { "type": "counter", "event": "loyly_throw", "target": 250 },
+      "reward": "medium_temp_boost",
+      "weight": 7,
+      "min_tier": 1,
+      "max_per_day": 1
+    },
+    {
+      "id": "loyly_500",
+      "title_fi": "Heitä löylyä 500 kertaa",
+      "desc_fi": "Heitä yhteensä 500 löylyä tänään.",
+      "category": "actions",
+      "condition": { "type": "counter", "event": "loyly_throw", "target": 500 },
+      "reward": "large_temp_boost",
+      "weight": 4,
+      "min_tier": 2,
+      "max_per_day": 1
+    },
+    {
+      "id": "buy_building_1",
+      "title_fi": "Osta 1 uusi rakennus",
+      "desc_fi": "Osta mikä tahansa uusi rakennus.",
+      "category": "economy",
+      "condition": { "type": "counter", "event": "building_bought", "target": 1 },
+      "reward": "small_temp_boost",
+      "weight": 9,
+      "min_tier": 0,
+      "max_per_day": 1
+    },
+    {
+      "id": "buy_building_10",
+      "title_fi": "Osta 10 rakennusta",
+      "desc_fi": "Osta yhteensä 10 rakennusta tänään.",
+      "category": "economy",
+      "condition": { "type": "counter", "event": "building_bought", "target": 10 },
+      "reward": "medium_temp_boost",
+      "weight": 6,
+      "min_tier": 1,
+      "max_per_day": 1
+    },
+    {
+      "id": "buy_tech_1",
+      "title_fi": "Osta yksi uusi teknologia",
+      "desc_fi": "Hanki tänään yksi uusi teknologia.",
+      "category": "tech",
+      "condition": { "type": "counter", "event": "technology_bought", "target": 1 },
+      "reward": "medium_temp_boost",
+      "weight": 8,
+      "min_tier": 0,
+      "max_per_day": 1
+    },
+    {
+      "id": "reach_temp_1e6",
+      "title_fi": "Saavuta 1e6 lämpötila",
+      "desc_fi": "Nosta lämpötila vähintään arvoon 1e6 tänään.",
+      "category": "milestone",
+      "condition": { "type": "threshold", "metric": "temperature", "target": "1e6" },
+      "reward": "small_temp_boost",
+      "weight": 8,
+      "min_tier": 0,
+      "max_per_day": 1
+    },
+    {
+      "id": "reach_temp_1e10",
+      "title_fi": "Saavuta 1e9 lämpötila",
+      "desc_fi": "Nosta lämpötila vähintään arvoon 1e9 tänään.",
+      "category": "milestone",
+      "condition": { "type": "threshold", "metric": "temperature", "target": "1e9" },
+      "reward": "medium_temp_boost",
+      "weight": 6,
+      "min_tier": 1,
+      "max_per_day": 1
+    },
+    {
+      "id": "reach_temp_1e16",
+      "title_fi": "Saavuta 1e12 lämpötila",
+      "desc_fi": "Nosta lämpötila vähintään arvoon 1e12 tänään.",
+      "category": "milestone",
+      "condition": { "type": "threshold", "metric": "temperature", "target": "1e12" },
+      "reward": "large_temp_boost",
+      "weight": 4,
+      "min_tier": 2,
+      "max_per_day": 1
+    },
+    {
+      "id": "combo_streak_60s",
+      "title_fi": "Löylyputki 60 s",
+      "desc_fi": "Pidä löylyputki yllä 60 sekuntia (heittoja ilman yli 2 s taukoa).",
+      "category": "skill",
+      "condition": { "type": "streak", "event": "loyly_throw", "window_s": 60, "max_gap_s": 2 },
+      "reward": "medium_temp_boost",
+      "weight": 5,
+      "min_tier": 1,
+      "max_per_day": 1
+    },
+    {
+      "id": "prestige_once",
+      "title_fi": "Polta sauna kerran",
+      "desc_fi": "Käytä Polta sauna tänään vähintään kerran.",
+      "category": "prestige",
+      "condition": { "type": "counter", "event": "prestige", "target": 1 },
+      "reward": "large_temp_boost",
+      "weight": 3,
+      "min_tier": 2,
+      "requires_feature": "prestige",
+      "max_per_day": 1
+    },
+    {
+      "id": "increase_prestige_mult",
+      "title_fi": "Kasvata polta sauna -kerrointa",
+      "desc_fi": "Nosta pysyvää kerrointa vähintään +1 tänään.",
+      "category": "prestige",
+      "condition": { "type": "delta_threshold", "metric": "prestige_multiplier", "delta": 1 },
+      "reward": "large_temp_boost",
+      "weight": 2,
+      "min_tier": 3,
+      "requires_feature": "prestige",
+      "max_per_day": 1
+    },
+    {
+      "id": "upgrade_same_building_3",
+      "title_fi": "Päivitä samaa rakennusta 3 kertaa",
+      "desc_fi": "Tee kolme ostoa samaan rakennukseen tänään.",
+      "category": "economy",
+      "condition": { "type": "counter", "event": "building_bought_same_type", "target": 3 },
+      "reward": "small_temp_boost",
+      "weight": 6,
+      "min_tier": 0,
+      "max_per_day": 1
+    },
+    {
+      "id": "unlock_next_tier",
+      "title_fi": "Avaa seuraava taso",
+      "desc_fi": "Etene seuraavaan tieriin tänään.",
+      "category": "progression",
+      "condition": { "type": "counter", "event": "tier_unlocked", "target": 1 },
+      "reward": "medium_temp_boost",
+      "weight": 4,
+      "min_tier": 1,
+      "max_per_day": 1
+    },
+    {
+      "id": "earn_population_today",
+      "title_fi": "Ansaitse 1e7 lämpötilaa tänään",
+      "desc_fi": "Kasvata päivän netto-lämpöä vähintään 1e7.",
+      "category": "economy",
+      "condition": { "type": "delta_threshold", "metric": "population_earned_today", "target": "1e7" },
+      "reward": "medium_temp_boost",
+      "weight": 6,
+      "min_tier": 1,
+      "max_per_day": 1
+    },
+    {
+      "id": "clicks_1000",
+      "title_fi": "Tee 1000 klikkausta",
+      "desc_fi": "Klikkaa yhteensä 1000 kertaa tänään.",
+      "category": "actions",
+      "condition": { "type": "counter", "event": "click", "target": 1000 },
+      "reward": "large_temp_boost",
+      "weight": 3,
+      "min_tier": 2,
+      "max_per_day": 1
+    },
+    {
+      "id": "session_10min",
+      "title_fi": "Saunavuoro 10 minuuttia",
+      "desc_fi": "Pidä peli auki yhtäjaksoisesti 10 minuuttia.",
+      "category": "time",
+      "condition": { "type": "uptime", "target_s": 600 },
+      "reward": "small_temp_boost",
+      "weight": 8,
+      "min_tier": 0,
+      "max_per_day": 1
+    },
+    {
+      "id": "fast_casts_5",
+      "title_fi": "Nopeat heitot ×5",
+      "desc_fi": "Tee 5 peräkkäistä löylynheittoa alle 1 s välein.",
+      "category": "skill",
+      "condition": { "type": "streak_rate", "event": "loyly_throw", "count": 5, "max_interval_s": 1.0 },
+      "reward": "small_temp_boost",
+      "weight": 6,
+      "min_tier": 0,
+      "max_per_day": 1
+    }
+  ],
+  "ui_texts_fi": {
+    "daily_tasks_title": "Päivän tehtävät",
+    "completed": "Valmis",
+    "claim_reward": "Lunasta tarjous",
+    "reward_active": "Päivitys aktiivinen",
+    "reward_expired": "Päivitys päättynyt",
+    "resets_in": "Uusiutuu",
+    "progress": "Edistyminen",
+    "of": "/"
+  },
+  "telemetry": {
+    "log_task_rolls": true,
+    "log_claims": true,
+    "log_buff_start_end": true
+  }
+}
