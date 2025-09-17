@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { useGameStore } from '../app/store';
 import {
   dailyTasksConfig,
@@ -34,6 +34,8 @@ export function DailyTasksPanel() {
   const uiTexts = dailyTasksConfig.ui_texts_fi;
   const [now, setNow] = useState(() => Date.now());
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const panelId = useId();
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -124,77 +126,114 @@ export function DailyTasksPanel() {
     ? Math.max(0, Math.floor((dailyTasks.nextResetAt - now) / 1000))
     : 0;
 
+  const readyToClaimCount = useMemo(
+    () => taskViews.reduce((count, task) => (task.claimable ? count + 1 : count), 0),
+    [taskViews],
+  );
+  const hasReadyTasks = readyToClaimCount > 0;
+  const readyTasksLabel = hasReadyTasks
+    ? readyToClaimCount === 1
+      ? '1 task ready to claim'
+      : `${readyToClaimCount} tasks ready to claim`
+    : '';
+  const toggleAriaLabel = hasReadyTasks
+    ? `${uiTexts.daily_tasks_title} · ${readyTasksLabel}`
+    : uiTexts.daily_tasks_title;
+
   return (
-    <section className="daily-tasks" aria-labelledby="daily-tasks-title">
-      <header className="daily-tasks__header">
-        <h2 id="daily-tasks-title" className="daily-tasks__title">
-          {uiTexts.daily_tasks_title}
-        </h2>
-        <span className="daily-tasks__reset" aria-live="polite">
-          {uiTexts.resets_in}: {formatTime(secondsToReset)}
+    <aside className={`daily-tasks-drawer${isOpen ? ' daily-tasks-drawer--open' : ''}`}>
+      <button
+        type="button"
+        className="daily-tasks-drawer__toggle"
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        aria-label={toggleAriaLabel}
+        onClick={() => setIsOpen((open) => !open)}
+        title={toggleAriaLabel}
+      >
+        <span className="daily-tasks-drawer__chevron" aria-hidden="true">
+          ›
         </span>
-      </header>
-      <div className="daily-tasks__list">
-        {taskViews.map((task) => {
-          const formattedProgress = formatNumber(task.progress, { maximumFractionDigits: 0 });
-          const formattedTarget = formatNumber(task.target, { maximumFractionDigits: 0 });
-          const buttonClass = task.claimable
-            ? 'btn btn--primary'
-            : task.claimed
-              ? 'btn btn--success'
-              : 'btn btn--disabled';
-          return (
-            <article className="daily-tasks__card" key={task.id}>
-              <header className="daily-tasks__card-header">
-                <div className="daily-tasks__card-text">
-                  <h3 className="daily-tasks__card-title">{task.title}</h3>
-                  <p className="daily-tasks__card-desc">{task.description}</p>
-                </div>
-                {task.statusLabel && (
-                  <span className={`daily-tasks__status daily-tasks__status--${task.statusType}`}>
-                    {task.statusLabel}
-                  </span>
-                )}
-              </header>
-              <div className="daily-tasks__progress">
-                <div
-                  className="daily-tasks__progress-bar"
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={task.target}
-                  aria-valuenow={task.progress}
-                >
-                  <div
-                    className="daily-tasks__progress-fill"
-                    style={{ width: `${Math.min(100, Math.max(0, task.progressRatio * 100))}%` }}
-                  />
-                </div>
-                <div className="daily-tasks__progress-label">
-                  {uiTexts.progress}: {formattedProgress} {uiTexts.of} {formattedTarget}
-                </div>
-              </div>
-              <button
-                type="button"
-                className={buttonClass}
-                disabled={!task.claimable}
-                onClick={() => claimReward(task.id)}
-              >
-                {task.buttonLabel}
-              </button>
-            </article>
-          );
-        })}
-        {taskViews.length === 0 && (
-          <div className="daily-tasks__empty" role="status">
-            {uiTexts.progress}: 0 {uiTexts.of} 0
-          </div>
+        <span className="daily-tasks-drawer__label">{uiTexts.daily_tasks_title}</span>
+        {hasReadyTasks && (
+          <span className="daily-tasks-drawer__badge" aria-label={readyTasksLabel} role="status">
+            !
+          </span>
         )}
-      </div>
+      </button>
+      {isOpen && (
+        <section id={panelId} className="daily-tasks" aria-labelledby="daily-tasks-title">
+          <header className="daily-tasks__header">
+            <h2 id="daily-tasks-title" className="daily-tasks__title">
+              {uiTexts.daily_tasks_title}
+            </h2>
+            <span className="daily-tasks__reset" aria-live="polite">
+              {uiTexts.resets_in}: {formatTime(secondsToReset)}
+            </span>
+          </header>
+          <div className="daily-tasks__list">
+            {taskViews.map((task) => {
+              const formattedProgress = formatNumber(task.progress, { maximumFractionDigits: 0 });
+              const formattedTarget = formatNumber(task.target, { maximumFractionDigits: 0 });
+              const buttonClass = task.claimable
+                ? 'btn btn--primary'
+                : task.claimed
+                  ? 'btn btn--success'
+                  : 'btn btn--disabled';
+              return (
+                <article className="daily-tasks__card" key={task.id}>
+                  <header className="daily-tasks__card-header">
+                    <div className="daily-tasks__card-text">
+                      <h3 className="daily-tasks__card-title">{task.title}</h3>
+                      <p className="daily-tasks__card-desc">{task.description}</p>
+                    </div>
+                    {task.statusLabel && (
+                      <span className={`daily-tasks__status daily-tasks__status--${task.statusType}`}>
+                        {task.statusLabel}
+                      </span>
+                    )}
+                  </header>
+                  <div className="daily-tasks__progress">
+                    <div
+                      className="daily-tasks__progress-bar"
+                      role="progressbar"
+                      aria-valuemin={0}
+                      aria-valuemax={task.target}
+                      aria-valuenow={task.progress}
+                    >
+                      <div
+                        className="daily-tasks__progress-fill"
+                        style={{ width: `${Math.min(100, Math.max(0, task.progressRatio * 100))}%` }}
+                      />
+                    </div>
+                    <div className="daily-tasks__progress-label">
+                      {uiTexts.progress}: {formattedProgress} {uiTexts.of} {formattedTarget}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className={buttonClass}
+                    disabled={!task.claimable}
+                    onClick={() => claimReward(task.id)}
+                  >
+                    {task.buttonLabel}
+                  </button>
+                </article>
+              );
+            })}
+            {taskViews.length === 0 && (
+              <div className="daily-tasks__empty" role="status">
+                {uiTexts.progress}: 0 {uiTexts.of} 0
+              </div>
+            )}
+          </div>
+        </section>
+      )}
       {toast && (
         <div className="daily-tasks__toast" role="status">
           {toast.message}
         </div>
       )}
-    </section>
+    </aside>
   );
 }
