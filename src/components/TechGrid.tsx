@@ -1,10 +1,11 @@
 import { useGameStore } from '../app/store';
 import { tech } from '../content';
-import { formatNumber } from '../utils/format';
+import { useLocale } from '../i18n/useLocale';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ImageCardButton } from './ImageCardButton';
 
 export function TechGrid() {
+  const { t, formatNumber } = useLocale();
   const population = useGameStore((s) => s.population);
   const tier = useGameStore((s) => s.tierLevel);
   const counts = useGameStore((s) => s.techCounts);
@@ -12,28 +13,35 @@ export function TechGrid() {
 
   return (
     <CollapsibleSection
-      title="Teknologiat"
+      title={t('tech.title')}
       className="hud hud__card"
       titleClassName="text--h2"
     >
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {tech.map((t) => {
-          const count = counts[t.id] || 0;
-          const limit = t.limit ?? 1;
+        {tech.map((techDef) => {
+          const count = counts[techDef.id] || 0;
+          const limit = techDef.limit ?? 1;
           const isOwned = count >= limit;
-          const locked = !!(t.unlock?.tier && tier < t.unlock.tier);
-          const disabled = isOwned || locked || population < t.cost;
-          const subtitle = `${isOwned ? 'Owned' : locked ? 'Locked' : ''}${
-            isOwned || locked ? ' - ' : ''
-          }Cost: ${formatNumber(t.cost)}`;
+          const locked = !!(techDef.unlock?.tier && tier < techDef.unlock.tier);
+          const disabled = isOwned || locked || population < techDef.cost;
+          const status = isOwned
+            ? t('tech.unlocked')
+            : locked
+              ? t('tech.locked')
+              : '';
+          const subtitleParts = [
+            status || null,
+            t('tech.card.cost', { cost: formatNumber(techDef.cost, { maximumFractionDigits: 0 }) }),
+          ].filter(Boolean);
+          const name = t(`tech.names.${techDef.id}` as const, { defaultValue: techDef.name });
           return (
             <ImageCardButton
-              key={t.id}
-              icon={`${import.meta.env.BASE_URL}assets/tech/${t.icon}`}
-              title={t.name}
-              subtitle={subtitle}
+              key={techDef.id}
+              icon={`${import.meta.env.BASE_URL}assets/tech/${techDef.icon}`}
+              title={name}
+              subtitle={subtitleParts.join(' · ')}
               disabled={disabled}
-              onClick={() => buy(t.id)}
+              onClick={() => buy(techDef.id)}
             />
           );
         })}

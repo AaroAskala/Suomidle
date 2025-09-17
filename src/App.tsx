@@ -13,8 +13,10 @@ import { useSettingsStore } from './app/settingsStore';
 import { MaailmaShop } from './ui/MaailmaShop';
 import { PoltaMaailmaButton } from './ui/PoltaMaailmaButton';
 import { DailyTasksPanel } from './ui/dailyTasksUI';
+import { useLocale } from './i18n/useLocale';
 
 function App() {
+  const { t } = useLocale();
   const tierLevel = useGameStore((s) => s.tierLevel);
   const hasInteracted = useSettingsStore((s) => s.hasInteracted);
   const markInteracted = useSettingsStore((s) => s.markInteracted);
@@ -53,8 +55,8 @@ function App() {
   return (
     <>
       {!hasInteracted && (
-        <div className="tap-overlay" onPointerDown={markInteracted}>
-          Tap to start
+        <div className="tap-overlay" onPointerDown={markInteracted} role="button" aria-label={t('app.tapToStart')}>
+          {t('app.tapToStart')}
         </div>
       )}
       <Settings />

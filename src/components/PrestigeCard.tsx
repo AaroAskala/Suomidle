@@ -6,10 +6,10 @@ import {
   useGameStore,
 } from '../app/store';
 import { prestige as prestigeData } from '../content';
-import { formatNumber } from '../utils/format';
+import { useLocale } from '../i18n/useLocale';
 
 export function PrestigeCard() {
-  const prestigePoints = useGameStore((s) => s.prestigePoints);
+  const { t, formatNumber } = useLocale();
   const prestigeMult = useGameStore((s) => s.prestigeMult);
   const totalPopulation = useGameStore((s) => s.totalPopulation);
   const canPrestige = useGameStore((s) => s.canPrestige());
@@ -18,19 +18,23 @@ export function PrestigeCard() {
   const { multAfter, deltaMult } = useMemo(() => {
     const pointsAfter = computePrestigePoints(totalPopulation);
     const multAfter = computePrestigeMult(pointsAfter);
-    const deltaPoints = pointsAfter - prestigePoints;
     return {
       multAfter,
       deltaMult: multAfter - prestigeMult,
-      deltaPoints,
     };
-  }, [prestigePoints, prestigeMult, totalPopulation]);
+  }, [prestigeMult, totalPopulation]);
 
   const prestigePercent = (prestigeMult - 1) * 100;
+  const prestigeName = t('prestige.action', { defaultValue: prestigeData.name });
 
   const subtitle = canPrestige
-    ? `Gain +${formatNumber(deltaMult * 100)}% → ${formatNumber(multAfter)}×`
-    : `Unlock at ${formatNumber(prestigeData.minPopulation)} lämpötila`;
+    ? t('prestige.card.gain', {
+        gain: formatNumber(deltaMult * 100, { maximumFractionDigits: 2 }),
+        target: formatNumber(multAfter, { maximumFractionDigits: 2 }),
+      })
+    : t('prestige.card.unlock', {
+        requirement: formatNumber(prestigeData.minPopulation, { maximumFractionDigits: 0 }),
+      });
 
   return (
     <div
@@ -47,23 +51,30 @@ export function PrestigeCard() {
       <ImageCardButton
         className="prestige-btn"
         icon={prestigeData.icon}
-        title={`${prestigeData.name}: ${formatNumber(prestigeMult)}×`}
+        title={t('prestige.card.title', {
+          name: prestigeName,
+          value: formatNumber(prestigeMult, { maximumFractionDigits: 2 }),
+        })}
         subtitle={subtitle}
         disabled={!canPrestige}
         onClick={() => {
           if (!canPrestige) return;
           if (
             confirm(
-              `Reset progress and gain +${formatNumber(
-                deltaMult * 100,
-              )}% ${prestigeData.name} multiplier?`,
+              t('prestige.confirm', {
+                gain: formatNumber(deltaMult * 100, { maximumFractionDigits: 2 }),
+                name: prestigeName,
+              }),
             )
           )
             prestige();
         }}
       />
       <div className="prestige-mobile-info">
-        {`Polta sauna: +${formatNumber(prestigePercent)}%`}
+        {t('prestige.mobileInfo', {
+          name: prestigeName,
+          bonus: formatNumber(prestigePercent, { maximumFractionDigits: 2 }),
+        })}
       </div>
     </div>
   );
