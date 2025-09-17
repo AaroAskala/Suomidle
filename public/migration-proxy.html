@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Suomidle Save Migration Proxy</title>
+    <meta name="robots" content="noindex" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0b0d16;
+        color: #f0f3ff;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      body {
+        display: flex;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Preparing Suomidle save data…</p>
+    <script>
+      (function () {
+        const REQUEST_TYPE = 'suomidle-legacy-migration-request-v1';
+        const RESPONSE_TYPE = 'suomidle-legacy-migration-response-v1';
+        const STORAGE_KEYS = ['suomidle', 'settings'];
+        const ALLOWED_ORIGINS = new Set([
+          'https://aaroonparas.com',
+          'https://www.aaroonparas.com',
+          'http://localhost:5173',
+          'http://127.0.0.1:5173',
+          'http://localhost:4173',
+          'http://127.0.0.1:4173',
+          'http://localhost',
+          'http://127.0.0.1',
+        ]);
+
+        const toErrorMessage = (error) => {
+          if (!error) return undefined;
+          if (typeof error === 'string') return error;
+          if (error instanceof Error && typeof error.message === 'string') return error.message;
+          try {
+            return JSON.stringify(error);
+          } catch (serializationError) {
+            return String(serializationError && serializationError.message ? serializationError.message : error);
+          }
+        };
+
+        const readPayload = () => {
+          const payload = {};
+          for (const key of STORAGE_KEYS) {
+            try {
+              const value = window.localStorage.getItem(key);
+              if (typeof value === 'string') {
+                payload[key] = value;
+              }
+            } catch (error) {
+              return { error: toErrorMessage(error) };
+            }
+          }
+          return { payload };
+        };
+
+        window.addEventListener('message', (event) => {
+          if (!event || !event.data || event.data.type !== REQUEST_TYPE) return;
+          if (!ALLOWED_ORIGINS.has(event.origin)) return;
+          if (!event.source) return;
+
+          const { requestId } = event.data;
+          const result = readPayload();
+          const payload = result.payload && typeof result.payload === 'object' ? result.payload : undefined;
+          const payloadSize = payload ? Object.keys(payload).length : 0;
+          const status = result.error ? 'error' : payloadSize > 0 ? 'ok' : 'empty';
+
+          event.source.postMessage(
+            {
+              type: RESPONSE_TYPE,
+              requestId,
+              status,
+              payload: result.error ? undefined : payload,
+              error: result.error,
+            },
+            event.origin,
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>
