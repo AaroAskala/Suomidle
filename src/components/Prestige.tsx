@@ -1,6 +1,7 @@
 import { useGameStore } from '../app/store';
 import { getTier } from '../content';
 import { formatNumber } from '../utils/format';
+import { CollapsibleSection } from './CollapsibleSection';
 
 export function Prestige() {
   const tierLevel = useGameStore((s) => s.tierLevel);
@@ -9,8 +10,11 @@ export function Prestige() {
   const current = getTier(tierLevel);
   const next = getTier(tierLevel + 1);
   return (
-    <div className="hud hud__card">
-      <h2 className="text--h2">Uusi sauna</h2>
+    <CollapsibleSection
+      title="Uusi sauna"
+      className="hud hud__card"
+      titleClassName="text--h2"
+    >
       <div className="text--body">
         Sauna Taso: {formatNumber(tierLevel)}
         {current ? ` (${current.name})` : ''}
@@ -28,6 +32,6 @@ export function Prestige() {
       >
         Uusi sauna!
       </button>
-    </div>
+    </CollapsibleSection>
   );
 }

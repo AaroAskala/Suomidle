@@ -7,6 +7,7 @@ import {
   type MouseEvent,
 } from 'react';
 import { useGameStore } from '../app/store';
+import { CollapsibleSection } from '../components/CollapsibleSection';
 import shopData from '../data/maailma_shop.json' assert { type: 'json' };
 import { formatNumber } from '../utils/format';
 
@@ -54,7 +55,8 @@ export function MaailmaShop() {
   const tuhkaString = useGameStore((state) => state.maailma.tuhka);
   const purchaseHistory = useGameStore((state) => state.maailma.purchases);
   const purchaseUpgrade = useGameStore((state) => state.purchaseMaailmaUpgrade);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const totalResetsRaw = useGameStore((state) => state.maailma.totalResets);
+  const containerRef = useRef<HTMLElement | null>(null);
   const [embers, setEmbers] = useState<Ember[]>([]);
   const emberTimeouts = useRef<number[]>([]);
 
@@ -65,18 +67,25 @@ export function MaailmaShop() {
     emberTimeouts.current = [];
   }, []);
 
+  const hasUnlockedShop = useMemo(() => {
+    const numeric = Number(totalResetsRaw ?? 0);
+    return Number.isFinite(numeric) && numeric > 0;
+  }, [totalResetsRaw]);
+
   const tuhkaValue = useMemo(() => {
+    if (!hasUnlockedShop) return 0;
     const numeric = Number.parseFloat(tuhkaString);
     return Number.isFinite(numeric) ? numeric : 0;
-  }, [tuhkaString]);
+  }, [hasUnlockedShop, tuhkaString]);
 
   const purchaseCounts = useMemo(() => {
+    if (!hasUnlockedShop) return new Map<string, number>();
     const counts = new Map<string, number>();
     for (const id of purchaseHistory) {
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
     return counts;
-  }, [purchaseHistory]);
+  }, [hasUnlockedShop, purchaseHistory]);
 
   const spawnEmber = (centerX: number, centerY: number) => {
     const container = containerRef.current;
@@ -110,10 +119,18 @@ export function MaailmaShop() {
     }
   };
 
+  if (!hasUnlockedShop) {
+    return null;
+  }
+
   return (
-    <div className="maailma-shop" ref={containerRef}>
-      <div className="maailma-shop__header">
-        <h2 className="maailma-shop__title text--h2">Maailman kauppa</h2>
+    <CollapsibleSection
+      title="Maailman kauppa"
+      className="maailma-shop"
+      headerClassName="maailma-shop__header"
+      titleClassName="maailma-shop__title text--h2"
+      sectionRef={containerRef}
+      headerContent={
         <div
           className="maailma-shop__balance"
           title={currency.accrual_formula_fi || undefined}
@@ -121,13 +138,14 @@ export function MaailmaShop() {
           {currencyLabel}:&nbsp;
           <span className="maailma-shop__balance-value">{formatNumber(tuhkaValue)}</span>
         </div>
-      </div>
+      }
+    >
       <table className="maailma-shop__table">
-        <thead>
-          <tr>
-            <th scope="col">Parannus</th>
-            <th scope="col">Taso</th>
-            <th scope="col">Seuraava hinta</th>
+          <thead>
+            <tr>
+              <th scope="col">Parannus</th>
+              <th scope="col">Taso</th>
+              <th scope="col">Seuraava hinta</th>
             <th scope="col" className="maailma-shop__action-header">
               Toiminto
             </th>
@@ -236,6 +254,6 @@ export function MaailmaShop() {
           />
         ))}
       </div>
-    </div>
+    </CollapsibleSection>
   );
 }
