@@ -17,6 +17,17 @@ import {
   type PermanentBonuses,
 } from '../effects/applyPermanentBonuses';
 import maailmaShop from '../data/maailma_shop.json' assert { type: 'json' };
+import {
+  createInitialDailyTasksState,
+  syncDailyTasksState,
+  handleDailyTaskEvent,
+  applyUptimeProgress,
+  getEffectiveTemperatureMultiplier,
+  claimDailyTaskReward as claimDailyTaskRewardEffect,
+  type DailyTasksState,
+  type DailyTaskPlayerContext,
+  updateDailyTaskMetrics,
+} from '../systems/dailyTasks';
 
 export const BigBeautifulBalancePath = 7;
 let needsEraPrompt = false;
@@ -55,6 +66,7 @@ interface BaseState {
   lastMajorVersion: number;
   eraPromptAcknowledged: boolean;
   maailma: MaailmaState;
+  dailyTasks: DailyTasksState;
 }
 
 interface Actions {
@@ -76,6 +88,8 @@ interface Actions {
   };
   prestige: () => boolean;
   changeEra: () => void;
+  initializeDailyTasks: () => void;
+  claimDailyTaskReward: (taskId: string) => void;
 }
 
 type State = BaseState & Actions;
@@ -221,6 +235,17 @@ const createInitialMaailmaState = (): MaailmaState => ({
   era: 0,
 });
 
+const buildDailyTaskContext = (state: BaseState): DailyTaskPlayerContext => ({
+  tierLevel: state.tierLevel,
+  population: state.population,
+  totalPopulation: state.totalPopulation,
+  prestigeMult: state.prestigeMult,
+  prestigeUnlocked:
+    state.prestigePoints > 0 ||
+    state.prestigeMult > 1 ||
+    state.totalPopulation >= prestigeData.minPopulation,
+});
+
 const createInitialBaseState = (): BaseState => {
   const maailma = createInitialMaailmaState();
   const permanent = computePermanentBonusesFromMaailma(maailma);
@@ -243,6 +268,7 @@ const createInitialBaseState = (): BaseState => {
     lastMajorVersion: BigBeautifulBalancePath,
     eraPromptAcknowledged: true,
     maailma,
+    dailyTasks: createInitialDailyTasksState(),
   };
 };
 
@@ -252,14 +278,18 @@ const createProgressResetState = (state: State, maailmaOverride?: MaailmaState):
   const permanent = computePermanentBonusesFromMaailma(maailma);
   const prestigeMult = Math.max(base.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
   const lampotilaRate = Math.max(0, permanent.lampotilaRateMult);
-  return {
+  const resetBase: BaseState = {
     ...base,
     eraMult: state.eraMult,
     maailma,
     modifiers: { ...(base.modifiers ?? { permanent }), permanent },
     prestigeMult,
     lampotilaRate,
+    dailyTasks: state.dailyTasks,
   };
+  const context = buildDailyTaskContext(resetBase);
+  const dailyTasks = syncDailyTasksState(state.dailyTasks, context, Date.now());
+  return { ...resetBase, dailyTasks };
 };
 
 const normalizeMaailma = (value: unknown): MaailmaState => {
@@ -380,13 +410,21 @@ const sanitizeState = (state: State): BaseState => {
   const permanent = computePermanentBonusesFromMaailma(maailma);
   const prestigeMult = Math.max(base.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
   const previousModifiers = base.modifiers ?? { permanent };
-  return {
+  const sanitized: BaseState = {
     ...base,
     prestigeMult,
     lampotilaRate: permanent.lampotilaRateMult,
     modifiers: { ...previousModifiers, permanent },
     maailma,
   };
+  const now = Date.now();
+  const context = buildDailyTaskContext(sanitized);
+  const dailyTasks = syncDailyTasksState(
+    base.dailyTasks ?? createInitialDailyTasksState(),
+    context,
+    now,
+  );
+  return { ...sanitized, dailyTasks };
 };
 
 const buildPersistedData = (
@@ -462,59 +500,129 @@ export const useGameStore = create<State>()(
     (set, get) => ({
       ...createInitialBaseState(),
       addPopulation: (amount) =>
-        set((s) => ({
-          population: s.population + amount,
-          totalPopulation: s.totalPopulation + amount,
-        })),
+        set((s) => {
+          const now = Date.now();
+          const contextBefore = buildDailyTaskContext(s);
+          let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
+          const { state: buffedTasks, multiplier } = getEffectiveTemperatureMultiplier(
+            dailyTasks,
+            now,
+          );
+          dailyTasks = buffedTasks;
+          const gain = amount * multiplier;
+          const nextPopulation = s.population + gain;
+          const nextTotalPopulation = s.totalPopulation + gain;
+          const contextAfter: DailyTaskPlayerContext = {
+            ...contextBefore,
+            population: nextPopulation,
+            totalPopulation: nextTotalPopulation,
+          };
+          dailyTasks = handleDailyTaskEvent(dailyTasks, { type: 'loyly_throw' }, contextAfter, now);
+          dailyTasks = handleDailyTaskEvent(dailyTasks, { type: 'click' }, contextAfter, now);
+          return {
+            population: nextPopulation,
+            totalPopulation: nextTotalPopulation,
+            dailyTasks,
+          };
+        }),
       purchaseBuilding: (id) => {
         const b = getBuilding(id);
         if (!b) return;
-        const s = get();
-        const permanent = s.modifiers.permanent;
-        const tierOffset = Math.trunc(permanent.tierUnlockOffset);
-        const effectiveTierLevel = s.tierLevel - tierOffset;
-        if (b.unlock?.tier && effectiveTierLevel < b.unlock.tier) return;
-        const count = s.buildings[id] || 0;
-        const baseCostMult = b.costMult + permanent.buildingCostMultiplier.delta;
-        const floor = permanent.buildingCostMultiplier.floor;
-        const adjustedMult =
-          typeof floor === 'number' && Number.isFinite(floor)
-            ? Math.max(baseCostMult, floor)
-            : baseCostMult;
-        const costMult = Math.max(0.0001, adjustedMult);
-        const price = b.baseCost * Math.pow(costMult, count);
-        if (s.population < price) return;
-        set({
-          population: s.population - price,
-          buildings: { ...s.buildings, [id]: count + 1 },
+        let didPurchase = false;
+        set((s) => {
+          const permanent = s.modifiers.permanent;
+          const tierOffset = Math.trunc(permanent.tierUnlockOffset);
+          const effectiveTierLevel = s.tierLevel - tierOffset;
+          if (b.unlock?.tier && effectiveTierLevel < b.unlock.tier) return {};
+          const count = s.buildings[id] || 0;
+          const baseCostMult = b.costMult + permanent.buildingCostMultiplier.delta;
+          const floor = permanent.buildingCostMultiplier.floor;
+          const adjustedMult =
+            typeof floor === 'number' && Number.isFinite(floor)
+              ? Math.max(baseCostMult, floor)
+              : baseCostMult;
+          const costMult = Math.max(0.0001, adjustedMult);
+          const price = b.baseCost * Math.pow(costMult, count);
+          if (s.population < price) return {};
+          const now = Date.now();
+          const contextBefore = buildDailyTaskContext(s);
+          let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
+          const nextPopulation = s.population - price;
+          const buildings = { ...s.buildings, [id]: count + 1 };
+          const contextAfter: DailyTaskPlayerContext = {
+            ...contextBefore,
+            population: nextPopulation,
+          };
+          dailyTasks = updateDailyTaskMetrics(dailyTasks, contextAfter, now);
+          dailyTasks = handleDailyTaskEvent(
+            dailyTasks,
+            { type: 'building_bought', buildingId: id },
+            contextAfter,
+            now,
+          );
+          dailyTasks = handleDailyTaskEvent(
+            dailyTasks,
+            { type: 'building_bought_same_type', buildingId: id },
+            contextAfter,
+            now,
+          );
+          didPurchase = true;
+          return {
+            population: nextPopulation,
+            buildings,
+            dailyTasks,
+          };
         });
-        get().recompute();
+        if (didPurchase) {
+          get().recompute();
+        }
       },
       purchaseTech: (id) => {
         const t = getTech(id);
         if (!t) return;
-        const s = get();
-        const count = s.techCounts[id] || 0;
-        const limit = t.limit ?? 1;
-        if (count >= limit) return;
-        const tierOffset = Math.trunc(s.modifiers.permanent.tierUnlockOffset);
-        const effectiveTierLevel = s.tierLevel - tierOffset;
-        if (t.unlock?.tier && effectiveTierLevel < t.unlock.tier) return;
-        if (s.population < t.cost) return;
-        const nextCounts = { ...s.techCounts, [id]: count + 1 };
-        const multipliers = { ...s.multipliers };
-        for (const eff of t.effects) {
-          if (eff.target === 'population_cps') {
-            if (eff.type === 'mult') multipliers.population_cps *= eff.value;
-            else multipliers.population_cps += eff.value;
+        let didPurchase = false;
+        set((s) => {
+          const count = s.techCounts[id] || 0;
+          const limit = t.limit ?? 1;
+          if (count >= limit) return {};
+          const tierOffset = Math.trunc(s.modifiers.permanent.tierUnlockOffset);
+          const effectiveTierLevel = s.tierLevel - tierOffset;
+          if (t.unlock?.tier && effectiveTierLevel < t.unlock.tier) return {};
+          if (s.population < t.cost) return {};
+          const nextCounts = { ...s.techCounts, [id]: count + 1 };
+          const multipliers = { ...s.multipliers };
+          for (const eff of t.effects) {
+            if (eff.target === 'population_cps') {
+              if (eff.type === 'mult') multipliers.population_cps *= eff.value;
+              else multipliers.population_cps += eff.value;
+            }
           }
-        }
-        set({
-          population: s.population - t.cost,
-          techCounts: nextCounts,
-          multipliers,
+          const now = Date.now();
+          const contextBefore = buildDailyTaskContext(s);
+          let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
+          const nextPopulation = s.population - t.cost;
+          const contextAfter: DailyTaskPlayerContext = {
+            ...contextBefore,
+            population: nextPopulation,
+          };
+          dailyTasks = updateDailyTaskMetrics(dailyTasks, contextAfter, now);
+          dailyTasks = handleDailyTaskEvent(
+            dailyTasks,
+            { type: 'technology_bought', technologyId: id },
+            contextAfter,
+            now,
+          );
+          didPurchase = true;
+          return {
+            population: nextPopulation,
+            techCounts: nextCounts,
+            multipliers,
+            dailyTasks,
+          };
         });
-        get().recompute();
+        if (didPurchase) {
+          get().recompute();
+        }
       },
       purchaseMaailmaUpgrade: (id) => {
         let didPurchase = false;
@@ -580,14 +688,36 @@ export const useGameStore = create<State>()(
         set({ cps, clickPower, lampotilaRate: Math.max(0, permanent.lampotilaRateMult) });
       },
       tick: (delta, options) => {
-        const state = get();
-        const offlineMult = options?.offline ? state.modifiers.permanent.offlineProdMult : 1;
-        const gain = state.cps * delta * offlineMult;
-        if (gain > 0)
-          set((s) => ({
-            population: s.population + gain,
-            totalPopulation: s.totalPopulation + gain,
-          }));
+        set((s) => {
+          const now = Date.now();
+          const contextBefore = buildDailyTaskContext(s);
+          let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
+          const { state: buffedTasks, multiplier } = getEffectiveTemperatureMultiplier(
+            dailyTasks,
+            now,
+          );
+          dailyTasks = buffedTasks;
+          const offlineMult = options?.offline ? s.modifiers.permanent.offlineProdMult : 1;
+          const gain = s.cps * delta * offlineMult * multiplier;
+          let nextPopulation = s.population;
+          let nextTotalPopulation = s.totalPopulation;
+          if (gain > 0) {
+            nextPopulation += gain;
+            nextTotalPopulation += gain;
+          }
+          const contextAfter: DailyTaskPlayerContext = {
+            ...contextBefore,
+            population: nextPopulation,
+            totalPopulation: nextTotalPopulation,
+          };
+          dailyTasks = updateDailyTaskMetrics(dailyTasks, contextAfter, now);
+          dailyTasks = applyUptimeProgress(dailyTasks, contextAfter, delta, now, options);
+          return {
+            population: nextPopulation,
+            totalPopulation: nextTotalPopulation,
+            dailyTasks,
+          };
+        });
       },
       canAdvanceTier: () => {
         const s = get();
@@ -598,7 +728,20 @@ export const useGameStore = create<State>()(
       },
       advanceTier: () => {
         if (!get().canAdvanceTier()) return;
-        set((s) => ({ tierLevel: s.tierLevel + 1 }));
+        const now = Date.now();
+        set((s) => {
+          const nextTier = s.tierLevel + 1;
+          const contextBefore = buildDailyTaskContext(s);
+          let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
+          const contextAfter: DailyTaskPlayerContext = { ...contextBefore, tierLevel: nextTier };
+          dailyTasks = handleDailyTaskEvent(
+            dailyTasks,
+            { type: 'tier_unlocked', tierLevel: nextTier },
+            contextAfter,
+            now,
+          );
+          return { tierLevel: nextTier, dailyTasks };
+        });
         get().recompute();
       },
       canPrestige: () => get().totalPopulation >= prestigeData.minPopulation,
@@ -625,6 +768,9 @@ export const useGameStore = create<State>()(
       prestige: () => {
         if (!get().canPrestige()) return false;
         const s = get();
+        const now = Date.now();
+        const contextBefore = buildDailyTaskContext(s);
+        let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
         const pointsAfter = computePrestigePoints(s.totalPopulation);
         const normalizedMaailma = normalizeMaailma(s.maailma);
         const permanent = computePermanentBonusesFromMaailma(normalizedMaailma);
@@ -634,7 +780,7 @@ export const useGameStore = create<State>()(
         const preservedMultipliers = keepTech ? { ...s.multipliers } : baseState.multipliers;
         const multAfterRaw = computePrestigeMult(pointsAfter);
         const multAfter = Math.max(multAfterRaw, permanent.saunaPrestigeBaseMultiplierMin);
-        set({
+        const resetState: BaseState = {
           ...baseState,
           multipliers: preservedMultipliers,
           techCounts: preservedTechCounts,
@@ -645,6 +791,14 @@ export const useGameStore = create<State>()(
           maailma: normalizedMaailma,
           modifiers: { ...baseState.modifiers, permanent },
           lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+          dailyTasks,
+        };
+        const contextAfter = buildDailyTaskContext(resetState);
+        dailyTasks = syncDailyTasksState(dailyTasks, contextAfter, now);
+        dailyTasks = handleDailyTaskEvent(dailyTasks, { type: 'prestige' }, contextAfter, now);
+        set({
+          ...resetState,
+          dailyTasks,
         });
         get().recompute();
         saveGame();
@@ -652,12 +806,16 @@ export const useGameStore = create<State>()(
       },
       changeEra: () => {
         const s = get();
+        const now = Date.now();
+        const contextBefore = buildDailyTaskContext(s);
+        let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
         const normalizedMaailma = normalizeMaailma(s.maailma);
         const permanent = computePermanentBonusesFromMaailma(normalizedMaailma);
         const baseState = createInitialBaseState();
-        set({
+        const nextEraMult = s.eraMult + 1;
+        const resetState: BaseState = {
           ...baseState,
-          eraMult: s.eraMult + 1,
+          eraMult: nextEraMult,
           maailma: normalizedMaailma,
           modifiers: { ...baseState.modifiers, permanent },
           prestigeMult: Math.max(
@@ -665,9 +823,33 @@ export const useGameStore = create<State>()(
             permanent.saunaPrestigeBaseMultiplierMin,
           ),
           lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+          dailyTasks,
+        };
+        const contextAfter = buildDailyTaskContext(resetState);
+        dailyTasks = syncDailyTasksState(dailyTasks, contextAfter, now);
+        set({
+          ...resetState,
+          dailyTasks,
         });
         get().recompute();
         saveGame();
+      },
+      initializeDailyTasks: () => {
+        const now = Date.now();
+        set((s) => {
+          const context = buildDailyTaskContext(s);
+          const dailyTasks = syncDailyTasksState(s.dailyTasks, context, now);
+          return { dailyTasks };
+        });
+      },
+      claimDailyTaskReward: (taskId) => {
+        const now = Date.now();
+        set((s) => {
+          const context = buildDailyTaskContext(s);
+          const synced = syncDailyTasksState(s.dailyTasks, context, now);
+          const { state: nextTasks } = claimDailyTaskRewardEffect(synced, taskId, now);
+          return { dailyTasks: nextTasks };
+        });
       },
     }),
     {
@@ -717,6 +899,7 @@ export const useGameStore = create<State>()(
             maailma,
             modifiers: { permanent },
             lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+            dailyTasks: createInitialDailyTasksState(),
           };
         }
 
@@ -749,6 +932,7 @@ export const useGameStore = create<State>()(
             maailma,
             modifiers: { permanent },
             lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+            dailyTasks: createInitialDailyTasksState(),
           };
         }
 
@@ -817,6 +1001,7 @@ export const useGameStore = create<State>()(
           maailma,
           modifiers: { permanent },
           lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+          dailyTasks: createInitialDailyTasksState(),
         };
       },
       onRehydrateStorage: () => (state) => {
@@ -835,6 +1020,7 @@ export const useGameStore = create<State>()(
         state.recompute();
         const delta = Math.max(0, Math.floor((now - last) / 1000));
         state.tick(delta, { offline: true });
+        state.initializeDailyTasks();
         useGameStore.setState({ lastSave: now, maailma: normalizedMaailma });
         let acknowledged = state.eraPromptAcknowledged;
         try {
