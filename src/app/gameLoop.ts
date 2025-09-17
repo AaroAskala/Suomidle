@@ -11,7 +11,7 @@ export function startGameLoop() {
   function frame(now: number) {
     const delta = (now - last) / 1000;
     last = now;
-    useGameStore.getState().tick(delta);
+    useGameStore.getState().tick(delta, 'tick');
     sinceSave += delta;
     if (sinceSave >= 5) {
       saveGame();
