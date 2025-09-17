@@ -9,16 +9,23 @@ import {
   getBuilding,
   getTech,
   getTier,
-  getBuildingCost,
   prestige as prestigeData,
 } from '../content';
-import { applyPermanentBonuses } from '../effects/applyPermanentBonuses';
+import {
+  applyPermanentBonuses,
+  type PermanentBonuses,
+} from '../effects/applyPermanentBonuses';
+import maailmaShop from '../data/maailma_shop.json' assert { type: 'json' };
 
 export const BigBeautifulBalancePath = 7;
 let needsEraPrompt = false;
 
 interface Multipliers {
   population_cps: number;
+}
+
+interface ModifiersState {
+  permanent: PermanentBonuses;
 }
 
 type MaailmaState = {
@@ -36,11 +43,13 @@ interface BaseState {
   buildings: Record<string, number>;
   techCounts: Record<string, number>;
   multipliers: Multipliers;
+  modifiers: ModifiersState;
   cps: number;
   clickPower: number;
   prestigePoints: number;
   prestigeMult: number;
   eraMult: number;
+  lampotilaRate: number;
   lastSave: number;
   lastMajorVersion: number;
   eraPromptAcknowledged: boolean;
@@ -51,8 +60,9 @@ interface Actions {
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
   purchaseTech: (id: string) => void;
+  purchaseMaailmaUpgrade: (id: string) => boolean;
   recompute: () => void;
-  tick: (delta: number) => void;
+  tick: (delta: number, options?: { offline?: boolean }) => void;
   canAdvanceTier: () => boolean;
   advanceTier: () => void;
   canPrestige: () => boolean;
@@ -71,6 +81,87 @@ type State = BaseState & Actions;
 
 const STORAGE_KEY = 'suomidle';
 
+type RawMaailmaShopItem = {
+  id?: unknown;
+  cost_tuhka?: unknown;
+  max_level?: unknown;
+};
+
+const rawShopItems = Array.isArray((maailmaShop as { shop?: unknown }).shop)
+  ? ((maailmaShop as { shop: RawMaailmaShopItem[] }).shop ?? [])
+  : [];
+
+const maailmaShopItemsById = new Map<
+  string,
+  { costs: number[]; maxLevel: number }
+>();
+
+for (const item of rawShopItems) {
+  if (!item || typeof item.id !== 'string') continue;
+  const costsSource = Array.isArray(item.cost_tuhka) ? item.cost_tuhka : [];
+  const costs = costsSource
+    .map((value) => (typeof value === 'number' && Number.isFinite(value) ? value : null))
+    .filter((value): value is number => value !== null);
+  const maxLevelRaw = item.max_level;
+  const maxLevel =
+    typeof maxLevelRaw === 'number' && Number.isFinite(maxLevelRaw)
+      ? Math.max(0, Math.floor(maxLevelRaw))
+      : costs.length;
+  maailmaShopItemsById.set(item.id, { costs, maxLevel });
+}
+
+const countMaailmaPurchases = (purchases: string[], id: string) =>
+  purchases.reduce((count, entry) => (entry === id ? count + 1 : count), 0);
+
+const getMaailmaNextCost = (id: string, level: number) => {
+  const item = maailmaShopItemsById.get(id);
+  if (!item) return undefined;
+  if (item.costs.length === 0 || level >= item.maxLevel) return undefined;
+  const index = Math.min(level, item.costs.length - 1);
+  return item.costs[index];
+};
+
+const formatDecimalString = (value: number) => {
+  if (!Number.isFinite(value)) return '0';
+  const safe = Math.max(0, value);
+  const fixed = safe.toFixed(6);
+  const trimmed = fixed.replace(/\.0+$/, '').replace(/\.([0-9]*?)0+$/, '.$1');
+  const cleaned = trimmed.endsWith('.') ? trimmed.slice(0, -1) : trimmed;
+  return cleaned.length > 0 ? cleaned : '0';
+};
+
+const cloneMaailmaForBonuses = (maailma: MaailmaState): MaailmaState => ({
+  ...maailma,
+  purchases: [...maailma.purchases],
+});
+
+const computePermanentBonusesFromMaailma = (maailma: MaailmaState): PermanentBonuses => {
+  const payload = {
+    maailma: cloneMaailmaForBonuses(maailma),
+  } as Parameters<typeof applyPermanentBonuses>[0];
+  return applyPermanentBonuses(payload);
+};
+
+const computeTierBonusMultiplier = (
+  tierLevel: number,
+  perTierBonuses: Record<string, number>,
+) => {
+  let multiplier = 1;
+  for (const [key, value] of Object.entries(perTierBonuses)) {
+    const fromTier = Number(key);
+    if (!Number.isFinite(fromTier)) continue;
+    const unlockedTiers = Math.max(0, tierLevel - fromTier + 1);
+    if (unlockedTiers <= 0) continue;
+    if (value >= 1) {
+      multiplier *= Math.pow(value, unlockedTiers);
+    } else {
+      const addition = Math.max(0, 1 + value * unlockedTiers);
+      multiplier *= addition;
+    }
+  }
+  return multiplier;
+};
+
 const createInitialMaailmaState = (): MaailmaState => ({
   tuhka: '0',
   purchases: [],
@@ -79,23 +170,30 @@ const createInitialMaailmaState = (): MaailmaState => ({
   era: 0,
 });
 
-const createInitialBaseState = (): BaseState => ({
-  population: 0,
-  totalPopulation: 0,
-  tierLevel: 1,
-  buildings: {} as Record<string, number>,
-  techCounts: {} as Record<string, number>,
-  multipliers: { population_cps: 1 },
-  cps: 0,
-  clickPower: 1,
-  prestigePoints: 0,
-  prestigeMult: 1,
-  eraMult: 1,
-  lastSave: Date.now(),
-  lastMajorVersion: BigBeautifulBalancePath,
-  eraPromptAcknowledged: true,
-  maailma: createInitialMaailmaState(),
-});
+const createInitialBaseState = (): BaseState => {
+  const maailma = createInitialMaailmaState();
+  const permanent = computePermanentBonusesFromMaailma(maailma);
+  const prestigeMult = Math.max(1, permanent.saunaPrestigeBaseMultiplierMin);
+  return {
+    population: 0,
+    totalPopulation: 0,
+    tierLevel: 1,
+    buildings: {} as Record<string, number>,
+    techCounts: {} as Record<string, number>,
+    multipliers: { population_cps: 1 },
+    modifiers: { permanent },
+    cps: 0,
+    clickPower: 1,
+    prestigePoints: 0,
+    prestigeMult,
+    eraMult: 1,
+    lampotilaRate: permanent.lampotilaRateMult,
+    lastSave: Date.now(),
+    lastMajorVersion: BigBeautifulBalancePath,
+    eraPromptAcknowledged: true,
+    maailma,
+  };
+};
 
 const normalizeMaailma = (value: unknown): MaailmaState => {
   const defaults = createInitialMaailmaState();
@@ -212,7 +310,16 @@ const sanitizeState = (state: State): BaseState => {
   void changeEra;
   const base = rest as BaseState;
   const maailma = normalizeMaailma(base.maailma);
-  return { ...base, maailma };
+  const permanent = computePermanentBonusesFromMaailma(maailma);
+  const prestigeMult = Math.max(base.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
+  const previousModifiers = base.modifiers ?? { permanent };
+  return {
+    ...base,
+    prestigeMult,
+    lampotilaRate: permanent.lampotilaRateMult,
+    modifiers: { ...previousModifiers, permanent },
+    maailma,
+  };
 };
 
 const buildPersistedData = (
@@ -221,10 +328,18 @@ const buildPersistedData = (
 ) => {
   const maailma = normalizeMaailma(state.maailma);
   const save = { ...(previousSave ?? {}), maailma } as Record<string, unknown>;
-  applyPermanentBonuses(save as Parameters<typeof applyPermanentBonuses>[0]);
+  const permanent = applyPermanentBonuses(
+    save as Parameters<typeof applyPermanentBonuses>[0],
+  );
   return {
     version: BigBeautifulBalancePath,
-    state: { ...state, maailma },
+    state: {
+      ...state,
+      maailma,
+      modifiers: { ...(state.modifiers ?? { permanent }), permanent },
+      prestigeMult: Math.max(state.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin),
+      lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+    },
     save,
   } satisfies PersistedStorageValue & {
     version: number;
@@ -288,9 +403,19 @@ export const useGameStore = create<State>()(
         const b = getBuilding(id);
         if (!b) return;
         const s = get();
-        if (b.unlock?.tier && s.tierLevel < b.unlock.tier) return;
+        const permanent = s.modifiers.permanent;
+        const tierOffset = Math.trunc(permanent.tierUnlockOffset);
+        const effectiveTierLevel = s.tierLevel - tierOffset;
+        if (b.unlock?.tier && effectiveTierLevel < b.unlock.tier) return;
         const count = s.buildings[id] || 0;
-        const price = getBuildingCost(b, count);
+        const baseCostMult = b.costMult + permanent.buildingCostMultiplier.delta;
+        const floor = permanent.buildingCostMultiplier.floor;
+        const adjustedMult =
+          typeof floor === 'number' && Number.isFinite(floor)
+            ? Math.max(baseCostMult, floor)
+            : baseCostMult;
+        const costMult = Math.max(0.0001, adjustedMult);
+        const price = b.baseCost * Math.pow(costMult, count);
         if (s.population < price) return;
         set({
           population: s.population - price,
@@ -305,7 +430,9 @@ export const useGameStore = create<State>()(
         const count = s.techCounts[id] || 0;
         const limit = t.limit ?? 1;
         if (count >= limit) return;
-        if (t.unlock?.tier && s.tierLevel < t.unlock.tier) return;
+        const tierOffset = Math.trunc(s.modifiers.permanent.tierUnlockOffset);
+        const effectiveTierLevel = s.tierLevel - tierOffset;
+        if (t.unlock?.tier && effectiveTierLevel < t.unlock.tier) return;
         if (s.population < t.cost) return;
         const nextCounts = { ...s.techCounts, [id]: count + 1 };
         const multipliers = { ...s.multipliers };
@@ -322,19 +449,73 @@ export const useGameStore = create<State>()(
         });
         get().recompute();
       },
+      purchaseMaailmaUpgrade: (id) => {
+        let didPurchase = false;
+        set((state) => {
+          const currentMaailma = normalizeMaailma(state.maailma);
+          const numericTuhka = Number.parseFloat(currentMaailma.tuhka);
+          if (!Number.isFinite(numericTuhka)) return {};
+          const level = countMaailmaPurchases(currentMaailma.purchases, id);
+          const cost = getMaailmaNextCost(id, level);
+          if (cost === undefined) return {};
+          if (numericTuhka < cost) return {};
+          const remaining = formatDecimalString(numericTuhka - cost);
+          const nextPurchases = [...currentMaailma.purchases, id];
+          const nextMaailma: MaailmaState = {
+            ...currentMaailma,
+            tuhka: remaining,
+            purchases: nextPurchases,
+          };
+          const permanent = computePermanentBonusesFromMaailma(nextMaailma);
+          const previousModifiers = state.modifiers ?? { permanent };
+          didPurchase = true;
+          return {
+            maailma: nextMaailma,
+            modifiers: { ...previousModifiers, permanent },
+            prestigeMult: Math.max(
+              state.prestigeMult,
+              permanent.saunaPrestigeBaseMultiplierMin,
+            ),
+            lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+          };
+        });
+        if (didPurchase) {
+          get().recompute();
+        }
+        return didPurchase;
+      },
       recompute: () => {
         const s = get();
-        let cps = 0;
+        const permanent = s.modifiers.permanent;
+        let cpsBase = 0;
         for (const b of buildings) {
           const count = s.buildings[b.id] || 0;
-          cps += b.baseProd * count;
+          if (count <= 0) continue;
+          cpsBase += b.baseProd * count;
         }
-        cps *= s.prestigeMult * s.multipliers.population_cps * s.eraMult;
+        const baseProdMult = Math.max(0, permanent.baseProdMult);
+        const techBonusMultiplier = Math.max(0, 1 + permanent.techMultiplierBonusAdd);
+        const spentBonusMultiplier = Math.max(0, 1 + permanent.globalCpsAddFromTuhkaSpent);
+        const tierBonusMultiplier = computeTierBonusMultiplier(
+          s.tierLevel,
+          permanent.perTierGlobalCpsAdd,
+        );
+        const prestigeMult = Math.max(s.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
+        const globalMultiplier =
+          prestigeMult *
+          s.eraMult *
+          Math.max(0, s.multipliers.population_cps) *
+          techBonusMultiplier *
+          spentBonusMultiplier *
+          tierBonusMultiplier;
+        const cps = cpsBase * baseProdMult * globalMultiplier;
         const clickPower = Math.max(1, Math.round(cps / 100));
-        set({ cps, clickPower });
+        set({ cps, clickPower, lampotilaRate: Math.max(0, permanent.lampotilaRateMult) });
       },
-      tick: (delta) => {
-        const gain = get().cps * delta;
+      tick: (delta, options) => {
+        const state = get();
+        const offlineMult = options?.offline ? state.modifiers.permanent.offlineProdMult : 1;
+        const gain = state.cps * delta * offlineMult;
         if (gain > 0)
           set((s) => ({
             population: s.population + gain,
@@ -343,38 +524,60 @@ export const useGameStore = create<State>()(
       },
       canAdvanceTier: () => {
         const s = get();
-        const next = getTier(s.tierLevel + 1);
+        const offset = Math.trunc(s.modifiers.permanent.tierUnlockOffset);
+        const targetTier = Math.max(1, s.tierLevel + 1 + offset);
+        const next = getTier(targetTier);
         return !!next && s.population >= next.population;
       },
       advanceTier: () => {
-        if (get().canAdvanceTier())
-          set((s) => ({ tierLevel: s.tierLevel + 1 }));
+        if (!get().canAdvanceTier()) return;
+        set((s) => ({ tierLevel: s.tierLevel + 1 }));
+        get().recompute();
       },
       canPrestige: () => get().totalPopulation >= prestigeData.minPopulation,
       projectPrestigeGain: () => {
         const s = get();
         const pointsAfter = computePrestigePoints(s.totalPopulation);
-        const multAfter = computePrestigeMult(pointsAfter);
+        const currentMult = Math.max(
+          s.prestigeMult,
+          s.modifiers.permanent.saunaPrestigeBaseMultiplierMin,
+        );
+        const multAfterRaw = computePrestigeMult(pointsAfter);
+        const multAfter = Math.max(
+          multAfterRaw,
+          s.modifiers.permanent.saunaPrestigeBaseMultiplierMin,
+        );
         return {
           pointsNow: s.prestigePoints,
-          multNow: s.prestigeMult,
+          multNow: currentMult,
           pointsAfter,
           multAfter,
-          deltaMult: multAfter - s.prestigeMult,
+          deltaMult: multAfter - currentMult,
         };
       },
       prestige: () => {
         if (!get().canPrestige()) return false;
         const s = get();
         const pointsAfter = computePrestigePoints(s.totalPopulation);
-        const multAfter = computePrestigeMult(pointsAfter);
+        const normalizedMaailma = normalizeMaailma(s.maailma);
+        const permanent = computePermanentBonusesFromMaailma(normalizedMaailma);
+        const baseState = createInitialBaseState();
+        const keepTech = permanent.keepTechOnSaunaReset;
+        const preservedTechCounts = keepTech ? { ...s.techCounts } : baseState.techCounts;
+        const preservedMultipliers = keepTech ? { ...s.multipliers } : baseState.multipliers;
+        const multAfterRaw = computePrestigeMult(pointsAfter);
+        const multAfter = Math.max(multAfterRaw, permanent.saunaPrestigeBaseMultiplierMin);
         set({
-          ...createInitialBaseState(),
+          ...baseState,
+          multipliers: preservedMultipliers,
+          techCounts: preservedTechCounts,
           eraMult: s.eraMult,
           totalPopulation: s.totalPopulation,
           prestigePoints: pointsAfter,
           prestigeMult: multAfter,
-          maailma: normalizeMaailma(s.maailma),
+          maailma: normalizedMaailma,
+          modifiers: { ...baseState.modifiers, permanent },
+          lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
         });
         get().recompute();
         saveGame();
@@ -382,10 +585,19 @@ export const useGameStore = create<State>()(
       },
       changeEra: () => {
         const s = get();
+        const normalizedMaailma = normalizeMaailma(s.maailma);
+        const permanent = computePermanentBonusesFromMaailma(normalizedMaailma);
+        const baseState = createInitialBaseState();
         set({
-          ...createInitialBaseState(),
+          ...baseState,
           eraMult: s.eraMult + 1,
-          maailma: normalizeMaailma(s.maailma),
+          maailma: normalizedMaailma,
+          modifiers: { ...baseState.modifiers, permanent },
+          prestigeMult: Math.max(
+            baseState.prestigeMult,
+            permanent.saunaPrestigeBaseMultiplierMin,
+          ),
+          lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
         });
         get().recompute();
         saveGame();
@@ -410,7 +622,14 @@ export const useGameStore = create<State>()(
             storedSave?.maailma ??
             storedState?.maailma,
         );
+        const permanent = computePermanentBonusesFromMaailma(maailma);
         if (version >= BigBeautifulBalancePath) {
+          const existingPrestigeMult =
+            typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1;
+          const prestigeMult = Math.max(
+            existingPrestigeMult,
+            permanent.saunaPrestigeBaseMultiplierMin,
+          );
           return {
             ...(old as Partial<State>),
             totalPopulation:
@@ -422,19 +641,26 @@ export const useGameStore = create<State>()(
                   ),
             prestigePoints:
               typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
-            prestigeMult:
-              typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+            prestigeMult,
             eraMult: typeof old?.eraMult === 'number' ? (old.eraMult as number) : 1,
             lastSave:
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
             lastMajorVersion,
             eraPromptAcknowledged: acknowledged,
             maailma,
+            modifiers: { permanent },
+            lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
           };
         }
 
         needsEraPrompt = true;
         if (version >= 3) {
+          const existingPrestigeMult =
+            typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1;
+          const prestigeMult = Math.max(
+            existingPrestigeMult,
+            permanent.saunaPrestigeBaseMultiplierMin,
+          );
           return {
             ...(old as Partial<State>),
             totalPopulation:
@@ -446,8 +672,7 @@ export const useGameStore = create<State>()(
                   ),
             prestigePoints:
               typeof old?.prestigePoints === 'number' ? (old.prestigePoints as number) : 0,
-            prestigeMult:
-              typeof old?.prestigeMult === 'number' ? (old.prestigeMult as number) : 1,
+            prestigeMult,
             eraMult:
               typeof old?.eraMult === 'number' ? (old.eraMult as number) : 1,
             lastSave:
@@ -455,6 +680,8 @@ export const useGameStore = create<State>()(
             lastMajorVersion,
             eraPromptAcknowledged: acknowledged,
             maailma,
+            modifiers: { permanent },
+            lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
           };
         }
 
@@ -476,7 +703,17 @@ export const useGameStore = create<State>()(
         }
 
         if (Object.values(counts).some((n) => n > 1)) {
-          return { ...createInitialBaseState(), maailma };
+          const baseState = createInitialBaseState();
+          return {
+            ...baseState,
+            maailma,
+            modifiers: { ...baseState.modifiers, permanent },
+            prestigeMult: Math.max(
+              baseState.prestigeMult,
+              permanent.saunaPrestigeBaseMultiplierMin,
+            ),
+            lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+          };
         }
 
         const multipliers: Multipliers = { population_cps: 1 };
@@ -491,6 +728,7 @@ export const useGameStore = create<State>()(
           }
         }
 
+        const prestigeMult = Math.max(1, permanent.saunaPrestigeBaseMultiplierMin);
         return {
           population: typeof old?.population === 'number' ? (old.population as number) : 0,
           totalPopulation: Math.max(
@@ -504,12 +742,14 @@ export const useGameStore = create<State>()(
           cps: 0,
           clickPower: 1,
           prestigePoints: 0,
-          prestigeMult: 1,
+          prestigeMult,
           eraMult: 1,
           lastSave: Date.now(),
           lastMajorVersion,
           eraPromptAcknowledged: acknowledged,
           maailma,
+          modifiers: { permanent },
+          lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
         };
       },
       onRehydrateStorage: () => (state) => {
@@ -518,9 +758,16 @@ export const useGameStore = create<State>()(
         const last = state.lastSave ?? now;
         const normalizedMaailma = normalizeMaailma(state.maailma);
         state.maailma = normalizedMaailma;
+        const permanent = computePermanentBonusesFromMaailma(normalizedMaailma);
+        state.modifiers = { ...(state.modifiers ?? { permanent }), permanent };
+        state.prestigeMult = Math.max(
+          state.prestigeMult,
+          permanent.saunaPrestigeBaseMultiplierMin,
+        );
+        state.lampotilaRate = Math.max(0, permanent.lampotilaRateMult);
         state.recompute();
         const delta = Math.max(0, Math.floor((now - last) / 1000));
-        state.tick(delta);
+        state.tick(delta, { offline: true });
         useGameStore.setState({ lastSave: now, maailma: normalizedMaailma });
         let acknowledged = state.eraPromptAcknowledged;
         try {
