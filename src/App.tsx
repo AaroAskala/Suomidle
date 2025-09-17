@@ -10,6 +10,7 @@ import { useGameStore } from './app/store';
 import './App.css';
 import { playTierMusic } from './audio/music';
 import { useSettingsStore } from './app/settingsStore';
+import { DailyTasksPanel } from './app/dailyTasksUI';
 
 function App() {
   const tierLevel = useGameStore((s) => s.tierLevel);
@@ -52,7 +53,12 @@ function App() {
         </div>
       )}
       <Settings />
-      <HUD />
+      <div className="app__top">
+        <div className="app__top-section">
+          <HUD />
+        </div>
+        <DailyTasksPanel />
+      </div>
       <PrestigeCard />
       <BuildingsGrid />
       <TechGrid />
