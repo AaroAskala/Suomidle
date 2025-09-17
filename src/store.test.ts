@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore, BigBeautifulBalancePath } from './app/store';
+import {
+  createInitialDailyTaskState,
+  getTempGainBuffSnapshots,
+  type ActiveBuffState,
+} from './app/dailyTasks';
 
 describe('model v6', () => {
   beforeEach(() => {
@@ -11,6 +16,7 @@ describe('model v6', () => {
       buildings: {},
       techCounts: {},
       multipliers: { population_cps: 1 },
+      baseCps: 0,
       cps: 0,
       clickPower: 1,
       prestigePoints: 0,
@@ -18,6 +24,7 @@ describe('model v6', () => {
       eraMult: 1,
       lastMajorVersion: BigBeautifulBalancePath,
       eraPromptAcknowledged: true,
+      tempGainBuffs: [],
     });
     useGameStore.getState().recompute();
   });
@@ -35,6 +42,41 @@ describe('model v6', () => {
     const before = useGameStore.getState().cps;
     useGameStore.getState().purchaseTech('vihta');
     expect(useGameStore.getState().cps).toBeCloseTo(before * 1.25);
+  });
+
+  it('applies active temp gain buffs to cps, ticks, and clicks', () => {
+    const now = Date.now();
+    const daily = createInitialDailyTaskState();
+    const activeBuff: ActiveBuffState = {
+      id: 'test',
+      sourceTaskId: 'test',
+      rewardId: 'test_reward',
+      type: 'temp_gain_mult',
+      value: 0.5,
+      startedAt: now,
+      expiresAt: now + 60_000,
+    };
+    daily.activeBuffs = { [activeBuff.id]: activeBuff };
+    daily.buffMultiplier = 1.5;
+    useGameStore.setState({
+      population: 0,
+      totalPopulation: 0,
+      buildings: { sauna: 1 },
+      daily,
+      tempGainBuffs: getTempGainBuffSnapshots(daily),
+    });
+    useGameStore.getState().recompute();
+    expect(useGameStore.getState().baseCps).toBeCloseTo(1, 6);
+    expect(useGameStore.getState().cps).toBeCloseTo(1.5, 6);
+
+    useGameStore.setState({ population: 0, totalPopulation: 0 });
+    useGameStore.getState().tick(1, 'tick');
+    expect(useGameStore.getState().population).toBeCloseTo(1.5, 6);
+
+    useGameStore.setState({ population: 0, totalPopulation: 0 });
+    const clickPower = useGameStore.getState().clickPower;
+    useGameStore.getState().addPopulation(clickPower);
+    expect(useGameStore.getState().population).toBeCloseTo(1.5, 6);
   });
 
   it('rehydrates techCounts from stored object', async () => {
