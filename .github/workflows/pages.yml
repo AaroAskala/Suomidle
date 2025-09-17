@@ -1,0 +1,118 @@
+name: Build & Deploy Pages (root + /dev)
+
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Prepare worktrees for both branches
+        run: |
+          set -euo pipefail
+          git fetch --all --prune
+          mkdir -p worktrees
+          if git show-ref --verify --quiet refs/remotes/origin/main; then
+            git worktree add worktrees/main origin/main
+          fi
+          if git show-ref --verify --quiet refs/remotes/origin/dev; then
+            git worktree add worktrees/dev origin/dev
+          fi
+
+      # ===== Build MAIN → combined/_root =====
+      - name: Build MAIN (root -> https://aaroonparas.com/)
+        if: ${{ hashFiles('worktrees/main/**') != '' }}
+        working-directory: worktrees/main
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build
+          mkdir -p "$GITHUB_WORKSPACE/combined/_root"
+          rsync -a --delete dist/ "$GITHUB_WORKSPACE/combined/_root/"
+
+      # ===== Build DEV → combined/dev (base=/dev -> https://aaroonparas.com/dev/) =====
+      - name: Build DEV (/dev -> https://aaroonparas.com/dev/)
+        if: ${{ hashFiles('worktrees/dev/**') != '' }}
+        working-directory: worktrees/dev
+        env:
+          PUBLIC_URL: /dev/
+          BASE_URL: /dev/
+          VITE_BASE: /dev/
+          NEXT_PUBLIC_BASE_PATH: /dev/
+          GATSBY_PATH_PREFIX: /dev/
+        run: |
+          set -euo pipefail
+          # If your framework supports a --base or similar flag, prefer it (e.g. Vite: npm run build -- --base=/dev/)
+          npm ci
+          npm run build
+          mkdir -p "$GITHUB_WORKSPACE/combined/dev"
+          rsync -a --delete dist/ "$GITHUB_WORKSPACE/combined/dev/"
+
+      # ===== Assemble combined artifact =====
+      - name: Assemble combined artifact (with CNAME and SPA fallbacks)
+        run: |
+          set -euo pipefail
+          mkdir -p combined
+
+          # Root site
+          if [ -d combined/_root ]; then
+            rsync -a --delete combined/_root/ combined/
+            rm -rf combined/_root
+          fi
+
+          # Prevent Jekyll processing
+          touch combined/.nojekyll
+
+          # Ensure custom domain
+          echo "aaroonparas.com" > combined/CNAME
+
+          # SPA 404 fallbacks
+          if [ ! -f combined/404.html ] && [ -f combined/index.html ]; then
+            cp combined/index.html combined/404.html || true
+          fi
+          if [ -d combined/dev ] && [ ! -f combined/dev/404.html ] && [ -f combined/dev/index.html ]; then
+            cp combined/dev/index.html combined/dev/404.html || true
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: combined
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary with URLs
+        run: |
+          echo "### Deployed URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- Production: https://aaroonparas.com/" >> $GITHUB_STEP_SUMMARY
+          echo "- Development: https://aaroonparas.com/dev/" >> $GITHUB_STEP_SUMMARY
