@@ -204,3 +204,233 @@ h1 {
     height: 2px;
   }
 }
+
+.app__top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: min(100%, 960px);
+  margin: 1rem auto 0;
+}
+
+.app__top-section {
+  flex: 1 1 280px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.daily-tasks-panel {
+  flex: 1 1 320px;
+  min-width: 280px;
+  max-width: 420px;
+  background: color-mix(in srgb, var(--surface-elevated) 90%, transparent);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.daily-tasks-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.daily-tasks-panel__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.daily-tasks-panel__timer {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.daily-tasks-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.daily-task-card {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.daily-task-card--completed {
+  border-color: color-mix(in srgb, var(--brand-primary) 60%, transparent);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.25);
+}
+
+.daily-task-card--claimed {
+  opacity: 0.85;
+}
+
+.daily-task-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.daily-task-card__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.daily-task-card__description {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  text-align: left;
+}
+
+.daily-task-card__progress-label {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  text-align: left;
+  margin-bottom: 0.35rem;
+}
+
+.daily-task-card__progress-bar {
+  width: 100%;
+  height: 0.6rem;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.daily-task-card__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.daily-task-card__claim {
+  width: fit-content;
+}
+
+.daily-task-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: color-mix(in srgb, var(--brand-primary) 25%, transparent);
+}
+
+.daily-task-card__badge--claimed {
+  background: color-mix(in srgb, #4caf50 30%, transparent);
+}
+
+.daily-task-card__badge--completed {
+  background: color-mix(in srgb, var(--brand-primary) 40%, transparent);
+}
+
+.daily-task-buffs {
+  border-radius: 0.65rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.daily-task-buffs__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.daily-task-buffs__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.daily-task-buffs__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.daily-task-buffs__name {
+  flex: 1;
+  text-align: left;
+}
+
+.daily-task-buffs__value {
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-task-buffs__timer {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.daily-tasks-toasts {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.daily-tasks-toast {
+  background: var(--surface-elevated);
+  color: var(--color-text);
+  padding: 0.75rem 1rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-left: 4px solid var(--brand-primary);
+  font-size: 0.9rem;
+  pointer-events: auto;
+}
+
+.daily-tasks-toast--success {
+  border-left-color: #4caf50;
+}
+
+.daily-tasks-toast--warning {
+  border-left-color: #f5a623;
+}
+
+@media (max-width: 720px) {
+  .app__top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .daily-tasks-panel {
+    max-width: none;
+    width: 100%;
+  }
+
+  .daily-tasks-toasts {
+    right: 0.75rem;
+    left: 0.75rem;
+  }
+}
