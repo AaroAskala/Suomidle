@@ -24,7 +24,7 @@ export function PoltaMaailmaButton() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [confirmValue, setConfirmValue] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const toastTimerRef = useRef<number | undefined>();
+  const toastTimerRef = useRef<number | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const tierLevel = useGameStore((s) => s.tierLevel);
