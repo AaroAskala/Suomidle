@@ -80,7 +80,56 @@ interface Actions {
 
 type State = BaseState & Actions;
 
-const STORAGE_KEY = 'suomidle';
+const STORAGE_KEY_BASE = 'suomidle';
+
+type ImportMetaEnvLike = {
+  VITE_STORAGE_NAMESPACE?: string;
+  BASE_URL?: string;
+  MODE?: string;
+};
+
+const normalizeStorageNamespace = (value: string | undefined): string | null => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const normalized = trimmed
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+  return normalized.length > 0 ? normalized : null;
+};
+
+const resolveStorageNamespace = (): string | null => {
+  const env =
+    (typeof import.meta !== 'undefined'
+      ? ((import.meta.env as ImportMetaEnvLike | undefined) ?? {})
+      : {});
+  const explicit = normalizeStorageNamespace(env.VITE_STORAGE_NAMESPACE);
+  if (explicit) return explicit;
+
+  const fromBaseUrl = normalizeStorageNamespace(env.BASE_URL);
+  if (fromBaseUrl) return fromBaseUrl;
+
+  const mode = env.MODE === 'production' ? null : normalizeStorageNamespace(env.MODE);
+  if (mode) return mode;
+
+  return null;
+};
+
+const STORAGE_NAMESPACE = resolveStorageNamespace();
+
+/**
+ * Derived local storage key for persisted saves.
+ *
+ * The production build keeps the original `suomidle` namespace to preserve
+ * existing player data. Development, test, and preview deployments can supply a
+ * custom namespace via `VITE_STORAGE_NAMESPACE`, or fall back to the build
+ * `BASE_URL`/mode so their saves land in an isolated slot (e.g.
+ * `suomidle:dev-preview`).
+ */
+export const STORAGE_KEY = STORAGE_NAMESPACE
+  ? `${STORAGE_KEY_BASE}:${STORAGE_NAMESPACE}`
+  : STORAGE_KEY_BASE;
 const decimalZero = new Decimal(0);
 
 type RawMaailmaShopItem = {
