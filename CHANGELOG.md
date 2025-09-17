@@ -8,3 +8,5 @@
 ### Fixed
 - Ensure the legacy migration overwrites any new-domain saves once so existing
   progress from GitHub Pages wins.
+- Block the initial render until the legacy data migration completes so
+  existing progress appears immediately.

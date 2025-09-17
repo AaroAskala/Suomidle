@@ -95,6 +95,66 @@ describe('legacy storage migration', () => {
     expect(localStorage.getItem(MIGRATION_STATE_KEY)).toBe('complete')
   })
 
+  test('hydrates the store from migrated data before the first render', async () => {
+    const migratedSave = {
+      version: Number.MAX_SAFE_INTEGER,
+      state: {
+        population: 4321,
+        totalPopulation: 8765,
+        tierLevel: 4,
+        eraMult: 2,
+        maailma: {
+          tuhka: '24',
+          purchases: ['upgrade-a', 'upgrade-b'],
+          totalTuhkaEarned: '48',
+          totalResets: 3,
+          era: 0,
+        },
+        lastSave: 1_700_000_000_000,
+      },
+    }
+
+    const migration = ensureLegacyStorageMigrated({
+      force: true,
+      requestIdOverride: 'hydrate',
+      requestTimeoutMs: 250,
+    })
+
+    await nextTick()
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        origin: 'https://aaroaskala.github.io',
+        data: {
+          type: RESPONSE_TYPE,
+          requestId: 'hydrate',
+          status: 'ok',
+          payload: {
+            suomidle: JSON.stringify(migratedSave),
+          },
+        },
+      }),
+    )
+
+    await migration
+
+    const { useGameStore } = (await import(
+      '../app/store?legacy-migration-test',
+    )) as typeof import('../app/store')
+    const state = useGameStore.getState()
+    expect(state.population).toBe(4321)
+    expect(state.totalPopulation).toBe(8765)
+    expect(state.tierLevel).toBe(4)
+    expect(state.eraMult).toBe(2)
+    expect(state.maailma).toEqual({
+      tuhka: '24',
+      purchases: ['upgrade-a', 'upgrade-b'],
+      totalTuhkaEarned: '48',
+      totalResets: 3,
+      era: 0,
+    })
+  })
+
   test('resolves after timing out when the legacy origin is unreachable', async () => {
     vi.useFakeTimers()
 
