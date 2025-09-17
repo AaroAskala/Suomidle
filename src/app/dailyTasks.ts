@@ -149,6 +149,12 @@ export interface ActiveBuffState {
   expiresAt: number;
 }
 
+export interface TempGainBuffSnapshot {
+  id: string;
+  value: number;
+  endsAt: number;
+}
+
 export interface DailyTaskRuntimeState {
   baseSeed: number;
   seed: number;
@@ -249,6 +255,23 @@ const computeBuffMultiplier = (buffs: Record<string, ActiveBuffState>) => {
   }
   return mult;
 };
+
+const createTempGainBuffSnapshot = (buff: ActiveBuffState): TempGainBuffSnapshot => ({
+  id: buff.id,
+  value: 1 + buff.value,
+  endsAt: buff.expiresAt,
+});
+
+export const getTempGainBuffSnapshots = (
+  state: DailyTaskRuntimeState,
+): TempGainBuffSnapshot[] =>
+  Object.values(state.activeBuffs)
+    .filter((buff) => buff.type === 'temp_gain_mult')
+    .map(createTempGainBuffSnapshot)
+    .sort((a, b) => {
+      if (a.endsAt === b.endsAt) return a.id.localeCompare(b.id);
+      return a.endsAt - b.endsAt;
+    });
 
 const withUpdatedProgress = (
   state: DailyTaskRuntimeState,
@@ -625,28 +648,70 @@ const syncUptimeProgress = (
   return next;
 };
 
+export interface BuffExpiryResult {
+  state: DailyTaskRuntimeState;
+  expired: ActiveBuffState[];
+}
+
 export const expireBuffs = (
   state: DailyTaskRuntimeState,
   now: number,
-): DailyTaskRuntimeState => {
+): BuffExpiryResult => {
   let changed = false;
   const activeBuffs: Record<string, ActiveBuffState> = {};
+  const expired: ActiveBuffState[] = [];
   for (const [id, buff] of Object.entries(state.activeBuffs)) {
     if (buff.expiresAt > now) {
       activeBuffs[id] = buff;
     } else {
       telemetryLog('buff-end', 'Buff expired', { id, reward: buff.rewardId });
+      expired.push(buff);
       changed = true;
     }
   }
-  if (!changed) return state;
-  return { ...state, activeBuffs, buffMultiplier: computeBuffMultiplier(activeBuffs) };
+  if (!changed) return { state, expired };
+  return {
+    state: { ...state, activeBuffs, buffMultiplier: computeBuffMultiplier(activeBuffs) },
+    expired,
+  };
+};
+
+interface BuffActivationResult {
+  activeBuffs: Record<string, ActiveBuffState>;
+  buff: ActiveBuffState;
+  refreshed: boolean;
+}
+
+const startOrRefreshTempGainBuff = (
+  activeBuffs: Record<string, ActiveBuffState>,
+  taskId: string,
+  rewardId: string,
+  template: DailyTaskRewardTemplate,
+  now: number,
+): BuffActivationResult => {
+  const previous = activeBuffs[taskId];
+  const buff: ActiveBuffState = {
+    id: taskId,
+    sourceTaskId: taskId,
+    rewardId,
+    type: 'temp_gain_mult',
+    value: template.value,
+    startedAt: now,
+    expiresAt: now + template.duration_s * 1000,
+  };
+  const nextBuffs = { ...activeBuffs, [taskId]: buff };
+  telemetryLog('buff-start', previous ? 'Buff refreshed' : 'Buff started', {
+    id: buff.id,
+    reward: buff.rewardId,
+  });
+  return { activeBuffs: nextBuffs, buff, refreshed: !!previous };
 };
 
 export interface ClaimResult {
   state: DailyTaskRuntimeState;
   buff?: ActiveBuffState;
   success: boolean;
+  refreshed?: boolean;
 }
 
 export const claimTaskReward = (
@@ -664,20 +729,19 @@ export const claimTaskReward = (
   const claimedAt = { ...state.claimedAt, [taskId]: now };
   let activeBuffs = state.activeBuffs;
   let buff: ActiveBuffState | undefined;
+  let refreshed: boolean | undefined;
 
   if (rewardTemplate.type === 'temp_gain_mult') {
-    const expiresAt = now + rewardTemplate.duration_s * 1000;
-    buff = {
-      id: taskId,
-      sourceTaskId: taskId,
-      rewardId: def.reward,
-      type: 'temp_gain_mult',
-      value: rewardTemplate.value,
-      startedAt: now,
-      expiresAt,
-    };
-    activeBuffs = { ...activeBuffs, [buff.id]: buff };
-    telemetryLog('buff-start', 'Buff started', { id: buff.id, reward: buff.rewardId });
+    const activation = startOrRefreshTempGainBuff(
+      activeBuffs,
+      taskId,
+      def.reward,
+      rewardTemplate,
+      now,
+    );
+    activeBuffs = activation.activeBuffs;
+    buff = activation.buff;
+    refreshed = activation.refreshed;
   }
 
   telemetryLog('claim', 'Reward claimed', { taskId, reward: def.reward });
@@ -690,6 +754,7 @@ export const claimTaskReward = (
       buffMultiplier: computeBuffMultiplier(activeBuffs),
     },
     buff,
+    refreshed,
     success: true,
   };
 };

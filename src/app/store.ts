@@ -19,6 +19,7 @@ import {
   createInitialDailyTaskState,
   ensureDailyTasks,
   expireBuffs as expireDailyBuffs,
+  getTempGainBuffSnapshots,
   getTaskStatus,
   handleGameEvent,
   rollDailyTasks as rollTasks,
@@ -26,6 +27,7 @@ import {
   type DailyTaskRuntimeState,
   type DailyTaskPlayerContext,
   type DailyTaskStatus,
+  type TempGainBuffSnapshot,
 } from './dailyTasks';
 import { gameEvents, type EventSource } from './events';
 
@@ -36,6 +38,63 @@ interface Multipliers {
   population_cps: number;
 }
 
+type TempGainBuff = TempGainBuffSnapshot;
+
+interface BaseCpsDependencies {
+  buildings: Record<string, number>;
+  prestigeMult: number;
+  multipliers: Multipliers;
+  eraMult: number;
+}
+
+const computeBaseCps = (state: BaseCpsDependencies) => {
+  let base = 0;
+  for (const building of buildings) {
+    const count = state.buildings[building.id] || 0;
+    if (count <= 0) continue;
+    base += building.baseProd * count;
+  }
+  return base * state.prestigeMult * state.multipliers.population_cps * state.eraMult;
+};
+
+const tempGainBuffsEqual = (a: TempGainBuff[], b: TempGainBuff[]) => {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    const left = a[i];
+    const right = b[i];
+    if (left.id !== right.id) return false;
+    if (left.value !== right.value) return false;
+    if (left.endsAt !== right.endsAt) return false;
+  }
+  return true;
+};
+
+const evaluateTempGainBuffs = (buffs: TempGainBuff[], now: number) => {
+  let multiplier = 1;
+  let changed = false;
+  const active: TempGainBuff[] = [];
+  for (const buff of buffs) {
+    if (buff.endsAt > now) {
+      active.push(buff);
+      multiplier *= buff.value;
+    } else {
+      changed = true;
+    }
+  }
+  return { active, multiplier, changed };
+};
+
+const multiplyActiveTempGainBuffs = (buffs: TempGainBuff[], now: number) => {
+  let product = 1;
+  for (const buff of buffs) {
+    if (buff.endsAt > now) {
+      product *= buff.value;
+    }
+  }
+  return product;
+};
+
 interface State {
   population: number;
   totalPopulation: number;
@@ -43,6 +102,7 @@ interface State {
   buildings: Record<string, number>;
   techCounts: Record<string, number>;
   multipliers: Multipliers;
+  baseCps: number;
   cps: number;
   clickPower: number;
   prestigePoints: number;
@@ -69,6 +129,7 @@ interface State {
   prestige: () => boolean;
   changeEra: () => void;
   daily: DailyTaskRuntimeState;
+  tempGainBuffs: TempGainBuff[];
   rollDailyTasksForToday: () => void;
   rerollDailyTasks: () => void;
   getDailyTaskStatuses: () => DailyTaskStatus[];
@@ -82,6 +143,7 @@ const initialState = {
   buildings: {} as Record<string, number>,
   techCounts: {} as Record<string, number>,
   multipliers: { population_cps: 1 },
+  baseCps: 0,
   cps: 0,
   clickPower: 1,
   prestigePoints: 0,
@@ -91,6 +153,7 @@ const initialState = {
   lastMajorVersion: BigBeautifulBalancePath,
   eraPromptAcknowledged: true,
   daily: createInitialDailyTaskState(),
+  tempGainBuffs: [] as TempGainBuff[],
 };
 
 const computeDailyFeatures = (state: State) => {
@@ -134,15 +197,27 @@ export const useGameStore = create<State>()(
       ...initialState,
       addPopulation: (amount) => {
         const now = Date.now();
+        let state = get();
+        const evaluation = evaluateTempGainBuffs(state.tempGainBuffs, now);
+        if (evaluation.changed) {
+          set({ tempGainBuffs: evaluation.active });
+          state = get();
+          state.recompute();
+          state = get();
+        }
+        const baseClick = amount;
+        const buffMultiplier = multiplyActiveTempGainBuffs(state.tempGainBuffs, now);
+        const gain = baseClick * buffMultiplier;
+        if (gain <= 0) return;
         set((s) => ({
-          population: s.population + amount,
-          totalPopulation: s.totalPopulation + amount,
+          population: s.population + gain,
+          totalPopulation: s.totalPopulation + gain,
         }));
         const updated = get();
-        gameEvents.emit('loyly_throw', { amount, timestamp: now, source: 'click' });
-        gameEvents.emit('click', { amount, timestamp: now, source: 'click' });
+        gameEvents.emit('loyly_throw', { amount: gain, timestamp: now, source: 'click' });
+        gameEvents.emit('click', { amount: gain, timestamp: now, source: 'click' });
         gameEvents.emit('population_gain', {
-          amount,
+          amount: gain,
           timestamp: now,
           source: 'click',
           currentPopulation: updated.population,
@@ -224,21 +299,38 @@ export const useGameStore = create<State>()(
         });
       },
       recompute: () => {
-        const s = get();
-        let cps = 0;
-        for (const b of buildings) {
-          const count = s.buildings[b.id] || 0;
-          cps += b.baseProd * count;
-        }
-        const buffMult = s.daily?.buffMultiplier ?? 1;
-        cps *= s.prestigeMult * s.multipliers.population_cps * s.eraMult * buffMult;
-        const clickPower = Math.max(1, Math.round(cps / 100));
-        set({ cps, clickPower });
+        const now = Date.now();
+        set((state) => {
+          const baseCps = computeBaseCps(state);
+          const evaluation = evaluateTempGainBuffs(state.tempGainBuffs, now);
+          const cps = baseCps * evaluation.multiplier;
+          const clickPower = Math.max(1, Math.round(baseCps / 100));
+          const next: Partial<State> = {
+            baseCps,
+            cps,
+            clickPower,
+          };
+          if (!tempGainBuffsEqual(evaluation.active, state.tempGainBuffs)) {
+            next.tempGainBuffs = evaluation.active;
+          }
+          return next;
+        });
       },
       tick: (delta, source = 'tick') => {
         const now = Date.now();
         gameEvents.emit('tick', { timestamp: now, delta, source });
-        const gain = get().cps * delta;
+        let state = get();
+        const evaluation = evaluateTempGainBuffs(state.tempGainBuffs, now);
+        if (evaluation.changed) {
+          set({ tempGainBuffs: evaluation.active });
+          state = get();
+          state.recompute();
+          state = get();
+        }
+        const buffMultiplier = evaluation.changed
+          ? multiplyActiveTempGainBuffs(state.tempGainBuffs, now)
+          : evaluation.multiplier;
+        const gain = state.baseCps * buffMultiplier * delta;
         if (gain > 0) {
           set((s) => ({
             population: s.population + gain,
@@ -315,19 +407,29 @@ export const useGameStore = create<State>()(
       },
       rollDailyTasksForToday: () => {
         const now = Date.now();
+        let shouldRecompute = false;
         set((s) => {
           const context = buildDailyContext(s, now);
           const daily = rollTasks(s.daily, context, now, { force: true });
-          return { daily };
+          const buffs = getTempGainBuffSnapshots(daily);
+          const same = tempGainBuffsEqual(buffs, s.tempGainBuffs);
+          if (!same) shouldRecompute = true;
+          return { daily, tempGainBuffs: same ? s.tempGainBuffs : buffs };
         });
+        if (shouldRecompute) get().recompute();
       },
       rerollDailyTasks: () => {
         const now = Date.now();
+        let shouldRecompute = false;
         set((s) => {
           const context = buildDailyContext(s, now);
           const daily = rollTasks(s.daily, context, now, { reroll: true });
-          return { daily };
+          const buffs = getTempGainBuffSnapshots(daily);
+          const same = tempGainBuffsEqual(buffs, s.tempGainBuffs);
+          if (!same) shouldRecompute = true;
+          return { daily, tempGainBuffs: same ? s.tempGainBuffs : buffs };
         });
+        if (shouldRecompute) get().recompute();
       },
       getDailyTaskStatuses: () => {
         const state = get();
@@ -341,10 +443,16 @@ export const useGameStore = create<State>()(
         set((s) => {
           const context = buildDailyContext(s, now);
           const ensured = ensureDailyTasks(s.daily, context, now);
+          const beforeBuffs = getTempGainBuffSnapshots(ensured);
           const result = claimTaskReward(ensured, taskId, now);
           if (!result.success) return { daily: ensured };
-          if (result.state.buffMultiplier !== ensured.buffMultiplier) shouldRecompute = true;
-          return { daily: result.state };
+          const afterBuffs = getTempGainBuffSnapshots(result.state);
+          if (!tempGainBuffsEqual(beforeBuffs, afterBuffs)) shouldRecompute = true;
+          const same = tempGainBuffsEqual(afterBuffs, s.tempGainBuffs);
+          return {
+            daily: result.state,
+            tempGainBuffs: same ? s.tempGainBuffs : afterBuffs,
+          };
         });
         if (shouldRecompute) get().recompute();
       },
@@ -361,6 +469,9 @@ export const useGameStore = create<State>()(
         if (!acknowledged) lastMajorVersion = BigBeautifulBalancePath - 1;
         if (lastMajorVersion < BigBeautifulBalancePath) needsEraPrompt = true;
         if (version >= BigBeautifulBalancePath) {
+          const persistedDaily =
+            (old?.daily as DailyTaskRuntimeState | undefined) ?? createInitialDailyTaskState();
+          const persistedBuffs = getTempGainBuffSnapshots(persistedDaily);
           return {
             ...(old as Partial<State>),
             totalPopulation:
@@ -379,8 +490,9 @@ export const useGameStore = create<State>()(
               typeof old?.lastSave === 'number' ? (old.lastSave as number) : Date.now(),
             lastMajorVersion,
             eraPromptAcknowledged: acknowledged,
-            daily:
-              (old?.daily as DailyTaskRuntimeState | undefined) ?? createInitialDailyTaskState(),
+            daily: persistedDaily,
+            tempGainBuffs: persistedBuffs,
+            baseCps: 0,
           };
         }
 
@@ -453,6 +565,7 @@ export const useGameStore = create<State>()(
           buildings: (old?.buildings as Record<string, number>) ?? {},
           techCounts: counts,
           multipliers,
+          baseCps: 0,
           cps: 0,
           clickPower: 1,
           prestigePoints: 0,
@@ -462,23 +575,28 @@ export const useGameStore = create<State>()(
           lastMajorVersion,
           eraPromptAcknowledged: acknowledged,
           daily: createInitialDailyTaskState(),
+          tempGainBuffs: [],
         };
       },
       onRehydrateStorage: () => (state) => {
         if (!state) return;
         const now = Date.now();
         const last = state.lastSave ?? now;
+        state.tempGainBuffs = getTempGainBuffSnapshots(state.daily);
         state.recompute();
         const delta = Math.max(0, Math.floor((now - last) / 1000));
         state.tick(delta, 'offline');
         useGameStore.setState((s) => {
           const context = buildDailyContext(s, now);
           let daily = ensureDailyTasks(s.daily, context, now);
-          daily = expireDailyBuffs(daily, now);
+          const expiry = expireDailyBuffs(daily, now);
+          daily = expiry.state;
           daily = updateMetricProgress(daily, 'temperature', s.population, now);
           daily = updateMetricProgress(daily, 'prestige_multiplier', s.prestigeMult, now);
           daily = updateMetricProgress(daily, 'population_earned_today', daily.populationEarnedToday, now);
-          return { lastSave: now, daily };
+          const buffs = getTempGainBuffSnapshots(daily);
+          const same = tempGainBuffsEqual(buffs, s.tempGainBuffs);
+          return { lastSave: now, daily, tempGainBuffs: same ? s.tempGainBuffs : buffs };
         });
         let acknowledged = state.eraPromptAcknowledged;
         try {
@@ -560,12 +678,16 @@ const applyDailyUpdate = (
   useGameStore.setState((state) => {
     const context = buildDailyContext(state, now);
     let daily = ensureDailyTasks(state.daily, context, now);
-    const before = daily.buffMultiplier;
+    const beforeBuffs = getTempGainBuffSnapshots(daily);
     if (mutator) {
       daily = mutator(daily, state, context);
     }
-    if (daily.buffMultiplier !== before) recomputeNeeded = true;
-    return { daily };
+    const expiry = expireDailyBuffs(daily, now);
+    daily = expiry.state;
+    const afterBuffs = getTempGainBuffSnapshots(daily);
+    if (!tempGainBuffsEqual(beforeBuffs, afterBuffs)) recomputeNeeded = true;
+    const sameAsExisting = tempGainBuffsEqual(afterBuffs, state.tempGainBuffs);
+    return { daily, tempGainBuffs: sameAsExisting ? state.tempGainBuffs : afterBuffs };
   });
   if (recomputeNeeded) useGameStore.getState().recompute();
 };
@@ -574,8 +696,8 @@ gameEvents.on('tick', ({ delta, timestamp, source }) => {
   applyDailyUpdate((daily) => {
     let next = daily;
     if (source !== 'offline') next = addUptime(next, delta, timestamp);
-    next = expireDailyBuffs(next, timestamp);
-    return next;
+    const expiry = expireDailyBuffs(next, timestamp);
+    return expiry.state;
   }, timestamp);
 });
 
