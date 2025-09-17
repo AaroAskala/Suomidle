@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/Suomidle/',
+  base: '/',
   // @ts-expect-error - Vitest config
   test: {
     environment: 'jsdom',
