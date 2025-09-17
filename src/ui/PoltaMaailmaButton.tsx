@@ -40,6 +40,11 @@ export function PoltaMaailmaButton() {
     return getTuhkaAwardPreview();
   }, [tierLevel, prestigeMult, tuhka, totalTuhkaEarned]);
 
+  const canPoltaMaailma = preview.award > 0n;
+  const disabledTooltip = canPoltaMaailma
+    ? undefined
+    : 'Et ansaitse vielä Tuhkaa polttamalla maailman.';
+
   const showToast = (message: string) => {
     setToastMessage(message);
     if (toastTimerRef.current !== undefined) {
@@ -108,6 +113,8 @@ export function PoltaMaailmaButton() {
           type="button"
           className="btn btn--primary"
           onClick={() => setModalOpen(true)}
+          disabled={!canPoltaMaailma}
+          title={disabledTooltip}
           style={{
             background: '#b91c1c',
             color: '#fff',
