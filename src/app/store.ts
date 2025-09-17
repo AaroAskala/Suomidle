@@ -80,7 +80,7 @@ interface Actions {
 
 type State = BaseState & Actions;
 
-export const STORAGE_KEY = 'suomidle';
+const STORAGE_KEY = 'suomidle';
 const decimalZero = new Decimal(0);
 
 type RawMaailmaShopItem = {
