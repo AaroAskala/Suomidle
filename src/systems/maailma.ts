@@ -182,12 +182,21 @@ const updateTuhkaTotals = (maailma: MaailmaState, award: Decimal): MaailmaState 
 };
 
 export const getTuhkaAwardPreview = (state: GameState): Decimal => {
-  const tier = decimalFrom(state.tierLevel ?? 0);
-  const multiplier = decimalFrom(state.prestigeMult ?? 0);
-  if (tier.lte(0) || multiplier.lte(0)) return zero;
-  const logTerm = multiplier.plus(1).log();
+  const rawTier = decimalFrom(state.tierLevel ?? 0);
+  const tier = rawTier.isFinite() ? Decimal.max(rawTier, zero) : zero;
+  const rawMultiplier = decimalFrom(state.prestigeMult ?? 0);
+  const multiplier = rawMultiplier.isFinite()
+    ? Decimal.max(rawMultiplier, zero)
+    : zero;
+  if (tier.lte(0)) return zero;
+
+  const logTerm = Decimal.log10(multiplier.plus(1));
   if (!logTerm.isFinite() || logTerm.lte(0)) return zero;
-  return tier.mul(logTerm).sqrt().floor();
+
+  const product = tier.mul(logTerm);
+  if (!product.isFinite() || product.lte(0)) return zero;
+
+  return product.sqrt().floor();
 };
 
 export const canPoltaMaailma = (state: GameState): boolean =>
