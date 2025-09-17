@@ -7,3 +7,5 @@
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
+### Changed
+- Update the page title to display "suomidle" in browser tabs.
