@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- Daily Tasks system with rotating objectives, persistent progress, and temporary Lämpötila buffs.
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
