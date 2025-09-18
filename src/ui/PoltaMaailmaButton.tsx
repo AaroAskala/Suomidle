@@ -31,7 +31,7 @@ export function PoltaMaailmaButton() {
     return getTuhkaAwardPreview();
   }, [tierLevel, prestigeMult, tuhka, totalTuhkaEarned]);
 
-  const confirmPhrase = t('maailma.confirmPhrase');
+  const confirmPhrase: string = t('maailma.confirmPhrase');
 
   const formatBigInt = (value: bigint) => formatNumber(value, { maximumFractionDigits: 0 });
 

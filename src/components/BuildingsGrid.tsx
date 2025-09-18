@@ -32,7 +32,7 @@ export function BuildingsGrid() {
               icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
               title={t('shop.card.title', {
                 name,
-                count: formatNumber(count, { maximumFractionDigits: 0 }),
+                count,
               })}
               subtitle={t('shop.card.subtitle', {
                 price: formatNumber(price, { maximumFractionDigits: 0 }),
