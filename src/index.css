@@ -88,15 +88,6 @@ h1 {
 
 .hud__population {
   border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.hud__metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
 }
 
 /* Generic HUD card */

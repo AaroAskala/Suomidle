@@ -9,15 +9,7 @@ const envBase = process?.env?.VITE_BASE ?? process?.env?.BASE_URL ?? '/'
 const base = envBase.endsWith('/') ? envBase : `${envBase}/`
 
 export default defineConfig({
-  plugins: [
-    react({
-      babel: {
-        parserOpts: {
-          plugins: ['importAttributes', 'deprecatedImportAssert'],
-        },
-      },
-    }),
-  ],
+  plugins: [react()],
   base,
   // @ts-expect-error - Vitest config
   test: {
