@@ -37,17 +37,7 @@ export function PrestigeCard() {
       });
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '1rem',
-        right: '1rem',
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
+    <div className="prestige-card">
       <ImageCardButton
         className="prestige-btn"
         icon={prestigeData.icon}
