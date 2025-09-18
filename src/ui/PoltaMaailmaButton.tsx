@@ -6,21 +6,12 @@ import {
   type PoltaMaailmaResult,
   type TuhkaAwardPreview,
 } from '../app/store';
-import { formatNumber } from '../utils/format';
-
-const CONFIRMATION_PHRASE = 'POLTA MAAILMA';
-
-const formatBigInt = (value: bigint) => {
-  const absolute = value < 0n ? -value : value;
-  if (absolute <= BigInt(Number.MAX_SAFE_INTEGER)) {
-    return formatNumber(Number(value));
-  }
-  return value.toString();
-};
+import { useLocale } from '../i18n/useLocale';
 
 const toastDurationMs = 5000;
 
 export function PoltaMaailmaButton() {
+  const { t, formatNumber } = useLocale();
   const [isModalOpen, setModalOpen] = useState(false);
   const [confirmValue, setConfirmValue] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -40,10 +31,13 @@ export function PoltaMaailmaButton() {
     return getTuhkaAwardPreview();
   }, [tierLevel, prestigeMult, tuhka, totalTuhkaEarned]);
 
+  const confirmPhrase = String(t('maailma.confirmPhrase'));
+  const confirmPhraseUpper = useMemo(() => confirmPhrase.toUpperCase(), [confirmPhrase]);
+
+  const formatBigInt = (value: bigint) => formatNumber(value, { maximumFractionDigits: 0 });
+
   const canPoltaMaailma = preview.award > 0n;
-  const disabledTooltip = canPoltaMaailma
-    ? undefined
-    : 'Et ansaitse vielä Tuhkaa polttamalla maailman.';
+  const disabledTooltip = canPoltaMaailma ? undefined : t('maailma.tooltip.noAsh');
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -78,7 +72,7 @@ export function PoltaMaailmaButton() {
 
   const handleConfirm = () => {
     const normalized = confirmValue.trim().toUpperCase();
-    if (normalized !== CONFIRMATION_PHRASE) return;
+    if (normalized !== confirmPhraseUpper) return;
 
     const result: PoltaMaailmaResult = poltaMaailmaConfirm();
     setModalOpen(false);
@@ -86,12 +80,13 @@ export function PoltaMaailmaButton() {
 
     if (result.awarded > 0n) {
       showToast(
-        `Maailma paloi! +${formatBigInt(result.awarded)} Tuhka (→ ${formatBigInt(
-          result.availableTuhka,
-        )}).`,
+        t('maailma.toast.awarded', {
+          awarded: formatBigInt(result.awarded),
+          available: formatBigInt(result.availableTuhka),
+        }),
       );
     } else {
-      showToast('Maailma paloi, mutta et ansainnut uutta Tuhkaa.');
+      showToast(t('maailma.toast.none'));
     }
   };
 
@@ -120,16 +115,21 @@ export function PoltaMaailmaButton() {
             color: '#fff',
             boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
           }}
+          aria-label={t('maailma.action')}
         >
-          <div style={{ fontWeight: 600 }}>Polta maailma</div>
+          <div style={{ fontWeight: 600 }}>{t('maailma.action')}</div>
           <div style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
-            {`+${formatBigInt(preview.award)} Tuhka → ${formatBigInt(preview.availableAfter)}`}
+            {t('maailma.preview.gain', {
+              award: formatBigInt(preview.award),
+              available: formatBigInt(preview.availableAfter),
+            })}
           </div>
         </button>
         <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.75)' }}>
-          {`Yhteensä: ${formatBigInt(preview.totalEarned)} → ${formatBigInt(
-            preview.totalEarnedAfter,
-          )}`}
+          {t('maailma.preview.total', {
+            total: formatBigInt(preview.totalEarned),
+            totalAfter: formatBigInt(preview.totalEarnedAfter),
+          })}
         </div>
       </div>
 
@@ -168,10 +168,11 @@ export function PoltaMaailmaButton() {
               boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
             }}
           >
-            <h2 id="polta-maailma-title" style={{ marginTop: 0 }}>Polta maailma</h2>
+            <h2 id="polta-maailma-title" style={{ marginTop: 0 }}>
+              {t('maailma.action')}
+            </h2>
             <p id="polta-maailma-description" style={{ marginBottom: '1rem' }}>
-              Kirjoita ”POLTA MAAILMA” vahvistaaksesi. Tämä nollaa nykyisen maailman ja alkaa uudelta
-              aikakaudelta.
+              {t('maailma.description', { phrase: confirmPhrase })}
             </p>
             <div
               style={{
@@ -181,13 +182,19 @@ export function PoltaMaailmaButton() {
                 fontSize: '0.9rem',
               }}
             >
-              <div>{`Saat: +${formatBigInt(preview.award)} Tuhka`}</div>
-              <div>{`Tuhka varastossa: ${formatBigInt(preview.current)} → ${formatBigInt(
-                preview.availableAfter,
-              )}`}</div>
-              <div>{`Tuhka ansaittu yhteensä: ${formatBigInt(preview.totalEarned)} → ${formatBigInt(
-                preview.totalEarnedAfter,
-              )}`}</div>
+              <div>{t('maailma.modal.award', { value: formatBigInt(preview.award) })}</div>
+              <div>
+                {t('maailma.modal.available', {
+                  current: formatBigInt(preview.current),
+                  next: formatBigInt(preview.availableAfter),
+                })}
+              </div>
+              <div>
+                {t('maailma.modal.total', {
+                  total: formatBigInt(preview.totalEarned),
+                  totalAfter: formatBigInt(preview.totalEarnedAfter),
+                })}
+              </div>
             </div>
             <form
               onSubmit={(event) => {
@@ -196,14 +203,14 @@ export function PoltaMaailmaButton() {
               }}
             >
               <label htmlFor="polta-maailma-confirm" style={{ display: 'block', marginBottom: '0.25rem' }}>
-                Vahvista polttamalla maailma
+                {t('maailma.modal.label')}
               </label>
               <input
                 id="polta-maailma-confirm"
                 ref={inputRef}
                 value={confirmValue}
                 onChange={(event) => setConfirmValue(event.target.value)}
-                placeholder={CONFIRMATION_PHRASE}
+                placeholder={confirmPhrase}
                 style={{
                   width: '100%',
                   padding: '0.65rem',
@@ -226,15 +233,15 @@ export function PoltaMaailmaButton() {
                   }}
                   style={{ background: 'rgba(255, 255, 255, 0.12)', color: 'inherit' }}
                 >
-                  Peruuta
+                  {t('actions.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="btn btn--primary"
-                  disabled={confirmValue.trim().toUpperCase() !== CONFIRMATION_PHRASE}
+                  disabled={confirmValue.trim().toUpperCase() !== confirmPhraseUpper}
                   style={{ background: '#16a34a' }}
                 >
-                  Vahvista
+                  {t('actions.confirm')}
                 </button>
               </div>
             </form>

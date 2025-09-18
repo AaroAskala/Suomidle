@@ -1,8 +1,10 @@
 import { beforeEach, describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HUD } from './components/HUD';
 import { useGameStore } from './app/store';
+import { renderWithI18n, setTestLanguage } from './tests/testUtils';
+import i18n from './i18n';
 
 function resetStore() {
   useGameStore.setState({
@@ -21,27 +23,29 @@ function resetStore() {
 }
 
 describe('HUD', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await setTestLanguage('en');
     resetStore();
   });
 
   it('increments population on click', () => {
-    render(<HUD />);
-    fireEvent.click(screen.getByRole('button'));
+    renderWithI18n(<HUD />);
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('hud.throw') }));
     expect(useGameStore.getState().population).toBe(1);
   });
 
-  it('renders LPS when cps is set', () => {
+  it('renders cps when cps is set', () => {
     useGameStore.setState({ cps: 5 });
-    render(<HUD />);
-    expect(screen.getByText(/LPS: 5/)).toBeInTheDocument();
+    renderWithI18n(<HUD />);
+    const formatted = new Intl.NumberFormat(i18n.language).format(5);
+    expect(screen.getByText(i18n.t('hud.cps', { value: formatted }))).toBeInTheDocument();
   });
 
   it('click gains at least 1% of cps, rounded', () => {
     useGameStore.setState({ buildings: { sauna: 250 } });
     useGameStore.getState().recompute();
-    render(<HUD />);
-    fireEvent.click(screen.getByRole('button'));
+    renderWithI18n(<HUD />);
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('hud.throw') }));
     expect(useGameStore.getState().population).toBe(3);
   });
 });
