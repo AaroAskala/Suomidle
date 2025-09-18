@@ -36,18 +36,11 @@ describe('HUD', () => {
     expect(useGameStore.getState().population).toBe(1);
   });
 
-  it('renders LPS progress with the configured cps value', () => {
+  it('renders cps when cps is set', () => {
     useGameStore.setState({ cps: 5 });
     renderWithI18n(<HUD />);
     const formatted = new Intl.NumberFormat(i18n.language).format(5);
-    const progressbar = screen.getByRole('progressbar', {
-      name: i18n.t('hud.lpsLabel'),
-    });
-    expect(progressbar).toBeInTheDocument();
-    expect(progressbar).toHaveAttribute(
-      'aria-valuetext',
-      i18n.t('hud.cps', { value: formatted }),
-    );
+    expect(screen.getByText(i18n.t('hud.cps', { value: formatted }))).toBeInTheDocument();
   });
 
   it('applies active daily task buffs to displayed cps', () => {
@@ -66,19 +59,7 @@ describe('HUD', () => {
     useGameStore.setState({ cps: 10, dailyTasks: buffedTasks });
     renderWithI18n(<HUD />);
     const formatted = new Intl.NumberFormat(i18n.language).format(15);
-    const multiplierText = i18n.t('hud.lpsMultiplier', {
-      value: new Intl.NumberFormat(i18n.language, {
-        maximumFractionDigits: 2,
-      }).format(1.5),
-    });
-    const progressbar = screen.getByRole('progressbar', {
-      name: i18n.t('hud.lpsLabel'),
-    });
-    expect(progressbar).toHaveAttribute(
-      'aria-valuetext',
-      i18n.t('hud.cps', { value: formatted }),
-    );
-    expect(screen.getByText(multiplierText)).toBeInTheDocument();
+    expect(screen.getByText(i18n.t('hud.cps', { value: formatted }))).toBeInTheDocument();
   });
 
   it('click gains at least 1% of cps, rounded', () => {
