@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ImageCardButton } from './ImageCardButton';
 import {
   computePrestigeMult,
@@ -7,6 +7,7 @@ import {
 } from '../app/store';
 import { prestige as prestigeData } from '../content';
 import { useLocale } from '../i18n/useLocale';
+import { CardDetailsModal } from './CardDetailsModal';
 
 export function PrestigeCard() {
   const { t, formatNumber } = useLocale();
@@ -14,6 +15,7 @@ export function PrestigeCard() {
   const totalPopulation = useGameStore((s) => s.totalPopulation);
   const canPrestige = useGameStore((s) => s.canPrestige());
   const prestige = useGameStore((s) => s.prestige);
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const { multAfter, deltaMult } = useMemo(() => {
     const pointsAfter = computePrestigePoints(totalPopulation);
@@ -28,13 +30,25 @@ export function PrestigeCard() {
   const prestigeName = t('prestige.action', { defaultValue: prestigeData.name });
 
   const subtitle = canPrestige
-    ? t('prestige.card.gain', {
-        gain: formatNumber(deltaMult * 100, { maximumFractionDigits: 2 }),
-        target: formatNumber(multAfter, { maximumFractionDigits: 2 }),
-      })
-    : t('prestige.card.unlock', {
-        requirement: formatNumber(prestigeData.minPopulation, { maximumFractionDigits: 0 }),
-      });
+    ? t('cardDetails.status.available')
+    : t('cardDetails.status.unavailable');
+
+  const selectedPrestige = isModalOpen
+    ? {
+        type: 'prestige' as const,
+        icon: prestigeData.icon,
+        canPrestige,
+        currentMultiplier: prestigeMult,
+        nextMultiplier: multAfter,
+        deltaMultiplier: deltaMult,
+        minPopulation: prestigeData.minPopulation,
+        onConfirm: () => {
+          if (!canPrestige) return;
+          prestige();
+          setModalOpen(false);
+        },
+      }
+    : null;
 
   return (
     <div
@@ -57,18 +71,7 @@ export function PrestigeCard() {
         })}
         subtitle={subtitle}
         disabled={!canPrestige}
-        onClick={() => {
-          if (!canPrestige) return;
-          if (
-            confirm(
-              t('prestige.confirm', {
-                gain: formatNumber(deltaMult * 100, { maximumFractionDigits: 2 }),
-                name: prestigeName,
-              }),
-            )
-          )
-            prestige();
-        }}
+        onSelect={() => setModalOpen(true)}
       />
       <div className="prestige-mobile-info">
         {t('prestige.mobileInfo', {
@@ -76,6 +79,7 @@ export function PrestigeCard() {
           bonus: formatNumber(prestigePercent, { maximumFractionDigits: 2 }),
         })}
       </div>
+      <CardDetailsModal selection={selectedPrestige} onClose={() => setModalOpen(false)} />
     </div>
   );
 }
