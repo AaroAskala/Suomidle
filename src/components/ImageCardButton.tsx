@@ -3,7 +3,7 @@ interface ImageCardButtonProps {
   title: string;
   subtitle?: string;
   disabled?: boolean;
-  onSelect: () => void;
+  onClick: () => void;
   className?: string;
   compact?: boolean;
 }
@@ -13,7 +13,7 @@ export function ImageCardButton({
   title,
   subtitle,
   disabled,
-  onSelect,
+  onClick,
   className,
   compact,
 }: ImageCardButtonProps) {
@@ -23,7 +23,7 @@ export function ImageCardButton({
     <button
       type="button"
       className={buttonClassName}
-      onClick={onSelect}
+      onClick={onClick}
       disabled={disabled}
       data-compact={compact ? '' : undefined}
       aria-label={compact ? title : undefined}

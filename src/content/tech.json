@@ -1,101 +1,50 @@
 [
-  {
-    "id": "vihta",
-    "name": "Vihta",
-    "icon": "Vihta.png",
+  { "id": "vihta", "name": "Vihta", "icon": "Vihta.png",
     "cost": 500,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.25 }],
-    "description": "A fresh birch whisk intensifies every burst of steam.",
-    "flavor": "Leaves flutter across the benches like green confetti.",
     "limit": 1
   },
-  {
-    "id": "kalja",
-    "name": "Kalja",
-    "icon": "Kalja.png",
+  { "id": "kalja", "name": "Kalja", "icon": "Kalja.png",
     "cost": 10000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.6 }],
-    "description": "Cold drinks keep visitors relaxed and willing to stay longer.",
-    "flavor": "Foamy moustaches become badges of sauna honor.",
-    "limit": 1,
-    "unlock": { "tier": 2 }
+    "limit": 1, "unlock": { "tier": 2 }
   },
-  {
-    "id": "kossu",
-    "name": "Kossu",
-    "icon": "Kossu.png",
+  { "id": "kossu", "name": "Kossu", "icon": "Kossu.png",
     "cost": 200000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.8 }],
-    "description": "Stronger spirits inspire bold purchases and louder cheers.",
-    "flavor": "One shot leads to another—and another upgrade.",
-    "limit": 1,
-    "unlock": { "tier": 3 }
+    "limit": 1, "unlock": { "tier": 3 }
   },
-  {
-    "id": "kiulu_ja_kauha",
-    "name": "Kiulu ja Kauha",
-    "icon": "Kiulu_ja_Kauha.png",
+
+  { "id": "kiulu_ja_kauha", "name": "Kiulu ja Kauha", "icon": "Kiulu_ja_Kauha.png",
     "cost": 20000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.5 }],
-    "description": "Precision gear for flawless löyly throws every time.",
-    "flavor": "The polished ladle gleams like a ceremonial relic.",
-    "limit": 1,
-    "unlock": { "tier": 4 }
+    "limit": 1, "unlock": { "tier": 4 }
   },
-  {
-    "id": "saunalakki",
-    "name": "Saunalakki",
-    "icon": "Saunalakki.png",
+  { "id": "saunalakki", "name": "Saunalakki", "icon": "Saunalakki.png",
     "cost": 400000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 1.8 }],
-    "description": "Heat-retaining hats help guests endure longer sessions.",
-    "flavor": "Woolen peaks bob through the mist like tiny mountains.",
-    "limit": 1,
-    "unlock": { "tier": 5 }
+    "limit": 1, "unlock": { "tier": 5 }
   },
-  {
-    "id": "lampomittari",
-    "name": "Lämpömittari",
-    "icon": "Lämpömittari.png",
+  { "id": "lampomittari", "name": "Lämpömittari", "icon": "Lämpömittari.png",
     "cost": 8000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.0 }],
-    "description": "Accurate readings keep the stove at peak efficiency.",
-    "flavor": "The red line climbs with smug precision.",
-    "limit": 1,
-    "unlock": { "tier": 6 }
+    "limit": 1, "unlock": { "tier": 6 }
   },
-  {
-    "id": "burana",
-    "name": "Burana",
-    "icon": "Burana.png",
+
+  { "id": "burana", "name": "Burana", "icon": "Burana.png",
     "cost": 15000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.0 }],
-    "description": "Pain relief keeps regulars returning for repeat sessions.",
-    "flavor": "A calm sigh follows every offered tablet.",
-    "limit": 1,
-    "unlock": { "tier": 7 }
+    "limit": 1, "unlock": { "tier": 7 }
   },
-  {
-    "id": "saunatuoksu",
-    "name": "Saunatuoksu",
-    "icon": "Saunatuoksu.png",
+  { "id": "saunatuoksu", "name": "Saunatuoksu", "icon": "Saunatuoksu.png",
     "cost": 1500000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 2.2 }],
-    "description": "Signature scents draw crowds eager for immersive steam.",
-    "flavor": "Hints of pine and citrus swirl above the stones.",
-    "limit": 1,
-    "unlock": { "tier": 8 }
+    "limit": 1, "unlock": { "tier": 8 }
   },
-  {
-    "id": "saunaklonkku",
-    "name": "Saunaklonkku",
-    "icon": "Saunaklonkku.png",
+  { "id": "saunaklonkku", "name": "Saunaklonkku", "icon": "Saunaklonkku.png",
     "cost": 150000000000000000,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 3.5 }],
-    "description": "A mischievous helper tends the coals with supernatural speed.",
-    "flavor": "Glowing eyes peek between benches before vanishing again.",
-    "limit": 1,
-    "unlock": { "tier": 9 }
+    "limit": 1, "unlock": { "tier": 9 }
   },
   {
     "id": "uraanikivet",
@@ -103,8 +52,6 @@
     "icon": "Uraanikivet.png",
     "cost": 9999999999999999999999999999,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 4.0 }],
-    "description": "Experimental stones radiate unheard-of levels of heat.",
-    "flavor": "Security insists nobody lick the gently glowing rocks.",
     "limit": 1,
     "unlock": { "tier": 10 }
   },
@@ -114,8 +61,6 @@
     "icon": "Kamehameha.png",
     "cost": 99999999999999999999999999999999999,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 4.5 }],
-    "description": "A legendary technique blasts water with cinematic flair.",
-    "flavor": "Rumor claims the shockwave is audible from orbit.",
     "limit": 1,
     "unlock": { "tier": 11 }
   },
@@ -125,11 +70,10 @@
     "icon": "Hawkingin_Loylygeneraattori.png",
     "cost": 9999999999999999999999999999999999999999,
     "effects": [{ "type": "mult", "target": "population_cps", "value": 5.0 }],
-    "description": "Quantum breakthroughs turn black holes into steam engines.",
-    "flavor": "Equations swirl in the air like glowing constellations.",
     "limit": 1,
     "unlock": { "tier": 12 }
   }
+
 ]
 
 
