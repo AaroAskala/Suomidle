@@ -58,8 +58,17 @@ export function useLocale() {
       const formatOptions: FormatNumberOptions | undefined = shouldUseScientificNotation(targetValue)
         ? { ...(options ?? {}), notation: 'scientific' }
         : options;
-      const formatter = new Intl.NumberFormat(locale, formatOptions);
-      return formatter.format(targetValue);
+      try {
+        const formatter = new Intl.NumberFormat(locale, formatOptions);
+        return formatter.format(targetValue);
+      } catch (error) {
+        console.warn('Falling back to default locale for number formatting', {
+          error,
+          locale,
+        });
+        const fallbackFormatter = new Intl.NumberFormat(resolvedLang, formatOptions);
+        return fallbackFormatter.format(targetValue);
+      }
     },
     [i18n.language, resolvedLang],
   );
