@@ -6,6 +6,7 @@ import {
   type DailyTaskToastDetail,
   getDailyTaskDefinition,
   getTaskTarget,
+  getRewardTemplate,
 } from '../systems/dailyTasks';
 import { useLocale } from '../i18n/useLocale';
 import './dailyTasks.css';
@@ -100,6 +101,17 @@ export function DailyTasksPanel() {
         const buffMs = buff ? buff.endsAt - now : 0;
         const claimable = state.completedAt !== null && state.claimedAt === null;
         const claimed = state.claimedAt !== null;
+        const rewardTemplate = getRewardTemplate(definition.reward);
+        let rewardLabel: string | null = null;
+        if (rewardTemplate?.type === 'temp_gain_mult') {
+          const formattedBonus = formatNumber(rewardTemplate.value * 100, {
+            maximumFractionDigits: 0,
+          });
+          rewardLabel = t('tasks.daily.reward.tempGain', {
+            bonus: formattedBonus,
+            duration: formatTime(rewardTemplate.duration_s),
+          });
+        }
         let statusLabel: string | null = null;
         let statusType: 'default' | 'completed' | 'active' | 'expired' = 'default';
         if (claimable) {
@@ -137,10 +149,11 @@ export function DailyTasksPanel() {
           claimable,
           claimed,
           buttonLabel,
+          rewardLabel,
         };
       })
       .filter((entry): entry is Exclude<typeof entry, null> => entry !== null);
-  }, [dailyTasks, now, t]);
+  }, [dailyTasks, formatNumber, now, t]);
 
   const secondsToReset = dailyTasks.nextResetAt
     ? Math.max(0, Math.floor((dailyTasks.nextResetAt - now) / 1000))
@@ -203,6 +216,9 @@ export function DailyTasksPanel() {
                     <div className="daily-tasks__card-text">
                       <h3 className="daily-tasks__card-title">{task.title}</h3>
                       <p className="daily-tasks__card-desc">{task.description}</p>
+                      {task.rewardLabel && (
+                        <p className="daily-tasks__reward">{task.rewardLabel}</p>
+                      )}
                     </div>
                     {task.statusLabel && (
                       <span className={`daily-tasks__status daily-tasks__status--${task.statusType}`}>

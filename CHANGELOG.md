@@ -12,6 +12,7 @@
 - Update the page title to display "suomidle" in browser tabs.
 - Namespace persisted local storage keys by environment to isolate saves across deployments.
 - Move the daily tasks list into a collapsible drawer beneath the settings menu and highlight ready-to-claim tasks.
+- Show the reward each daily task grants and apply active bonuses to the LPS counter in the HUD.
 
 
 ### Fixed
