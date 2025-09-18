@@ -2,6 +2,22 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_LANG, SUPPORTED_LANGS, type SupportedLang } from './config';
 
+const SCIENTIFIC_NOTATION_THRESHOLD = 1_000_000_000;
+const SCIENTIFIC_NOTATION_THRESHOLD_BIGINT = 1_000_000_000n;
+
+const shouldUseScientificNotation = (value: number | bigint) => {
+  if (typeof value === 'bigint') {
+    return (
+      value >= SCIENTIFIC_NOTATION_THRESHOLD_BIGINT ||
+      value <= -SCIENTIFIC_NOTATION_THRESHOLD_BIGINT
+    );
+  }
+
+  if (!Number.isFinite(value)) return false;
+
+  return Math.abs(value) >= SCIENTIFIC_NOTATION_THRESHOLD;
+};
+
 const STORAGE_KEY = 'i18nextLng';
 
 type FormatNumberOptions = Intl.NumberFormatOptions;
@@ -37,8 +53,12 @@ export function useLocale() {
 
   const formatNumber = useCallback(
     (value: number | bigint, options?: FormatNumberOptions) => {
-      const formatter = new Intl.NumberFormat(i18n.language || resolvedLang, options);
+      const locale = i18n.language || resolvedLang;
       const targetValue = typeof value === 'bigint' ? value : Number(value);
+      const formatOptions: FormatNumberOptions | undefined = shouldUseScientificNotation(targetValue)
+        ? { ...(options ?? {}), notation: 'scientific' }
+        : options;
+      const formatter = new Intl.NumberFormat(locale, formatOptions);
       return formatter.format(targetValue);
     },
     [i18n.language, resolvedLang],
