@@ -12,6 +12,7 @@
 - Update the page title to display "suomidle" in browser tabs.
 - Namespace persisted local storage keys by environment to isolate saves across deployments.
 - Move the daily tasks list into a collapsible drawer beneath the settings menu and highlight ready-to-claim tasks.
+- Localize the daily tasks expired reward label to "Bonus käytetty" for Finnish players.
 
 
 ### Fixed
