@@ -21,7 +21,7 @@ export function Store() {
             <span>
               {t('shop.list.item', {
                 name,
-                count: formatNumber(count, { maximumFractionDigits: 0 }),
+                count,
               })}
             </span>
             <button
