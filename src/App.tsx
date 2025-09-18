@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { HUD } from './components/HUD';
 import { BuildingsGrid } from './components/BuildingsGrid';
 import { TechGrid } from './components/TechGrid';
 import { Prestige } from './components/Prestige';
-import { PrestigeCard } from './components/PrestigeCard';
 import { Settings } from './components/Settings';
 import { startGameLoop, stopGameLoop } from './app/gameLoop';
 import { useGameStore } from './app/store';
@@ -14,12 +13,16 @@ import { MaailmaShop } from './ui/MaailmaShop';
 import { PoltaMaailmaButton } from './ui/PoltaMaailmaButton';
 import { DailyTasksPanel } from './ui/dailyTasksUI';
 import { useLocale } from './i18n/useLocale';
+import { GameHeader } from './components/GameHeader';
+import { CardDetailsModal } from './components/CardDetailsModal';
+import type { CardSelection } from './components/CardSelection';
 
 function App() {
   const { t } = useLocale();
   const tierLevel = useGameStore((s) => s.tierLevel);
   const hasInteracted = useSettingsStore((s) => s.hasInteracted);
   const markInteracted = useSettingsStore((s) => s.markInteracted);
+  const [selection, setSelection] = useState<CardSelection | null>(null);
   useEffect(() => {
     startGameLoop();
     return () => {
@@ -59,15 +62,20 @@ function App() {
           {t('app.tapToStart')}
         </div>
       )}
-      <Settings />
-      <HUD />
-      <DailyTasksPanel />
-      <PrestigeCard />
-      <BuildingsGrid />
-      <TechGrid />
-      <Prestige />
-      <MaailmaShop />
+      <div className="app-shell">
+        <GameHeader />
+        <Settings />
+        <main className="app-shell__main">
+          <HUD />
+          <DailyTasksPanel />
+          <BuildingsGrid onSelect={setSelection} />
+          <TechGrid onSelect={setSelection} />
+          <Prestige />
+          <MaailmaShop />
+        </main>
+      </div>
       <PoltaMaailmaButton />
+      <CardDetailsModal selection={selection} onClose={() => setSelection(null)} />
     </>
   );
 }

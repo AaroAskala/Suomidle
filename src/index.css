@@ -2,6 +2,7 @@
   --brand-primary: #646cff;
   --color-text: rgba(255, 255, 255, 0.87);
   --color-button-text: #ffffff;
+  --app-header-offset: 0px;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -34,7 +35,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   overflow-x: hidden;
 }
 
@@ -255,6 +256,15 @@ h1 {
   min-height: 100%;
 }
 
+.card-button[data-status='unavailable'],
+.card-button[data-status='locked'] {
+  opacity: 0.65;
+}
+
+.card-button[data-status='owned'] {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35);
+}
+
 .card-button:hover:not(:disabled),
 .card-button:focus-visible:not(:disabled) {
   transform: translateY(-2px);
@@ -352,7 +362,7 @@ h1 {
 /* Settings button and menu */
 .settings {
   position: fixed;
-  top: 0.5rem;
+  top: calc(var(--app-header-offset, 0px) + 0.5rem);
   left: 0.5rem;
   z-index: 1000;
 }

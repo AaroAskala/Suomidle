@@ -7,6 +7,7 @@
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
 - Animated progress bar component for sharing reusable HUD metric styling.
+- Fixed game header with translated stat summaries plus an accessible card details modal with localized copy.
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
