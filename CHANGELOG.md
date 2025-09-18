@@ -7,6 +7,7 @@
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
 - Animated progress bar component for sharing reusable HUD metric styling.
+- Detail panels for buildings, technologies, and prestige resets that surface localized descriptions, costs, production effects, and flavour text.
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
@@ -17,6 +18,8 @@
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
 - Replace the HUD counters with themed progress bars that highlight next tier unlock progress.
+- Streamlined shop cards to show only availability, leaving long-form details inside the new panels.
+- Moved the prestige card's long-form copy into the detail panel while keeping the card focused on availability.
 
 
 ### Fixed

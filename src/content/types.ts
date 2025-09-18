@@ -11,6 +11,8 @@ export interface BuildingDef {
   baseCost: number;
   costMult: number;
   baseProd: number;
+  description?: string;
+  flavor?: string;
   unlock?: {
     tier: number;
   };
@@ -28,6 +30,8 @@ export interface TechDef {
   icon: string;
   cost: number;
   effects: TechEffect[];
+  description?: string;
+  flavor?: string;
   limit?: number;
   unlock?: {
     tier: number;
@@ -54,4 +58,6 @@ export interface PrestigeDef {
   icon: string;
   minPopulation: number;
   formula: PrestigeFormula;
+  description?: string;
+  flavor?: string;
 }

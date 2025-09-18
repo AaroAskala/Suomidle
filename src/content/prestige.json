@@ -3,6 +3,8 @@
   "name": "Polta sauna",
   "icon": "assets/ui/torch.png",
   "minPopulation": 10000,
+  "description": "Burn the sauna to reset progress for a permanent multiplier.",
+  "flavor": "From the ashes rises an even hotter löyly.",
   "formula": {
     "type": "sqrt",
     "k": 100000,
