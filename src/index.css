@@ -58,6 +58,11 @@ h1 {
   color: var(--color-button-text);
 }
 
+.btn--secondary {
+  background-color: color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  color: var(--color-button-text);
+}
+
 .btn--success {
   background-color: #2f9e44;
   color: var(--color-button-text);
@@ -73,9 +78,18 @@ h1 {
   opacity: 0.75;
 }
 
+.btn--secondary:disabled {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.55);
+  cursor: not-allowed;
+}
+
 .btn--primary:hover,
 .btn--primary:active,
-.btn--primary:focus-visible {
+.btn--primary:focus-visible,
+.btn--secondary:hover,
+.btn--secondary:active,
+.btn--secondary:focus-visible {
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
@@ -118,6 +132,27 @@ h1 {
   justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.store__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.store__item-label {
+  flex: 1 1 12rem;
+  text-align: left;
+}
+
+.store__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .collapsible__toggle {

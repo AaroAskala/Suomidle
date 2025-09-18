@@ -85,6 +85,8 @@
   "shop.list.item": "{name} ({count, number})",
   "shop.list.buy": "Buy {name} for {price}",
   "shop.list.button": "Buy {price}",
+  "shop.list.buyAll": "Buy all available {name} ({count}) for {price}",
+  "shop.list.buttonAll": "Buy all ({count})",
   "shop.permanentMods": "Permanent Modifiers",
   "buildings.names.sauna": "Sauna",
   "buildings.names.kylakauppa": "Village Shop",
