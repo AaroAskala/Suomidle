@@ -1,0 +1,68 @@
+:root {
+  --progress-bar-track-bg: color-mix(in srgb, var(--surface-elevated) 75%, transparent);
+  --progress-bar-fill-blue: #5ea0ff;
+  --progress-bar-fill-orange: #f79a3e;
+  --progress-bar-helper-color: color-mix(in srgb, var(--color-text) 60%, transparent);
+}
+
+.progress-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.progress-bar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.progress-bar__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.progress-bar__value {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.progress-bar__track {
+  position: relative;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--progress-bar-track-bg, rgba(255, 255, 255, 0.15));
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  background: var(--progress-bar-fill-color, var(--progress-bar-fill-blue));
+  transition: width 320ms ease-in-out;
+}
+
+.progress-bar__helper {
+  font-size: 0.8rem;
+  color: var(--progress-bar-helper-color);
+}
+
+.progress-bar--blue {
+  --progress-bar-fill-color: var(--progress-bar-fill-blue);
+}
+
+.progress-bar--orange {
+  --progress-bar-fill-color: var(--progress-bar-fill-orange);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --progress-bar-track-bg: color-mix(in srgb, var(--surface-elevated) 65%, transparent);
+    --progress-bar-helper-color: color-mix(in srgb, var(--color-text) 45%, transparent);
+    --progress-bar-fill-blue: #2563eb;
+    --progress-bar-fill-orange: #ea580c;
+  }
+}

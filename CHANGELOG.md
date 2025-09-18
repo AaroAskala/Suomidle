@@ -6,6 +6,7 @@
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
+- Animated progress bar component for sharing reusable HUD metric styling.
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
@@ -15,6 +16,7 @@
 - Show the reward each daily task grants and apply active bonuses to the LPS counter in the HUD.
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
+- Replace the HUD counters with themed progress bars that highlight next tier unlock progress.
 
 
 ### Fixed
