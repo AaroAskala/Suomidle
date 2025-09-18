@@ -1,7 +1,8 @@
 interface ImageCardButtonProps {
   icon: string;
   title: string;
-  subtitle?: string;
+  countLabel?: string;
+  statusLabel?: string;
   disabled?: boolean;
   onSelect?: () => void;
   className?: string;
@@ -12,7 +13,8 @@ interface ImageCardButtonProps {
 export function ImageCardButton({
   icon,
   title,
-  subtitle,
+  countLabel,
+  statusLabel,
   disabled,
   onSelect,
   className,
@@ -35,8 +37,11 @@ export function ImageCardButton({
         <img src={icon} alt="" loading="lazy" decoding="async" />
       </span>
       <span className="card-button__text">
-        <span className="card-button__title">{title}</span>
-        {subtitle && <span className="card-button__subtitle">{subtitle}</span>}
+        <span className="card-button__header">
+          <span className="card-button__title">{title}</span>
+          {countLabel ? <span className="card-button__count">{countLabel}</span> : null}
+        </span>
+        {statusLabel ? <span className="card-button__subtitle">{statusLabel}</span> : null}
       </span>
     </button>
   );

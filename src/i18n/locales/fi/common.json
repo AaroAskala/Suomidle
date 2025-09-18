@@ -100,6 +100,8 @@
   "cards.status.locked": "Lukittu",
   "cards.status.lockedTier": "Lukittu · Taso {tier}",
   "cards.status.owned": "Omistat",
+  "cards.count.owned": "{count} kpl",
+  "cards.count.ownedWithLimit": "{count} / {limit} kpl",
   "shop.permanentMods": "Pysyvät modifikaattorit",
   "buildings.names.sauna": "Sauna",
   "buildings.names.kylakauppa": "Kyläkauppa",

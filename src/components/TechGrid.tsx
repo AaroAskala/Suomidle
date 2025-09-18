@@ -39,12 +39,22 @@ export function TechGrid({ onSelect }: TechGridProps) {
                 })
               : t(`cards.status.${statusKey}` as const);
           const name = t(`tech.names.${techDef.id}` as const, { defaultValue: techDef.name });
+          const countLabel =
+            limit > 1
+              ? t('cards.count.ownedWithLimit', {
+                  count: formatNumber(count, { maximumFractionDigits: 0 }),
+                  limit: formatNumber(limit, { maximumFractionDigits: 0 }),
+                })
+              : t('cards.count.owned', {
+                  count: formatNumber(count, { maximumFractionDigits: 0 }),
+                });
           return (
             <li key={techDef.id} className="card-grid__item" role="listitem">
               <ImageCardButton
                 icon={`${import.meta.env.BASE_URL}assets/tech/${techDef.icon}`}
                 title={name}
-                subtitle={statusLabel}
+                countLabel={countLabel}
+                statusLabel={statusLabel}
                 status={statusKey}
                 onSelect={() => onSelect({ kind: 'tech', id: techDef.id })}
               />

@@ -100,6 +100,8 @@
   "cards.status.locked": "Låst",
   "cards.status.lockedTier": "Låst · Nivå {tier}",
   "cards.status.owned": "Ägs",
+  "cards.count.owned": "{count} i ägo",
+  "cards.count.ownedWithLimit": "{count} / {limit} i ägo",
   "shop.permanentMods": "Permanenta modifierare",
   "buildings.names.sauna": "Bastu",
   "buildings.names.kylakauppa": "Bybutik",

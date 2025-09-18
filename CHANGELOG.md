@@ -18,6 +18,7 @@
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
 - Replace the HUD counters with themed progress bars that highlight next tier unlock progress.
+- Refine shop cards to trigger the localized detail modal while leaving the cards focused on name, ownership count, and availability.
 
 
 ### Fixed

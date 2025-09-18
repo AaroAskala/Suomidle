@@ -55,9 +55,9 @@ export function PrestigeCard() {
           name: prestigeName,
           value: formatNumber(prestigeMult, { maximumFractionDigits: 2 }),
         })}
-        subtitle={subtitle}
+        statusLabel={subtitle}
         disabled={!canPrestige}
-        onClick={() => {
+        onSelect={() => {
           if (!canPrestige) return;
           if (
             confirm(

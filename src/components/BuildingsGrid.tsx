@@ -10,7 +10,7 @@ interface BuildingsGridProps {
 }
 
 export function BuildingsGrid({ onSelect }: BuildingsGridProps) {
-  const { t } = useLocale();
+  const { t, formatNumber } = useLocale();
   const population = useGameStore((s) => s.population);
   const owned = useGameStore((s) => s.buildings);
   const tier = useGameStore((s) => s.tierLevel);
@@ -28,17 +28,18 @@ export function BuildingsGrid({ onSelect }: BuildingsGridProps) {
           const price = getBuildingCost(b, count);
           const canAfford = population >= price;
           const statusKey = canAfford ? 'available' : 'unavailable';
-          const subtitle = t(`cards.status.${statusKey}` as const);
+          const statusLabel = t(`cards.status.${statusKey}` as const);
           const name = t(`buildings.names.${b.id}` as const, { defaultValue: b.name });
+          const countLabel = t('cards.count.owned', {
+            count: formatNumber(count, { maximumFractionDigits: 0 }),
+          });
           return (
             <li key={b.id} className="card-grid__item" role="listitem">
               <ImageCardButton
                 icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
-                title={t('shop.card.title', {
-                  name,
-                  count,
-                })}
-                subtitle={subtitle}
+                title={name}
+                countLabel={countLabel}
+                statusLabel={statusLabel}
                 status={statusKey}
                 onSelect={() => onSelect({ kind: 'building', id: b.id })}
               />
