@@ -1,40 +1,66 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { ImageCardButton } from './ImageCardButton';
-import {
-  computePrestigeMult,
-  computePrestigePoints,
-  useGameStore,
-} from '../app/store';
+import { CardDetailsPanel } from './CardDetailsPanel';
+import { useGameStore } from '../app/store';
 import { prestige as prestigeData } from '../content';
 import { useLocale } from '../i18n/useLocale';
 
 export function PrestigeCard() {
   const { t, formatNumber } = useLocale();
-  const prestigeMult = useGameStore((s) => s.prestigeMult);
-  const totalPopulation = useGameStore((s) => s.totalPopulation);
   const canPrestige = useGameStore((s) => s.canPrestige());
   const prestige = useGameStore((s) => s.prestige);
+  const projectPrestigeGain = useGameStore((s) => s.projectPrestigeGain);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
-  const { multAfter, deltaMult } = useMemo(() => {
-    const pointsAfter = computePrestigePoints(totalPopulation);
-    const multAfter = computePrestigeMult(pointsAfter);
-    return {
-      multAfter,
-      deltaMult: multAfter - prestigeMult,
-    };
-  }, [prestigeMult, totalPopulation]);
+  const projection = projectPrestigeGain();
+  const { multNow, multAfter, deltaMult, pointsAfter } = projection;
 
-  const prestigePercent = (prestigeMult - 1) * 100;
+  const prestigePercent = (multNow - 1) * 100;
   const prestigeName = t('prestige.action', { defaultValue: prestigeData.name });
+  const description = t('prestige.details.description', {
+    defaultValue: prestigeData.description ?? '',
+  });
+  const flavor = t('prestige.details.flavor', {
+    defaultValue: prestigeData.flavor ?? '',
+  });
 
-  const subtitle = canPrestige
+  const formattedCurrentMultiplier = formatNumber(multNow, { maximumFractionDigits: 2 });
+  const formattedNextMultiplier = formatNumber(multAfter, { maximumFractionDigits: 2 });
+  const formattedGainPercent = formatNumber(deltaMult * 100, { maximumFractionDigits: 2 });
+  const formattedRequirement = formatNumber(prestigeData.minPopulation, {
+    maximumFractionDigits: 0,
+  });
+  const formattedPointsAfter = formatNumber(pointsAfter, {
+    maximumFractionDigits: 0,
+  });
+
+  const cardStatus = canPrestige
+    ? t('prestige.card.status.availableShort')
+    : t('prestige.card.status.lockedShort');
+
+  const detailStatus = canPrestige
     ? t('prestige.card.gain', {
-        gain: formatNumber(deltaMult * 100, { maximumFractionDigits: 2 }),
-        target: formatNumber(multAfter, { maximumFractionDigits: 2 }),
+        gain: formattedGainPercent,
+        target: formattedNextMultiplier,
       })
     : t('prestige.card.unlock', {
-        requirement: formatNumber(prestigeData.minPopulation, { maximumFractionDigits: 0 }),
+        requirement: formattedRequirement,
       });
+
+  const handlePrestige = () => {
+    if (!canPrestige) return;
+    const confirmed = confirm(
+      t('prestige.confirm', {
+        gain: formattedGainPercent,
+        name: prestigeName,
+      }),
+    );
+    if (!confirmed) return;
+    const success = prestige();
+    if (success) {
+      setDetailsOpen(false);
+    }
+  };
 
   return (
     <div
@@ -53,23 +79,68 @@ export function PrestigeCard() {
         icon={prestigeData.icon}
         title={t('prestige.card.title', {
           name: prestigeName,
-          value: formatNumber(prestigeMult, { maximumFractionDigits: 2 }),
+          value: formattedCurrentMultiplier,
         })}
-        subtitle={subtitle}
-        disabled={!canPrestige}
-        onClick={() => {
-          if (!canPrestige) return;
-          if (
-            confirm(
-              t('prestige.confirm', {
-                gain: formatNumber(deltaMult * 100, { maximumFractionDigits: 2 }),
-                name: prestigeName,
-              }),
-            )
-          )
-            prestige();
-        }}
+        subtitle={cardStatus}
+        onSelect={() => setDetailsOpen(true)}
       />
+      <CardDetailsPanel
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        icon={prestigeData.icon}
+        title={prestigeName}
+        subtitle={t('prestige.details.subtitle', {
+          value: formattedCurrentMultiplier,
+        })}
+        status={detailStatus}
+        description={description}
+        flavor={flavor}
+        actions={
+          <button
+            type="button"
+            className="btn btn--primary"
+            disabled={!canPrestige}
+            onClick={handlePrestige}
+          >
+            {t('prestige.details.action')}
+          </button>
+        }
+      >
+        <dl className="card-details__stats">
+          <div>
+            <dt>{t('prestige.details.currentMultiplierLabel')}</dt>
+            <dd>
+              {t('prestige.details.multiplierValue', {
+                value: formattedCurrentMultiplier,
+              })}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('prestige.details.nextMultiplierLabel')}</dt>
+            <dd>
+              {t('prestige.details.multiplierValue', {
+                value: formattedNextMultiplier,
+              })}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('prestige.details.gainLabel')}</dt>
+            <dd>
+              {t('prestige.details.gainValue', {
+                value: formattedGainPercent,
+              })}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('prestige.details.pointsLabel')}</dt>
+            <dd>{formattedPointsAfter}</dd>
+          </div>
+          <div>
+            <dt>{t('prestige.details.requirementLabel')}</dt>
+            <dd>{formattedRequirement}</dd>
+          </div>
+        </dl>
+      </CardDetailsPanel>
       <div className="prestige-mobile-info">
         {t('prestige.mobileInfo', {
           name: prestigeName,

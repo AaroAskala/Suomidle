@@ -1,60 +1,166 @@
 [
-  { "id": "sauna", "name": "Sauna", "icon": "Sauna.png",
-    "baseCost": 10, "costMult": 1.15, "baseProd": 1 },
-
-  { "id": "kylakauppa", "name": "Kyläkauppa", "icon": "Kyläkauppa.png",
-    "baseCost": 100, "costMult": 1.15, "baseProd": 5 },
-
-  { "id": "alko", "name": "Alko", "icon": "Alko.png",
-    "baseCost": 1000, "costMult": 1.15, "baseProd": 25 },
-
-  { "id": "ensiapu", "name": "Ensiapu", "icon": "Ensiapu.png",
-    "baseCost": 10000, "costMult": 1.16, "baseProd": 100,
-    "unlock": { "tier": 2 } },
-
-  { "id": "baari", "name": "Baari", "icon": "Baari.png",
-    "baseCost": 100000, "costMult": 1.15, "baseProd": 500,
-    "unlock": { "tier": 3 } },
-
-  { "id": "cittari", "name": "Cittari", "icon": "Cittari.png",
-    "baseCost": 10000000, "costMult": 1.15, "baseProd": 20000,
-    "unlock": { "tier": 4 } },
-
-  { "id": "sateri", "name": "Säteri", "icon": "Säteri.png",
-    "baseCost": 1000000000, "costMult": 1.15, "baseProd": 400000,
-    "unlock": { "tier": 5 } },
-
-  { "id": "kasino", "name": "Kasino", "icon": "Kasino.png",
-    "baseCost": 100000000000, "costMult": 1.15, "baseProd": 10000000,
-    "unlock": { "tier": 6 } },
-
-  { "id": "kirkko", "name": "Kirkko", "icon": "Kirkko.png",
-    "baseCost": 1000000000000, "costMult": 1.15, "baseProd": 250000000,
-    "unlock": { "tier": 7 } },
-
-  { "id": "vankila", "name": "Vankila", "icon": "Vankila.png",
-    "baseCost": 10000000000000, "costMult": 1.15, "baseProd": 5000000000,
-    "unlock": { "tier": 8 } },
-
-  { "id": "bordelli", "name": "Bordelli", "icon": "Bordelli.png",
-    "baseCost": 100000000000000, "costMult": 1.15, "baseProd": 100000000000,
-    "unlock": { "tier": 9 } },
-
-  { "id": "kampus", "name": "Kampus", "icon": "Kampus.png",
-    "baseCost": 999999999999999999999999999, "costMult": 1.15, "baseProd": 2000000000000,
-    "unlock": { "tier": 10 } },
-
-  { "id": "tehdas", "name": "Tehdas", "icon": "Tehdas.png",
-    "baseCost": 9999999999999999999999999999999999, "costMult": 1.15, "baseProd": 500000000000000,
-    "unlock": { "tier": 11 } },
-
-  { "id": "parlamenttitalo", "name": "Parlamenttitalo", "icon": "Parlamenttitalo.png",
-    "baseCost": 999999999999999999999999999999999999999, "costMult": 1.15, "baseProd": 1000000000000000000000,
-    "unlock": { "tier": 12 } },
-
-  { "id": "placeholder", "name": "TätäEiMissäänNimessäPitäisiNähdä!", "icon": "Sauna.png",
-    "baseCost": 1, "costMult": 1.15, "baseProd": 1,
-    "unlock": { "tier": 13 } }
+  {
+    "id": "sauna",
+    "name": "Sauna",
+    "icon": "Sauna.png",
+    "baseCost": 10,
+    "costMult": 1.15,
+    "baseProd": 1,
+    "description": "A humble steam room that sparks your heat economy.",
+    "flavor": "The hiss of water on stone echoes through the village square."
+  },
+  {
+    "id": "kylakauppa",
+    "name": "Kyläkauppa",
+    "icon": "Kyläkauppa.png",
+    "baseCost": 100,
+    "costMult": 1.15,
+    "baseProd": 5,
+    "description": "A general store that stocks essentials for every sauna-goer.",
+    "flavor": "The shopkeeper already has a tab ready with your name."
+  },
+  {
+    "id": "alko",
+    "name": "Alko",
+    "icon": "Alko.png",
+    "baseCost": 1000,
+    "costMult": 1.15,
+    "baseProd": 25,
+    "description": "State shelves of spirits that keep patrons spending freely.",
+    "flavor": "A celebratory bottle warms more than the stove ever could."
+  },
+  {
+    "id": "ensiapu",
+    "name": "Ensiapu",
+    "icon": "Ensiapu.png",
+    "baseCost": 10000,
+    "costMult": 1.16,
+    "baseProd": 100,
+    "description": "On-call medics patch up overenthusiastic bathers.",
+    "flavor": "The waiting room smells faintly of eucalyptus and courage.",
+    "unlock": { "tier": 2 }
+  },
+  {
+    "id": "baari",
+    "name": "Baari",
+    "icon": "Baari.png",
+    "baseCost": 100000,
+    "costMult": 1.15,
+    "baseProd": 500,
+    "description": "A lively bar that keeps crowds nearby and wallets open.",
+    "flavor": "Stories flow faster than the taps on karaoke night.",
+    "unlock": { "tier": 3 }
+  },
+  {
+    "id": "cittari",
+    "name": "Cittari",
+    "icon": "Cittari.png",
+    "baseCost": 10000000,
+    "costMult": 1.15,
+    "baseProd": 20000,
+    "description": "A sprawling market that draws shoppers from every village.",
+    "flavor": "You can buy birch whisks, groceries, and gossip in one trip.",
+    "unlock": { "tier": 4 }
+  },
+  {
+    "id": "sateri",
+    "name": "Säteri",
+    "icon": "Säteri.png",
+    "baseCost": 1000000000,
+    "costMult": 1.15,
+    "baseProd": 400000,
+    "description": "Luxury estates where wealthy guests pay for prestige sessions.",
+    "flavor": "Marble paths lead to private steam with unobstructed views.",
+    "unlock": { "tier": 5 }
+  },
+  {
+    "id": "kasino",
+    "name": "Kasino",
+    "icon": "Kasino.png",
+    "baseCost": 100000000000,
+    "costMult": 1.15,
+    "baseProd": 10000000,
+    "description": "High-stakes entertainment that funnels winnings into heat.",
+    "flavor": "The roulette wheel spins in perfect rhythm with the löyly.",
+    "unlock": { "tier": 6 }
+  },
+  {
+    "id": "kirkko",
+    "name": "Kirkko",
+    "icon": "Kirkko.png",
+    "baseCost": 1000000000000,
+    "costMult": 1.15,
+    "baseProd": 250000000,
+    "description": "A sacred hall where blessings boost community attendance.",
+    "flavor": "Candles flicker, mixing incense with the scent of pine.",
+    "unlock": { "tier": 7 }
+  },
+  {
+    "id": "vankila",
+    "name": "Vankila",
+    "icon": "Vankila.png",
+    "baseCost": 10000000000000,
+    "costMult": 1.15,
+    "baseProd": 5000000000,
+    "description": "Mandatory sessions ensure inmates contribute steady heat.",
+    "flavor": "The guards swear the steam keeps tempers in check.",
+    "unlock": { "tier": 8 }
+  },
+  {
+    "id": "bordelli",
+    "name": "Bordelli",
+    "icon": "Bordelli.png",
+    "baseCost": 100000000000000,
+    "costMult": 1.15,
+    "baseProd": 100000000000,
+    "description": "An illicit lounge where exclusivity commands a premium.",
+    "flavor": "Whispers of secret suites lure even the stoic inside.",
+    "unlock": { "tier": 9 }
+  },
+  {
+    "id": "kampus",
+    "name": "Kampus",
+    "icon": "Kampus.png",
+    "baseCost": 999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 2000000000000,
+    "description": "A modern campus researching efficient steam technology.",
+    "flavor": "Students argue about thermodynamics between sauna rounds.",
+    "unlock": { "tier": 10 }
+  },
+  {
+    "id": "tehdas",
+    "name": "Tehdas",
+    "icon": "Tehdas.png",
+    "baseCost": 9999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 500000000000000,
+    "description": "Industrial complexes that automate löyly generation.",
+    "flavor": "Giant turbines roar like waterfalls made of heat.",
+    "unlock": { "tier": 11 }
+  },
+  {
+    "id": "parlamenttitalo",
+    "name": "Parlamenttitalo",
+    "icon": "Parlamenttitalo.png",
+    "baseCost": 999999999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 1000000000000000000000,
+    "description": "Political clout delivers subsidies and devoted supporters.",
+    "flavor": "Sauna diplomacy keeps debates steamy but productive.",
+    "unlock": { "tier": 12 }
+  },
+  {
+    "id": "placeholder",
+    "name": "TätäEiMissäänNimessäPitäisiNähdä!",
+    "icon": "Sauna.png",
+    "baseCost": 1,
+    "costMult": 1.15,
+    "baseProd": 1,
+    "description": "A debug structure that only appears during development.",
+    "flavor": "If you see this, reality has sprung a leak.",
+    "unlock": { "tier": 13 }
+  }
 ]
 
 
