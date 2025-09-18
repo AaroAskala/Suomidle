@@ -1,30 +1,36 @@
 import { useGameStore } from '../app/store';
 import { tech as techList } from '../content';
-import { formatNumber } from '../utils/format';
+import { useLocale } from '../i18n/useLocale';
 
 export function Upgrades() {
+  const { t, formatNumber } = useLocale();
   const population = useGameStore((s) => s.population);
   const counts = useGameStore((s) => s.techCounts);
   const buy = useGameStore((s) => s.purchaseTech);
   const tier = useGameStore((s) => s.tierLevel);
   return (
     <div>
-      <h2>Tech</h2>
-      {techList.map((t) => {
-        if (t.unlock?.tier && tier < t.unlock.tier) return null;
+      <h2>{t('tech.title')}</h2>
+      {techList.map((techDef) => {
+        if (techDef.unlock?.tier && tier < techDef.unlock.tier) return null;
+        const name = t(`tech.names.${techDef.id}` as const, { defaultValue: techDef.name });
         return (
-          <div key={t.id}>
+          <div key={techDef.id}>
             <span>
-              {t.name} ({formatNumber(t.cost)})
+              {t('tech.list.item', {
+                name,
+                cost: formatNumber(techDef.cost, { maximumFractionDigits: 0 }),
+              })}
             </span>
             <button
               className="btn btn--primary"
               disabled={
-                population < t.cost || (counts[t.id] || 0) >= (t.limit ?? 1)
+                population < techDef.cost || (counts[techDef.id] || 0) >= (techDef.limit ?? 1)
               }
-              onClick={() => buy(t.id)}
+              onClick={() => buy(techDef.id)}
+              aria-label={t('tech.list.buy', { name })}
             >
-              Buy
+              {t('actions.buy')}
             </button>
           </div>
         );

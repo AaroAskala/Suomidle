@@ -1,14 +1,14 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { useGameStore } from '../app/store';
 import {
-  dailyTasksConfig,
   dailyTaskEventTarget,
   DAILY_TASK_TOAST_EVENT,
   type DailyTaskToastDetail,
   getDailyTaskDefinition,
   getTaskTarget,
+  getRewardTemplate,
 } from '../systems/dailyTasks';
-import { formatNumber } from '../utils/format';
+import { useLocale } from '../i18n/useLocale';
 import './dailyTasks.css';
 
 const formatTime = (totalSeconds: number) => {
@@ -29,9 +29,9 @@ interface ToastState {
 }
 
 export function DailyTasksPanel() {
+  const { t, formatNumber } = useLocale();
   const dailyTasks = useGameStore((state) => state.dailyTasks);
   const claimReward = useGameStore((state) => state.claimDailyTaskReward);
-  const uiTexts = dailyTasksConfig.ui_texts_fi;
   const [now, setNow] = useState(() => Date.now());
   const [toast, setToast] = useState<ToastState | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -48,19 +48,34 @@ export function DailyTasksPanel() {
       const custom = event as CustomEvent<DailyTaskToastDetail>;
       const detail = custom.detail;
       if (!detail) return;
-      let message = detail.taskTitle;
+      const taskTitle = t(`tasks.daily.items.${detail.taskId}.title` as const, {
+        defaultValue: detail.taskTitle,
+      });
+      let message = taskTitle;
       if (detail.type === 'complete') {
-        message = `${detail.taskTitle} · ${uiTexts.completed}`;
+        message = t('tasks.daily.toast.completed', {
+          title: taskTitle,
+          status: t('tasks.daily.status.completed'),
+        });
       } else if (detail.type === 'claim') {
         const pct = detail.rewardValue !== undefined ? Math.round(detail.rewardValue * 100) : null;
-        const duration =
-          detail.rewardDuration !== undefined ? formatTime(detail.rewardDuration) : undefined;
-        const suffix = [uiTexts.reward_active, pct !== null ? `+${pct}%` : null, duration]
+        const duration = detail.rewardDuration !== undefined ? formatTime(detail.rewardDuration) : undefined;
+        const suffix = [
+          t('tasks.daily.status.active'),
+          pct !== null ? t('tasks.daily.toast.bonus', { bonus: pct }) : null,
+          duration ? t('tasks.daily.toast.duration', { duration }) : null,
+        ]
           .filter(Boolean)
           .join(' · ');
-        message = `${detail.taskTitle} · ${suffix}`;
+        message = t('tasks.daily.toast.claimed', {
+          title: taskTitle,
+          details: suffix,
+        });
       } else if (detail.type === 'buff_expired') {
-        message = `${detail.taskTitle} · ${uiTexts.reward_expired}`;
+        message = t('tasks.daily.toast.expired', {
+          title: taskTitle,
+          status: t('tasks.daily.status.expired'),
+        });
       }
       if (toastTimer !== undefined) window.clearTimeout(toastTimer);
       setToast({ id: Date.now(), message });
@@ -71,7 +86,7 @@ export function DailyTasksPanel() {
       if (toastTimer !== undefined) window.clearTimeout(toastTimer);
       dailyTaskEventTarget.removeEventListener(DAILY_TASK_TOAST_EVENT, handler);
     };
-  }, [uiTexts.completed, uiTexts.reward_active, uiTexts.reward_expired]);
+  }, [t]);
 
   const taskViews = useMemo(() => {
     return dailyTasks.taskOrder
@@ -86,29 +101,46 @@ export function DailyTasksPanel() {
         const buffMs = buff ? buff.endsAt - now : 0;
         const claimable = state.completedAt !== null && state.claimedAt === null;
         const claimed = state.claimedAt !== null;
+        const rewardTemplate = getRewardTemplate(definition.reward);
+        let rewardLabel: string | null = null;
+        if (rewardTemplate?.type === 'temp_gain_mult') {
+          const formattedBonus = formatNumber(rewardTemplate.value * 100, {
+            maximumFractionDigits: 0,
+          });
+          rewardLabel = t('tasks.daily.reward.tempGain', {
+            bonus: formattedBonus,
+            duration: formatTime(rewardTemplate.duration_s),
+          });
+        }
         let statusLabel: string | null = null;
         let statusType: 'default' | 'completed' | 'active' | 'expired' = 'default';
         if (claimable) {
-          statusLabel = uiTexts.completed;
+          statusLabel = t('tasks.daily.status.completed');
           statusType = 'completed';
         } else if (claimed && buffMs > 0) {
-          statusLabel = `${uiTexts.reward_active} · ${formatTime(buffMs / 1000)}`;
+          statusLabel = t('tasks.daily.status.activeWithTime', {
+            duration: formatTime(buffMs / 1000),
+          });
           statusType = 'active';
         } else if (claimed) {
-          statusLabel = uiTexts.reward_expired;
+          statusLabel = t('tasks.daily.status.expired');
           statusType = 'expired';
         }
         const buttonLabel = claimable
-          ? uiTexts.claim_reward
+          ? t('tasks.redeem')
           : claimed && buffMs > 0
-            ? uiTexts.reward_active
+            ? t('tasks.daily.status.active')
             : claimed
-              ? uiTexts.reward_expired
-              : uiTexts.progress;
+              ? t('tasks.daily.status.expired')
+              : t('tasks.daily.button.progress');
         return {
           id: taskId,
-          title: definition.title_fi,
-          description: definition.desc_fi,
+          title: t(`tasks.daily.items.${definition.id}.title` as const, {
+            defaultValue: definition.title_fi,
+          }),
+          description: t(`tasks.daily.items.${definition.id}.description` as const, {
+            defaultValue: definition.desc_fi,
+          }),
           progress,
           target,
           progressRatio,
@@ -117,10 +149,11 @@ export function DailyTasksPanel() {
           claimable,
           claimed,
           buttonLabel,
+          rewardLabel,
         };
       })
       .filter((entry): entry is Exclude<typeof entry, null> => entry !== null);
-  }, [dailyTasks, now, uiTexts]);
+  }, [dailyTasks, formatNumber, now, t]);
 
   const secondsToReset = dailyTasks.nextResetAt
     ? Math.max(0, Math.floor((dailyTasks.nextResetAt - now) / 1000))
@@ -132,13 +165,10 @@ export function DailyTasksPanel() {
   );
   const hasReadyTasks = readyToClaimCount > 0;
   const readyTasksLabel = hasReadyTasks
-    ? readyToClaimCount === 1
-      ? '1 task ready to claim'
-      : `${readyToClaimCount} tasks ready to claim`
+    ? t('tasks.daily.ready', { count: readyToClaimCount })
     : '';
-  const toggleAriaLabel = hasReadyTasks
-    ? `${uiTexts.daily_tasks_title} · ${readyTasksLabel}`
-    : uiTexts.daily_tasks_title;
+  const title = t('tasks.daily.title');
+  const toggleAriaLabel = hasReadyTasks ? `${title} · ${readyTasksLabel}` : title;
 
   return (
     <aside className={`daily-tasks-drawer${isOpen ? ' daily-tasks-drawer--open' : ''}`}>
@@ -154,7 +184,7 @@ export function DailyTasksPanel() {
         <span className="daily-tasks-drawer__chevron" aria-hidden="true">
           ›
         </span>
-        <span className="daily-tasks-drawer__label">{uiTexts.daily_tasks_title}</span>
+        <span className="daily-tasks-drawer__label">{title}</span>
         {hasReadyTasks && (
           <span className="daily-tasks-drawer__badge" aria-label={readyTasksLabel} role="status">
             !
@@ -165,10 +195,10 @@ export function DailyTasksPanel() {
         <section id={panelId} className="daily-tasks" aria-labelledby="daily-tasks-title">
           <header className="daily-tasks__header">
             <h2 id="daily-tasks-title" className="daily-tasks__title">
-              {uiTexts.daily_tasks_title}
+              {title}
             </h2>
             <span className="daily-tasks__reset" aria-live="polite">
-              {uiTexts.resets_in}: {formatTime(secondsToReset)}
+              {t('tasks.daily.resetsIn', { duration: formatTime(secondsToReset) })}
             </span>
           </header>
           <div className="daily-tasks__list">
@@ -186,6 +216,9 @@ export function DailyTasksPanel() {
                     <div className="daily-tasks__card-text">
                       <h3 className="daily-tasks__card-title">{task.title}</h3>
                       <p className="daily-tasks__card-desc">{task.description}</p>
+                      {task.rewardLabel && (
+                        <p className="daily-tasks__reward">{task.rewardLabel}</p>
+                      )}
                     </div>
                     {task.statusLabel && (
                       <span className={`daily-tasks__status daily-tasks__status--${task.statusType}`}>
@@ -207,7 +240,10 @@ export function DailyTasksPanel() {
                       />
                     </div>
                     <div className="daily-tasks__progress-label">
-                      {uiTexts.progress}: {formattedProgress} {uiTexts.of} {formattedTarget}
+                      {t('tasks.daily.progressLabel', {
+                        current: formattedProgress,
+                        total: formattedTarget,
+                      })}
                     </div>
                   </div>
                   <button
@@ -215,6 +251,7 @@ export function DailyTasksPanel() {
                     className={buttonClass}
                     disabled={!task.claimable}
                     onClick={() => claimReward(task.id)}
+                    aria-label={task.buttonLabel}
                   >
                     {task.buttonLabel}
                   </button>
@@ -223,7 +260,7 @@ export function DailyTasksPanel() {
             })}
             {taskViews.length === 0 && (
               <div className="daily-tasks__empty" role="status">
-                {uiTexts.progress}: 0 {uiTexts.of} 0
+                {t('tasks.daily.empty')}
               </div>
             )}
           </div>

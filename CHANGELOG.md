@@ -12,10 +12,13 @@
 - Update the page title to display "suomidle" in browser tabs.
 - Namespace persisted local storage keys by environment to isolate saves across deployments.
 - Move the daily tasks list into a collapsible drawer beneath the settings menu and highlight ready-to-claim tasks.
-- Localize the daily tasks expired reward label to "Bonus käytetty" for Finnish players.
+- Show the reward each daily task grants and apply active bonuses to the LPS counter in the HUD.
+- Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
+- Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
 
 
 ### Fixed
 - Prevent GitHub Pages deployments from failing when promoting the root build into the combined artifact.
 - Remove decimals from the Lämpötila counter for clearer progress tracking.
+- Align shop translation interpolations with numeric ICU formatting and fix the Polta Maailma confirmation phrase typing error.
 

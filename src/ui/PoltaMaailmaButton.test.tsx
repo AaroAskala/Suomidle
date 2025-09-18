@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { screen } from '@testing-library/react';
 
 import { PoltaMaailmaButton } from './PoltaMaailmaButton';
 import { useGameStore } from '../app/store';
+import { renderWithI18n, setTestLanguage } from '../tests/testUtils';
+import i18n from '../i18n';
 
 describe('PoltaMaailmaButton', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await setTestLanguage('en');
     useGameStore.persist.clearStorage();
     useGameStore.setState((state) => ({
       ...state,
@@ -21,14 +24,10 @@ describe('PoltaMaailmaButton', () => {
   });
 
   it('disables the reset button when no award is available', () => {
-    render(<PoltaMaailmaButton />);
+    renderWithI18n(<PoltaMaailmaButton />);
 
-    const button = screen.getByRole('button', { name: /polta maailma/i });
+    const button = screen.getByRole('button', { name: i18n.t('maailma.action') });
     expect(button).toBeDisabled();
-    expect(button).toHaveAttribute(
-      'title',
-      'Et ansaitse vielä Tuhkaa polttamalla maailman.',
-    );
+    expect(button).toHaveAttribute('title', i18n.t('maailma.tooltip.noAsh'));
   });
 });
-

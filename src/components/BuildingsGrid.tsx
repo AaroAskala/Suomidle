@@ -1,10 +1,11 @@
 import { useGameStore } from '../app/store';
 import { buildings, getBuildingCost } from '../content';
-import { formatNumber } from '../utils/format';
+import { useLocale } from '../i18n/useLocale';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ImageCardButton } from './ImageCardButton';
 
 export function BuildingsGrid() {
+  const { t, formatNumber } = useLocale();
   const buy = useGameStore((s) => s.purchaseBuilding);
   const population = useGameStore((s) => s.population);
   const owned = useGameStore((s) => s.buildings);
@@ -13,7 +14,7 @@ export function BuildingsGrid() {
 
   return (
     <CollapsibleSection
-      title="Store"
+      title={t('shop.title')}
       className="hud hud__card"
       titleClassName="text--h2"
     >
@@ -24,12 +25,19 @@ export function BuildingsGrid() {
           const price = getBuildingCost(b, count);
           const cpsDelta = b.baseProd * mult;
           const disabled = population < price;
+          const name = t(`buildings.names.${b.id}` as const, { defaultValue: b.name });
           return (
             <ImageCardButton
               key={b.id}
               icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
-              title={`${b.name} (${formatNumber(count)})`}
-              subtitle={`Next: ${formatNumber(price)} | +${formatNumber(cpsDelta)} LPS`}
+              title={t('shop.card.title', {
+                name,
+                count,
+              })}
+              subtitle={t('shop.card.subtitle', {
+                price: formatNumber(price, { maximumFractionDigits: 0 }),
+                cps: formatNumber(cpsDelta, { maximumFractionDigits: 2 }),
+              })}
               disabled={disabled}
               onClick={() => buy(b.id)}
             />
