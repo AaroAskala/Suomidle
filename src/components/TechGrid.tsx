@@ -17,7 +17,7 @@ export function TechGrid() {
       className="hud hud__card"
       titleClassName="text--h2"
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+      <ul className="card-grid" role="list">
         {tech.map((techDef) => {
           const count = counts[techDef.id] || 0;
           const limit = techDef.limit ?? 1;
@@ -35,17 +35,18 @@ export function TechGrid() {
           ].filter(Boolean);
           const name = t(`tech.names.${techDef.id}` as const, { defaultValue: techDef.name });
           return (
-            <ImageCardButton
-              key={techDef.id}
-              icon={`${import.meta.env.BASE_URL}assets/tech/${techDef.icon}`}
-              title={name}
-              subtitle={subtitleParts.join(' · ')}
-              disabled={disabled}
-              onClick={() => buy(techDef.id)}
-            />
+            <li key={techDef.id} className="card-grid__item" role="listitem">
+              <ImageCardButton
+                icon={`${import.meta.env.BASE_URL}assets/tech/${techDef.icon}`}
+                title={name}
+                subtitle={subtitleParts.join(' · ')}
+                disabled={disabled}
+                onClick={() => buy(techDef.id)}
+              />
+            </li>
           );
         })}
-      </div>
+      </ul>
     </CollapsibleSection>
   );
 }

@@ -1,4 +1,3 @@
-
 interface ImageCardButtonProps {
   icon: string;
   title: string;
@@ -18,37 +17,24 @@ export function ImageCardButton({
   className,
   compact,
 }: ImageCardButtonProps) {
+  const buttonClassName = ['card-button', className].filter(Boolean).join(' ');
+
   return (
     <button
-      className={`btn btn--primary ${className ?? ''}`.trim()}
+      type="button"
+      className={buttonClassName}
       onClick={onClick}
       disabled={disabled}
       data-compact={compact ? '' : undefined}
       aria-label={compact ? title : undefined}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        margin: 4,
-        padding: 8,
-        border: '1px solid #ccc',
-        background: '#fff',
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? 'default' : 'pointer',
-      }}
     >
-      <img
-        src={icon}
-        alt={title}
-        width={compact ? 48 : 96}
-        height={compact ? 48 : 96}
-      />
-      {!compact && (
-        <div className="card__text">
-          <div>{title}</div>
-          {subtitle && <div>{subtitle}</div>}
-        </div>
-      )}
+      <span className="card-button__media" aria-hidden="true">
+        <img src={icon} alt="" loading="lazy" decoding="async" />
+      </span>
+      <span className="card-button__text">
+        <span className="card-button__title">{title}</span>
+        {subtitle && <span className="card-button__subtitle">{subtitle}</span>}
+      </span>
     </button>
   );
 }

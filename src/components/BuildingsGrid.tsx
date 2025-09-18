@@ -18,7 +18,7 @@ export function BuildingsGrid() {
       className="hud hud__card"
       titleClassName="text--h2"
     >
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+      <ul className="card-grid" role="list">
         {buildings.map((b) => {
           if (b.unlock?.tier && tier < b.unlock.tier) return null;
           const count = owned[b.id] || 0;
@@ -27,23 +27,24 @@ export function BuildingsGrid() {
           const disabled = population < price;
           const name = t(`buildings.names.${b.id}` as const, { defaultValue: b.name });
           return (
-            <ImageCardButton
-              key={b.id}
-              icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
-              title={t('shop.card.title', {
-                name,
-                count,
-              })}
-              subtitle={t('shop.card.subtitle', {
-                price: formatNumber(price, { maximumFractionDigits: 0 }),
-                cps: formatNumber(cpsDelta, { maximumFractionDigits: 2 }),
-              })}
-              disabled={disabled}
-              onClick={() => buy(b.id)}
-            />
+            <li key={b.id} className="card-grid__item" role="listitem">
+              <ImageCardButton
+                icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
+                title={t('shop.card.title', {
+                  name,
+                  count,
+                })}
+                subtitle={t('shop.card.subtitle', {
+                  price: formatNumber(price, { maximumFractionDigits: 0 }),
+                  cps: formatNumber(cpsDelta, { maximumFractionDigits: 2 }),
+                })}
+                disabled={disabled}
+                onClick={() => buy(b.id)}
+              />
+            </li>
           );
         })}
-      </div>
+      </ul>
     </CollapsibleSection>
   );
 }
