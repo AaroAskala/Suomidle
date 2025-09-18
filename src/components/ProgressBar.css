@@ -2,7 +2,6 @@
   --progress-bar-track-bg: color-mix(in srgb, var(--surface-elevated) 75%, transparent);
   --progress-bar-fill-blue: #5ea0ff;
   --progress-bar-fill-orange: #f79a3e;
-  --progress-bar-fill-purple: #a855f7;
   --progress-bar-helper-color: color-mix(in srgb, var(--color-text) 60%, transparent);
 }
 
@@ -59,16 +58,11 @@
   --progress-bar-fill-color: var(--progress-bar-fill-orange);
 }
 
-.progress-bar--purple {
-  --progress-bar-fill-color: var(--progress-bar-fill-purple);
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     --progress-bar-track-bg: color-mix(in srgb, var(--surface-elevated) 65%, transparent);
     --progress-bar-helper-color: color-mix(in srgb, var(--color-text) 45%, transparent);
     --progress-bar-fill-blue: #2563eb;
     --progress-bar-fill-orange: #ea580c;
-    --progress-bar-fill-purple: #9333ea;
   }
 }
