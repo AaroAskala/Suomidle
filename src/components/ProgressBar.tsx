@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import './ProgressBar.css';
 
-export type ProgressBarVariant = 'blue' | 'orange';
+export type ProgressBarVariant = 'blue' | 'orange' | 'purple';
 
 export interface ProgressBarProps {
   label: string;

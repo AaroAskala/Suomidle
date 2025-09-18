@@ -3,9 +3,10 @@ interface ImageCardButtonProps {
   title: string;
   subtitle?: string;
   disabled?: boolean;
-  onClick: () => void;
+  onSelect?: () => void;
   className?: string;
   compact?: boolean;
+  status?: 'available' | 'unavailable' | 'locked' | 'owned';
 }
 
 export function ImageCardButton({
@@ -13,9 +14,10 @@ export function ImageCardButton({
   title,
   subtitle,
   disabled,
-  onClick,
+  onSelect,
   className,
   compact,
+  status,
 }: ImageCardButtonProps) {
   const buttonClassName = ['card-button', className].filter(Boolean).join(' ');
 
@@ -23,9 +25,10 @@ export function ImageCardButton({
     <button
       type="button"
       className={buttonClassName}
-      onClick={onClick}
+      onClick={onSelect}
       disabled={disabled}
       data-compact={compact ? '' : undefined}
+      data-status={status}
       aria-label={compact ? title : undefined}
     >
       <span className="card-button__media" aria-hidden="true">

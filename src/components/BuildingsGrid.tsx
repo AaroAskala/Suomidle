@@ -3,14 +3,17 @@ import { buildings, getBuildingCost } from '../content';
 import { useLocale } from '../i18n/useLocale';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ImageCardButton } from './ImageCardButton';
+import type { CardSelection } from './CardSelection';
 
-export function BuildingsGrid() {
-  const { t, formatNumber } = useLocale();
-  const buy = useGameStore((s) => s.purchaseBuilding);
+interface BuildingsGridProps {
+  onSelect: (selection: CardSelection) => void;
+}
+
+export function BuildingsGrid({ onSelect }: BuildingsGridProps) {
+  const { t } = useLocale();
   const population = useGameStore((s) => s.population);
   const owned = useGameStore((s) => s.buildings);
   const tier = useGameStore((s) => s.tierLevel);
-  const mult = useGameStore((s) => s.multipliers.population_cps);
 
   return (
     <CollapsibleSection
@@ -23,8 +26,9 @@ export function BuildingsGrid() {
           if (b.unlock?.tier && tier < b.unlock.tier) return null;
           const count = owned[b.id] || 0;
           const price = getBuildingCost(b, count);
-          const cpsDelta = b.baseProd * mult;
-          const disabled = population < price;
+          const canAfford = population >= price;
+          const statusKey = canAfford ? 'available' : 'unavailable';
+          const subtitle = t(`cards.status.${statusKey}` as const);
           const name = t(`buildings.names.${b.id}` as const, { defaultValue: b.name });
           return (
             <li key={b.id} className="card-grid__item" role="listitem">
@@ -34,12 +38,9 @@ export function BuildingsGrid() {
                   name,
                   count,
                 })}
-                subtitle={t('shop.card.subtitle', {
-                  price: formatNumber(price, { maximumFractionDigits: 0 }),
-                  cps: formatNumber(cpsDelta, { maximumFractionDigits: 2 }),
-                })}
-                disabled={disabled}
-                onClick={() => buy(b.id)}
+                subtitle={subtitle}
+                status={statusKey}
+                onSelect={() => onSelect({ kind: 'building', id: b.id })}
               />
             </li>
           );

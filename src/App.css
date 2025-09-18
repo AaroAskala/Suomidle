@@ -1,40 +1,136 @@
 #root {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0 1.5rem 3rem;
+  box-sizing: border-box;
+}
+
+.app-shell {
+  position: relative;
+  padding-top: calc(var(--app-header-offset, 0px) + 1.5rem);
+}
+
+.app-shell__main {
+  display: grid;
+  gap: 1.5rem;
+  text-align: left;
+  align-content: start;
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 0;
+  pointer-events: none;
+}
+
+.app-header__inner {
+  width: min(100% - 2rem, 1280px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.app-header__summary {
+  flex: 2 1 420px;
+  display: grid;
+  gap: 1rem;
+}
+
+.app-header__title {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.app-header__game {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.app-header__tier {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.app-header__next-tier {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+
+.app-header__progress {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.app-header__actions {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.app-header__action {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   text-align: center;
+  padding: 0.75rem 1rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-header__action--burn {
+  background: linear-gradient(135deg, #f97316, #b91c1c);
+  border: none;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.app-header__action:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.app-header__action-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.app-header__action-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .app-header__inner {
+    gap: 1rem;
+    padding: 0.85rem 1rem;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .app-header__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: stretch;
   }
-}
 
-.read-the-docs {
-  color: #888;
+  .app-header__action {
+    flex: 1 1 100%;
+  }
 }
 
 .tap-overlay {
@@ -46,5 +142,175 @@
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   font-size: 2rem;
-  z-index: 1000;
+  z-index: 1200;
+}
+
+.card-detail-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 950;
+}
+
+.card-detail-modal {
+  width: min(100%, 32rem);
+  max-height: calc(100vh - 3rem);
+  background: var(--surface-elevated);
+  color: var(--color-text);
+  border-radius: 1rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  gap: 1.25rem;
+}
+
+.card-detail-modal__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.card-detail-modal__media {
+  width: 4rem;
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  display: grid;
+  place-items: center;
+}
+
+.card-detail-modal__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.card-detail-modal__headline h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.card-detail-modal__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.card-detail-modal__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-detail-modal__status--available {
+  background: rgba(34, 197, 94, 0.15);
+  color: #34d399;
+}
+
+.card-detail-modal__status--unavailable,
+.card-detail-modal__status--locked {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.card-detail-modal__status--owned {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.card-detail-modal__close {
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.card-detail-modal__body {
+  display: grid;
+  gap: 1rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.card-detail-modal__description {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.card-detail-modal__facts {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.card-detail-modal__facts dt {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.card-detail-modal__facts dd {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.card-detail-modal__effects {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.card-detail-modal__flavour {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--color-text) 75%, transparent);
+}
+
+.card-detail-modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.card-detail-modal__primary {
+  flex: 1 1 12rem;
+}
+
+.card-detail-modal__secondary {
+  flex: 0 1 auto;
+}
+
+@media (max-width: 540px) {
+  .card-detail-modal {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .card-detail-modal__header {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  .card-detail-modal__media {
+    grid-row: span 2;
+  }
 }
