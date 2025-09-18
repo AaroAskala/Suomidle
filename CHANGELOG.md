@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- Add a "Buy all" option to building shop entries to purchase the maximum affordable amount at once.
 - Daily Tasks system with rotating objectives, persistent progress, and temporary Lämpötila buffs.
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
