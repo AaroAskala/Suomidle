@@ -24,6 +24,7 @@
   "tasks.daily.status.active": "Buff active",
   "tasks.daily.status.expired": "Buff expired",
   "tasks.daily.status.activeWithTime": "Buff active · {duration}",
+  "tasks.daily.reward.tempGain": "Reward: +{bonus}% production · {duration}",
   "tasks.daily.button.progress": "In progress",
   "tasks.daily.ready": "{count, plural, one {# task ready to claim} other {# tasks ready to claim}}",
   "tasks.daily.resetsIn": "Resets in {duration}",

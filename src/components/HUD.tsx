@@ -1,5 +1,6 @@
 import { useGameStore } from '../app/store';
 import { useLocale } from '../i18n/useLocale';
+import { getTemperatureGainMultiplier } from '../systems/dailyTasks';
 
 export function HUD() {
   const { t, formatNumber } = useLocale();
@@ -7,6 +8,9 @@ export function HUD() {
   const addPopulation = useGameStore((s) => s.addPopulation);
   const click = useGameStore((s) => s.clickPower);
   const cps = useGameStore((s) => s.cps);
+  const dailyTasks = useGameStore((s) => s.dailyTasks);
+  const lpsMultiplier = getTemperatureGainMultiplier(dailyTasks);
+  const effectiveCps = cps * lpsMultiplier;
   return (
     <div>
       <div className="hud hud__population">
@@ -16,7 +20,7 @@ export function HUD() {
           })}
         </span>
         <span> | </span>
-        <span>{t('hud.cps', { value: formatNumber(cps, { maximumFractionDigits: 2 }) })}</span>
+        <span>{t('hud.cps', { value: formatNumber(effectiveCps, { maximumFractionDigits: 2 }) })}</span>
       </div>
       <button
         className="btn btn--primary"

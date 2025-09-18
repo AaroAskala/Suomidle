@@ -24,6 +24,7 @@
   "tasks.daily.status.active": "Buff aktiv",
   "tasks.daily.status.expired": "Buffen har gått ut",
   "tasks.daily.status.activeWithTime": "Buff aktiv · {duration}",
+  "tasks.daily.reward.tempGain": "Belöning: +{bonus}% produktion · {duration}",
   "tasks.daily.button.progress": "Pågår",
   "tasks.daily.ready": "{count, plural, one {# uppgift kan lösas in} other {# uppgifter kan lösas in}}",
   "tasks.daily.resetsIn": "Återställs om {duration}",

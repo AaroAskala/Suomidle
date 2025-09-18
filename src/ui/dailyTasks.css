@@ -147,6 +147,13 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+.daily-tasks__reward {
+  margin: 0.1rem 0 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
 .daily-tasks__status {
   align-self: flex-start;
   padding: 0.2rem 0.6rem;
