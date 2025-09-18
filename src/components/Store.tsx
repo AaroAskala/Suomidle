@@ -66,12 +66,12 @@ export function Store() {
                 onClick={() => buyMax(building.id)}
                 aria-label={t('shop.list.buyAll', {
                   name,
-                  count: formattedBuyAllCount,
+                  formattedCount: formattedBuyAllCount,
                   price: formattedBuyAllCost,
                 })}
               >
                 {t('shop.list.buttonAll', {
-                  count: formattedBuyAllCount,
+                  formattedCount: formattedBuyAllCount,
                 })}
               </button>
             </div>
