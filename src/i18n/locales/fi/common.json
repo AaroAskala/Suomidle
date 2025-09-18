@@ -22,7 +22,7 @@
   "tasks.daily.toast.duration": "{duration}",
   "tasks.daily.status.completed": "Valmis",
   "tasks.daily.status.active": "Bonus aktiviinen",
-  "tasks.daily.status.expired": "Päivitys päättynyt",
+  "tasks.daily.status.expired": "Bonus käytetty",
   "tasks.daily.status.activeWithTime": "Bonus aktiviinen · {duration}",
   "tasks.daily.reward.tempGain": "Palkinto: +{bonus}% tuotanto · {duration}",
   "tasks.daily.button.progress": "Käynnissä",
