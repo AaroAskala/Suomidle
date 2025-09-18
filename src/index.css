@@ -300,6 +300,18 @@ h1 {
   width: 100%;
 }
 
+.prestige-card {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: min(22rem, calc(100vw - 2rem));
+  gap: 0.5rem;
+}
+
 .card-button__title {
   font-weight: 600;
   font-size: 1rem;
@@ -320,6 +332,12 @@ h1 {
 }
 
 @media (max-width: 480px) {
+  .prestige-card {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
+
   .prestige-btn {
     margin: 2px !important;
     padding: 4px !important;

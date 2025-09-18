@@ -21,4 +21,5 @@
 - Prevent GitHub Pages deployments from failing when promoting the root build into the combined artifact.
 - Remove decimals from the Lämpötila counter for clearer progress tracking.
 - Align shop translation interpolations with numeric ICU formatting and fix the Polta Maailma confirmation phrase typing error.
+- Adjust the Polta sauna prestige button layout so it stays within the viewport and remains fully clickable on small screens.
 
