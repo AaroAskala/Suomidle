@@ -25,4 +25,5 @@
 - Align shop translation interpolations with numeric ICU formatting and fix the Polta Maailma confirmation phrase typing error.
 - Adjust the Polta sauna prestige button layout so it stays within the viewport and remains fully clickable on small screens.
 - Fix the store "Buy all" translations to use formatted counts so the TypeScript build completes successfully.
+- Render the building shop bulk purchase button so the "Buy all" option is visible in the card grid UI.
 
