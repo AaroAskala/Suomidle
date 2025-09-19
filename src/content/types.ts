@@ -4,10 +4,12 @@ export interface Resource {
   icon?: string;
 }
 
+import type { IconKey } from '../icons';
+
 export interface BuildingDef {
   id: string;
   name: string;
-  icon: string;
+  icon: IconKey;
   baseCost: number;
   costMult: number;
   baseProd: number;
@@ -25,7 +27,7 @@ export interface TechEffect {
 export interface TechDef {
   id: string;
   name: string;
-  icon: string;
+  icon: IconKey;
   cost: number;
   effects: TechEffect[];
   limit?: number;
@@ -51,7 +53,7 @@ export interface PrestigeFormula {
 export interface PrestigeDef {
   id: string;
   name: string;
-  icon: string;
+  icon: IconKey;
   minPopulation: number;
   formula: PrestigeFormula;
 }

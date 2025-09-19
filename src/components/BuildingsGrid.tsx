@@ -29,7 +29,7 @@ export function BuildingsGrid() {
           return (
             <li key={b.id} className="card-grid__item" role="listitem">
               <ImageCardButton
-                icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
+                iconKey={b.icon}
                 title={t('shop.card.title', {
                   name,
                   count,

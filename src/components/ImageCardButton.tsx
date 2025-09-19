@@ -1,5 +1,7 @@
+import { iconMap, type IconKey } from '../icons';
+
 interface ImageCardButtonProps {
-  icon: string;
+  iconKey: IconKey;
   title: string;
   subtitle?: string;
   disabled?: boolean;
@@ -9,7 +11,7 @@ interface ImageCardButtonProps {
 }
 
 export function ImageCardButton({
-  icon,
+  iconKey,
   title,
   subtitle,
   disabled,
@@ -18,6 +20,11 @@ export function ImageCardButton({
   compact,
 }: ImageCardButtonProps) {
   const buttonClassName = ['card-button', className].filter(Boolean).join(' ');
+  const IconComponent = iconMap[iconKey] ?? iconMap.placeholder;
+
+  if (!iconMap[iconKey]) {
+    console.warn(`Unknown icon key provided to ImageCardButton: "${iconKey}"`);
+  }
 
   return (
     <button
@@ -29,7 +36,7 @@ export function ImageCardButton({
       aria-label={compact ? title : undefined}
     >
       <span className="card-button__media" aria-hidden="true">
-        <img src={icon} alt="" loading="lazy" decoding="async" />
+        <IconComponent className="card-button__icon" aria-hidden="true" focusable="false" />
       </span>
       <span className="card-button__text">
         <span className="card-button__title">{title}</span>

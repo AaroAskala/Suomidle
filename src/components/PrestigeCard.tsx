@@ -50,7 +50,7 @@ export function PrestigeCard() {
     >
       <ImageCardButton
         className="prestige-btn"
-        icon={prestigeData.icon}
+        iconKey={prestigeData.icon}
         title={t('prestige.card.title', {
           name: prestigeName,
           value: formatNumber(prestigeMult, { maximumFractionDigits: 2 }),
