@@ -36,17 +36,20 @@ export function PrestigeCard() {
         requirement: formatNumber(prestigeData.minPopulation, { maximumFractionDigits: 0 }),
       });
 
+  const cardTitle = t('prestige.card.title', {
+    name: prestigeName,
+    value: formatNumber(prestigeMult, { maximumFractionDigits: 2 }),
+  });
+
   return (
     <div className="prestige-card">
       <ImageCardButton
         className="prestige-btn"
         icon={prestigeData.icon}
-        title={t('prestige.card.title', {
-          name: prestigeName,
-          value: formatNumber(prestigeMult, { maximumFractionDigits: 2 }),
-        })}
+        title={cardTitle}
         subtitle={subtitle}
         disabled={!canPrestige}
+        ariaLabel={cardTitle}
         onClick={() => {
           if (!canPrestige) return;
           if (
