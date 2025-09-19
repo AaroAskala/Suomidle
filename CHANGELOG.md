@@ -17,6 +17,8 @@
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
 - Surface a contextual "Buy all" summary and tooltips in the store for clearer bulk purchases.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
+- Refine the Polta sauna action button, modal, and toast styling so the prestige flow stays accessible on phones.
+- Rework the daily tasks drawer spacing and cards to better fit smaller mobile viewports without overlapping other HUD controls.
 
 
 ### Fixed

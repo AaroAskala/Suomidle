@@ -234,13 +234,109 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .daily-tasks-drawer {
-    top: calc(28px + 1rem);
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom) + 5.25rem);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(440px, calc(100vw - 1.25rem));
+    align-items: center;
+  }
+
+  .daily-tasks-drawer__toggle {
+    width: 100%;
+    justify-content: center;
+    padding: 0.6rem 1rem;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+  }
+
+  .daily-tasks-drawer__label {
+    font-size: 0.95rem;
   }
 
   .daily-tasks {
-    width: min(320px, calc(100vw - 1rem));
-    max-height: calc(100vh - 7rem);
+    width: 100%;
+    max-width: 440px;
+    max-height: min(60vh, calc(100vh - 7rem));
+    padding: 1.1rem;
+  }
+
+  .daily-tasks__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .daily-tasks__title {
+    text-align: center;
+  }
+
+  .daily-tasks__reset {
+    text-align: center;
+  }
+
+  .daily-tasks__card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .daily-tasks__status {
+    align-self: flex-start;
+  }
+
+  .daily-tasks__toast {
+    align-self: center;
+    margin-left: 0;
+    width: min(100%, 20rem);
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-tasks-drawer {
+    width: min(360px, calc(100vw - 1rem));
+    bottom: calc(env(safe-area-inset-bottom) + 4.75rem);
+  }
+
+  .daily-tasks-drawer__toggle {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  .daily-tasks {
+    max-width: none;
+    width: min(100%, calc(100vw - 0.75rem));
+    max-height: min(70vh, calc(100vh - 5.5rem));
+    padding: 1rem;
+  }
+
+  .daily-tasks__card {
+    padding: 0.85rem;
+  }
+
+  .daily-tasks__card-header {
+    gap: 0.5rem;
+  }
+
+  .daily-tasks__card-title {
+    font-size: 1rem;
+  }
+
+  .daily-tasks__card-desc {
+    font-size: 0.85rem;
+  }
+
+  .daily-tasks__reward {
+    font-size: 0.75rem;
+  }
+
+  .daily-tasks__progress-label {
+    font-size: 0.75rem;
+  }
+
+  .daily-tasks__toast {
+    width: min(100%, calc(100vw - 2rem));
+    font-size: 0.8rem;
   }
 }
