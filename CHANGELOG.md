@@ -15,6 +15,7 @@
 - Move the daily tasks list into a collapsible drawer beneath the settings menu and highlight ready-to-claim tasks.
 - Show the reward each daily task grants and apply active bonuses to the LPS counter in the HUD.
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
+- Surface a contextual "Buy all" summary and tooltips in the store for clearer bulk purchases.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
 
 

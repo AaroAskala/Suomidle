@@ -150,9 +150,23 @@ h1 {
 
 .store__actions {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.store__button-group {
+  display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.store__hint {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  text-align: right;
+  margin: 0;
 }
 
 .collapsible__toggle {

@@ -38,6 +38,19 @@ export function Store() {
             ? formatNumber(totalCost, { maximumFractionDigits: 0 })
             : '—';
         const formattedBuyAllCount = formatNumber(maxPurchases, { maximumFractionDigits: 0 });
+        const buyLabel = t('shop.list.button', {
+          price: formattedPrice,
+        });
+        const buyDescription = t('shop.list.buy', {
+          name,
+          price: formattedPrice,
+        });
+        const buyAllDescription = t('shop.list.buyAll', {
+          name,
+          formattedCount: formattedBuyAllCount,
+          price: formattedBuyAllCost,
+        });
+        const showMaxPurchaseHint = maxPurchases > 1 && Number.isFinite(totalCost);
         return (
           <div key={building.id} className="store__item">
             <span className="store__item-label">
@@ -47,33 +60,36 @@ export function Store() {
               })}
             </span>
             <div className="store__actions">
-              <button
-                className="btn btn--primary"
-                disabled={!canBuyNow}
-                onClick={() => buy(building.id)}
-                aria-label={t('shop.list.buy', {
-                  name,
-                  price: formattedPrice,
-                })}
-              >
-                {t('shop.list.button', {
-                  price: formattedPrice,
-                })}
-              </button>
-              <button
-                className="btn btn--secondary"
-                disabled={!canBuyNow}
-                onClick={() => buyMax(building.id)}
-                aria-label={t('shop.list.buyAll', {
-                  name,
-                  formattedCount: formattedBuyAllCount,
-                  price: formattedBuyAllCost,
-                })}
-              >
-                {t('shop.list.buttonAll', {
-                  formattedCount: formattedBuyAllCount,
-                })}
-              </button>
+              <div className="store__button-group">
+                <button
+                  className="btn btn--primary"
+                  disabled={!canBuyNow}
+                  onClick={() => buy(building.id)}
+                  aria-label={buyDescription}
+                  title={buyDescription}
+                >
+                  {buyLabel}
+                </button>
+                <button
+                  className="btn btn--secondary"
+                  disabled={!canBuyNow}
+                  onClick={() => buyMax(building.id)}
+                  aria-label={buyAllDescription}
+                  title={buyAllDescription}
+                >
+                  {t('shop.list.buttonAll', {
+                    formattedCount: formattedBuyAllCount,
+                  })}
+                </button>
+              </div>
+              {showMaxPurchaseHint ? (
+                <p className="store__hint" role="status">
+                  {t('shop.list.maxPurchaseHint', {
+                    formattedCount: formattedBuyAllCount,
+                    price: formattedBuyAllCost,
+                  })}
+                </p>
+              ) : null}
             </div>
           </div>
         );
