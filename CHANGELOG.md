@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- Add a "Buy all" option to building shop entries to purchase the maximum affordable amount at once.
 - Daily Tasks system with rotating objectives, persistent progress, and temporary Lämpötila buffs.
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
@@ -14,6 +15,7 @@
 - Move the daily tasks list into a collapsible drawer beneath the settings menu and highlight ready-to-claim tasks.
 - Show the reward each daily task grants and apply active bonuses to the LPS counter in the HUD.
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
+- Surface a contextual "Buy all" summary and tooltips in the store for clearer bulk purchases.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
 
 
@@ -22,4 +24,7 @@
 - Remove decimals from the Lämpötila counter for clearer progress tracking.
 - Align shop translation interpolations with numeric ICU formatting and fix the Polta Maailma confirmation phrase typing error.
 - Adjust the Polta sauna prestige button layout so it stays within the viewport and remains fully clickable on small screens.
+- Fix the store "Buy all" translations to use formatted counts so the TypeScript build completes successfully.
+- Render the building shop bulk purchase button so the "Buy all" option is visible in the card grid UI.
+- Keep the building shop "Buy all" controls above the grid so they are never hidden behind neighbouring cards.
 

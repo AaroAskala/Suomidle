@@ -16,6 +16,12 @@ import {
   applyPermanentBonuses,
   type PermanentBonuses,
 } from '../effects/applyPermanentBonuses';
+import {
+  BUILDING_PURCHASE_EPSILON,
+  createBuildingPurchaseState,
+  getMaxAffordablePurchases,
+  getTotalCostForPurchases,
+} from './buildingPurchase';
 import maailmaShop from '../data/maailma_shop.json' assert { type: 'json' };
 import {
   createInitialDailyTasksState,
@@ -72,6 +78,7 @@ interface BaseState {
 interface Actions {
   addPopulation: (amount: number) => void;
   purchaseBuilding: (id: string) => void;
+  purchaseBuildingMax: (id: string) => void;
   purchaseTech: (id: string) => void;
   purchaseMaailmaUpgrade: (id: string) => boolean;
   recompute: () => void;
@@ -383,6 +390,7 @@ const sanitizeState = (state: State): BaseState => {
   const {
     addPopulation,
     purchaseBuilding,
+    purchaseBuildingMax,
     purchaseTech,
     recompute,
     tick,
@@ -396,6 +404,7 @@ const sanitizeState = (state: State): BaseState => {
   } = state;
   void addPopulation;
   void purchaseBuilding;
+  void purchaseBuildingMax;
   void purchaseTech;
   void recompute;
   void tick;
@@ -535,15 +544,9 @@ export const useGameStore = create<State>()(
           const effectiveTierLevel = s.tierLevel - tierOffset;
           if (b.unlock?.tier && effectiveTierLevel < b.unlock.tier) return {};
           const count = s.buildings[id] || 0;
-          const baseCostMult = b.costMult + permanent.buildingCostMultiplier.delta;
-          const floor = permanent.buildingCostMultiplier.floor;
-          const adjustedMult =
-            typeof floor === 'number' && Number.isFinite(floor)
-              ? Math.max(baseCostMult, floor)
-              : baseCostMult;
-          const costMult = Math.max(0.0001, adjustedMult);
-          const price = b.baseCost * Math.pow(costMult, count);
-          if (s.population < price) return {};
+          const purchaseState = createBuildingPurchaseState(b, count, permanent);
+          const price = purchaseState.nextPrice;
+          if (!Number.isFinite(price) || price <= 0 || s.population < price) return {};
           const now = Date.now();
           const contextBefore = buildDailyTaskContext(s);
           let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
@@ -566,6 +569,60 @@ export const useGameStore = create<State>()(
             contextAfter,
             now,
           );
+          didPurchase = true;
+          return {
+            population: nextPopulation,
+            buildings,
+            dailyTasks,
+          };
+        });
+        if (didPurchase) {
+          get().recompute();
+        }
+      },
+      purchaseBuildingMax: (id) => {
+        const b = getBuilding(id);
+        if (!b) return;
+        let didPurchase = false;
+        set((s) => {
+          const permanent = s.modifiers.permanent;
+          const tierOffset = Math.trunc(permanent.tierUnlockOffset);
+          const effectiveTierLevel = s.tierLevel - tierOffset;
+          if (b.unlock?.tier && effectiveTierLevel < b.unlock.tier) return {};
+          const count = s.buildings[id] || 0;
+          const purchaseState = createBuildingPurchaseState(b, count, permanent);
+          const maxPurchases = getMaxAffordablePurchases(purchaseState, s.population);
+          if (maxPurchases <= 0) return {};
+          const totalCost = getTotalCostForPurchases(purchaseState, maxPurchases);
+          if (!Number.isFinite(totalCost) || totalCost <= 0) return {};
+          const nextPopulationRaw = s.population - totalCost;
+          const nextPopulation =
+            nextPopulationRaw <= 0 && Math.abs(nextPopulationRaw) <= BUILDING_PURCHASE_EPSILON
+              ? 0
+              : nextPopulationRaw;
+          const buildings = { ...s.buildings, [id]: count + maxPurchases };
+          const now = Date.now();
+          const contextBefore = buildDailyTaskContext(s);
+          let dailyTasks = syncDailyTasksState(s.dailyTasks, contextBefore, now);
+          const contextAfter: DailyTaskPlayerContext = {
+            ...contextBefore,
+            population: nextPopulation,
+          };
+          dailyTasks = updateDailyTaskMetrics(dailyTasks, contextAfter, now);
+          for (let i = 0; i < maxPurchases; i += 1) {
+            dailyTasks = handleDailyTaskEvent(
+              dailyTasks,
+              { type: 'building_bought', buildingId: id },
+              contextAfter,
+              now,
+            );
+            dailyTasks = handleDailyTaskEvent(
+              dailyTasks,
+              { type: 'building_bought_same_type', buildingId: id },
+              contextAfter,
+              now,
+            );
+          }
           didPurchase = true;
           return {
             population: nextPopulation,

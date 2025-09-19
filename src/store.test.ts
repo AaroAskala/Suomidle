@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {
+  createBuildingPurchaseState,
+  getMaxAffordablePurchases,
+  getTotalCostForPurchases,
+} from './app/buildingPurchase';
 import { useGameStore, BigBeautifulBalancePath, STORAGE_KEY } from './app/store';
+import { getBuilding } from './content';
 
 describe('model v6', () => {
   beforeEach(() => {
@@ -27,6 +33,40 @@ describe('model v6', () => {
     const before = useGameStore.getState().cps;
     useGameStore.getState().purchaseBuilding('sauna');
     expect(useGameStore.getState().cps).toBeGreaterThan(before);
+  });
+
+  it('purchaseBuildingMax buys the maximum affordable amount', () => {
+    useGameStore.setState({ population: 5000 });
+    const building = getBuilding('sauna');
+    if (!building) throw new Error('Missing sauna building definition');
+    const stateBefore = useGameStore.getState();
+    const purchaseFn = stateBefore.purchaseBuildingMax;
+    const startingPopulation = stateBefore.population;
+    const startingCount = stateBefore.buildings.sauna ?? 0;
+    const purchaseState = createBuildingPurchaseState(
+      building,
+      startingCount,
+      stateBefore.modifiers.permanent,
+    );
+    const expectedPurchases = getMaxAffordablePurchases(purchaseState, startingPopulation);
+    expect(expectedPurchases).toBeGreaterThan(0);
+    const expectedCost = getTotalCostForPurchases(purchaseState, expectedPurchases);
+    expect(expectedCost).toBeGreaterThan(0);
+    purchaseFn('sauna');
+    const afterState = useGameStore.getState();
+    expect(afterState.buildings.sauna).toBe(startingCount + expectedPurchases);
+    expect(afterState.population).toBeCloseTo(startingPopulation - expectedCost, 6);
+  });
+
+  it('purchaseBuildingMax does nothing when unaffordable', () => {
+    useGameStore.setState({ population: 1, buildings: {} });
+    const before = useGameStore.getState();
+    const startingPopulation = before.population;
+    const purchaseFn = before.purchaseBuildingMax;
+    purchaseFn('sauna');
+    const after = useGameStore.getState();
+    expect(after.population).toBeCloseTo(startingPopulation, 6);
+    expect(after.buildings.sauna ?? 0).toBe(0);
   });
 
   it("Tech 'vihta' multiplies LPS", () => {

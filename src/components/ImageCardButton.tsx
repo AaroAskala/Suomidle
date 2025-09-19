@@ -6,6 +6,8 @@ interface ImageCardButtonProps {
   onClick: () => void;
   className?: string;
   compact?: boolean;
+  ariaLabel?: string;
+  tooltip?: string;
 }
 
 export function ImageCardButton({
@@ -16,8 +18,12 @@ export function ImageCardButton({
   onClick,
   className,
   compact,
+  ariaLabel,
+  tooltip,
 }: ImageCardButtonProps) {
   const buttonClassName = ['card-button', className].filter(Boolean).join(' ');
+  const computedAriaLabel = ariaLabel ?? (compact ? title : undefined);
+  const computedTitle = tooltip ?? (compact ? title : undefined);
 
   return (
     <button
@@ -26,7 +32,8 @@ export function ImageCardButton({
       onClick={onClick}
       disabled={disabled}
       data-compact={compact ? '' : undefined}
-      aria-label={compact ? title : undefined}
+      aria-label={computedAriaLabel}
+      title={computedTitle}
     >
       <span className="card-button__media" aria-hidden="true">
         <img src={icon} alt="" loading="lazy" decoding="async" />

@@ -58,6 +58,11 @@ h1 {
   color: var(--color-button-text);
 }
 
+.btn--secondary {
+  background-color: color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  color: var(--color-button-text);
+}
+
 .btn--success {
   background-color: #2f9e44;
   color: var(--color-button-text);
@@ -73,9 +78,18 @@ h1 {
   opacity: 0.75;
 }
 
+.btn--secondary:disabled {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.55);
+  cursor: not-allowed;
+}
+
 .btn--primary:hover,
 .btn--primary:active,
-.btn--primary:focus-visible {
+.btn--primary:focus-visible,
+.btn--secondary:hover,
+.btn--secondary:active,
+.btn--secondary:focus-visible {
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
@@ -118,6 +132,41 @@ h1 {
   justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.store__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.store__item-label {
+  flex: 1 1 12rem;
+  text-align: left;
+}
+
+.store__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.store__button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.store__hint {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  text-align: right;
+  margin: 0;
 }
 
 .collapsible__toggle {
@@ -208,6 +257,40 @@ h1 {
   flex: 1 1 auto;
 }
 
+.building-card {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.building-card__buy-one {
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
+}
+
+.building-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
+  position: relative;
+  z-index: 1;
+}
+
+.building-card__buy-all {
+  width: 100%;
+}
+
+.building-card__hint {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  text-align: center;
+  margin: 0;
+}
+
 @media (max-width: 599px) {
   .card-grid {
     --card-grid-gap: 0.75rem;
@@ -243,7 +326,6 @@ h1 {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease,
     background-color 0.2s ease, border-color 0.2s ease;
-  min-height: 100%;
 }
 
 .card-button:hover:not(:disabled),
