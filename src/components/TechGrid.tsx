@@ -37,7 +37,7 @@ export function TechGrid() {
           return (
             <li key={techDef.id} className="card-grid__item" role="listitem">
               <ImageCardButton
-                icon={`${import.meta.env.BASE_URL}assets/tech/${techDef.icon}`}
+                iconKey={techDef.icon}
                 title={name}
                 subtitle={subtitleParts.join(' · ')}
                 disabled={disabled}

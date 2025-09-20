@@ -1,61 +1,158 @@
 [
-  { "id": "sauna", "name": "Sauna", "icon": "Sauna.png",
-    "baseCost": 10, "costMult": 1.15, "baseProd": 1 },
-
-  { "id": "kylakauppa", "name": "Kyläkauppa", "icon": "Kyläkauppa.png",
-    "baseCost": 100, "costMult": 1.15, "baseProd": 5 },
-
-  { "id": "alko", "name": "Alko", "icon": "Alko.png",
-    "baseCost": 1000, "costMult": 1.15, "baseProd": 25 },
-
-  { "id": "ensiapu", "name": "Ensiapu", "icon": "Ensiapu.png",
-    "baseCost": 10000, "costMult": 1.16, "baseProd": 100,
-    "unlock": { "tier": 2 } },
-
-  { "id": "baari", "name": "Baari", "icon": "Baari.png",
-    "baseCost": 100000, "costMult": 1.15, "baseProd": 500,
-    "unlock": { "tier": 3 } },
-
-  { "id": "cittari", "name": "Cittari", "icon": "Cittari.png",
-    "baseCost": 10000000, "costMult": 1.15, "baseProd": 20000,
-    "unlock": { "tier": 4 } },
-
-  { "id": "sateri", "name": "Säteri", "icon": "Säteri.png",
-    "baseCost": 1000000000, "costMult": 1.15, "baseProd": 400000,
-    "unlock": { "tier": 5 } },
-
-  { "id": "kasino", "name": "Kasino", "icon": "Kasino.png",
-    "baseCost": 100000000000, "costMult": 1.15, "baseProd": 10000000,
-    "unlock": { "tier": 6 } },
-
-  { "id": "kirkko", "name": "Kirkko", "icon": "Kirkko.png",
-    "baseCost": 1000000000000, "costMult": 1.15, "baseProd": 250000000,
-    "unlock": { "tier": 7 } },
-
-  { "id": "vankila", "name": "Vankila", "icon": "Vankila.png",
-    "baseCost": 10000000000000, "costMult": 1.15, "baseProd": 5000000000,
-    "unlock": { "tier": 8 } },
-
-  { "id": "bordelli", "name": "Bordelli", "icon": "Bordelli.png",
-    "baseCost": 100000000000000, "costMult": 1.15, "baseProd": 100000000000,
-    "unlock": { "tier": 9 } },
-
-  { "id": "kampus", "name": "Kampus", "icon": "Kampus.png",
-    "baseCost": 999999999999999999999999999, "costMult": 1.15, "baseProd": 2000000000000,
-    "unlock": { "tier": 10 } },
-
-  { "id": "tehdas", "name": "Tehdas", "icon": "Tehdas.png",
-    "baseCost": 9999999999999999999999999999999999, "costMult": 1.15, "baseProd": 500000000000000,
-    "unlock": { "tier": 11 } },
-
-  { "id": "parlamenttitalo", "name": "Parlamenttitalo", "icon": "Parlamenttitalo.png",
-    "baseCost": 999999999999999999999999999999999999999, "costMult": 1.15, "baseProd": 1000000000000000000000,
-    "unlock": { "tier": 12 } },
-
-  { "id": "placeholder", "name": "TätäEiMissäänNimessäPitäisiNähdä!", "icon": "Sauna.png",
-    "baseCost": 1, "costMult": 1.15, "baseProd": 1,
-    "unlock": { "tier": 13 } }
+  {
+    "id": "sauna",
+    "name": "Sauna",
+    "icon": "sauna",
+    "baseCost": 10,
+    "costMult": 1.15,
+    "baseProd": 1
+  },
+  {
+    "id": "kylakauppa",
+    "name": "Kyläkauppa",
+    "icon": "kylakauppa",
+    "baseCost": 100,
+    "costMult": 1.15,
+    "baseProd": 5
+  },
+  {
+    "id": "alko",
+    "name": "Alko",
+    "icon": "alko",
+    "baseCost": 1000,
+    "costMult": 1.15,
+    "baseProd": 25
+  },
+  {
+    "id": "ensiapu",
+    "name": "Ensiapu",
+    "icon": "ensiapu",
+    "baseCost": 10000,
+    "costMult": 1.16,
+    "baseProd": 100,
+    "unlock": {
+      "tier": 2
+    }
+  },
+  {
+    "id": "baari",
+    "name": "Baari",
+    "icon": "baari",
+    "baseCost": 100000,
+    "costMult": 1.15,
+    "baseProd": 500,
+    "unlock": {
+      "tier": 3
+    }
+  },
+  {
+    "id": "cittari",
+    "name": "Cittari",
+    "icon": "cittari",
+    "baseCost": 10000000,
+    "costMult": 1.15,
+    "baseProd": 20000,
+    "unlock": {
+      "tier": 4
+    }
+  },
+  {
+    "id": "sateri",
+    "name": "Säteri",
+    "icon": "sateri",
+    "baseCost": 1000000000,
+    "costMult": 1.15,
+    "baseProd": 400000,
+    "unlock": {
+      "tier": 5
+    }
+  },
+  {
+    "id": "kasino",
+    "name": "Kasino",
+    "icon": "kasino",
+    "baseCost": 100000000000,
+    "costMult": 1.15,
+    "baseProd": 10000000,
+    "unlock": {
+      "tier": 6
+    }
+  },
+  {
+    "id": "kirkko",
+    "name": "Kirkko",
+    "icon": "kirkko",
+    "baseCost": 1000000000000,
+    "costMult": 1.15,
+    "baseProd": 250000000,
+    "unlock": {
+      "tier": 7
+    }
+  },
+  {
+    "id": "vankila",
+    "name": "Vankila",
+    "icon": "vankila",
+    "baseCost": 10000000000000,
+    "costMult": 1.15,
+    "baseProd": 5000000000,
+    "unlock": {
+      "tier": 8
+    }
+  },
+  {
+    "id": "bordelli",
+    "name": "Bordelli",
+    "icon": "bordelli",
+    "baseCost": 100000000000000,
+    "costMult": 1.15,
+    "baseProd": 100000000000,
+    "unlock": {
+      "tier": 9
+    }
+  },
+  {
+    "id": "kampus",
+    "name": "Kampus",
+    "icon": "kampus",
+    "baseCost": 999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 2000000000000,
+    "unlock": {
+      "tier": 10
+    }
+  },
+  {
+    "id": "tehdas",
+    "name": "Tehdas",
+    "icon": "tehdas",
+    "baseCost": 9999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 500000000000000,
+    "unlock": {
+      "tier": 11
+    }
+  },
+  {
+    "id": "parlamenttitalo",
+    "name": "Parlamenttitalo",
+    "icon": "parlamenttitalo",
+    "baseCost": 999999999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 1000000000000000000000,
+    "unlock": {
+      "tier": 12
+    }
+  },
+  {
+    "id": "placeholder",
+    "name": "TätäEiMissäänNimessäPitäisiNähdä!",
+    "icon": "placeholder",
+    "baseCost": 1,
+    "costMult": 1.15,
+    "baseProd": 1,
+    "unlock": {
+      "tier": 13
+    }
+  }
 ]
-
-
-

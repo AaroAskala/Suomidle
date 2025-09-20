@@ -75,7 +75,7 @@ export function BuildingsGrid() {
               <article className="building-card">
                 <ImageCardButton
                   className="building-card__buy-one"
-                  icon={`${import.meta.env.BASE_URL}assets/buildings/${b.icon}`}
+                  iconKey={b.icon}
                   title={t('shop.card.title', {
                     name,
                     count,
