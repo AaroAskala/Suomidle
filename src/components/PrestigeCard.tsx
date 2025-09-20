@@ -45,7 +45,7 @@ export function PrestigeCard() {
     <div className="prestige-card">
       <ImageCardButton
         className="prestige-btn"
-        icon={prestigeData.icon}
+        iconKey={prestigeData.icon}
         title={cardTitle}
         subtitle={subtitle}
         disabled={!canPrestige}

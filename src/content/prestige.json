@@ -1,7 +1,7 @@
 {
   "id": "polta_sauna",
   "name": "Polta sauna",
-  "icon": "assets/ui/torch.png",
+  "icon": "torch",
   "minPopulation": 10000,
   "formula": {
     "type": "sqrt",

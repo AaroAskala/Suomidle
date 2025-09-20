@@ -9,6 +9,7 @@
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
 
 ### Changed
+- Replace building, tech, and prestige card PNGs with inline SVG icons rendered through a shared map for faster loading.
 - Hide the Maailma shop until Polta Maailma has been used at least once.
 - Update the page title to display "suomidle" in browser tabs.
 - Namespace persisted local storage keys by environment to isolate saves across deployments.
