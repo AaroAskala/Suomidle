@@ -7,6 +7,7 @@
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
+- Procedurally generated SVG badges for daily tasks so each objective has bespoke artwork.
 
 ### Changed
 - Replace building, tech, and prestige card PNGs with inline SVG icons rendered through a shared map for faster loading.
@@ -18,6 +19,7 @@
 - Display large numeric values in scientific notation once they exceed 1e9 to improve readability in the UI.
 - Surface a contextual "Buy all" summary and tooltips in the store for clearer bulk purchases.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
+- Generate sauna tier backgrounds dynamically from the localized sauna name instead of loading static SVG assets.
 
 
 ### Fixed

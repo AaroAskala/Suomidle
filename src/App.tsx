@@ -14,9 +14,11 @@ import { MaailmaShop } from './ui/MaailmaShop';
 import { PoltaMaailmaButton } from './ui/PoltaMaailmaButton';
 import { DailyTasksPanel } from './ui/dailyTasksUI';
 import { useLocale } from './i18n/useLocale';
+import { getTier } from './content';
+import { generateTierBackground } from './ui/generatedSvg';
 
 function App() {
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
   const tierLevel = useGameStore((s) => s.tierLevel);
   const hasInteracted = useSettingsStore((s) => s.hasInteracted);
   const markInteracted = useSettingsStore((s) => s.markInteracted);
@@ -34,14 +36,20 @@ function App() {
   }, []);
   useEffect(() => {
     const body = document.body;
-    body.style.backgroundImage = `url(${import.meta.env.BASE_URL}assets/backgrounds/tier${tierLevel}.svg)`;
+    const tier = getTier(tierLevel);
+    const fallbackName = tier?.name ?? `Sauna ${tierLevel}`;
+    const tierName = tier
+      ? t(`tiers.${tier.tier}.name` as const, { defaultValue: tier.name })
+      : fallbackName;
+    const backgroundUrl = generateTierBackground(tierName, tierLevel);
+    body.style.backgroundImage = `url("${backgroundUrl}")`;
     body.style.backgroundSize = 'cover';
     body.style.backgroundPosition = 'center';
     body.style.backgroundRepeat = 'no-repeat';
     return () => {
       body.style.backgroundImage = '';
     };
-  }, [tierLevel]);
+  }, [tierLevel, t, lang]);
   useEffect(() => {
     void playTierMusic(tierLevel);
   }, [tierLevel]);

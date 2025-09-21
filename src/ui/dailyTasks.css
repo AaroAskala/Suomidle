@@ -127,12 +127,31 @@
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.daily-tasks__card-main {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.daily-tasks__card-illustration {
+  width: 72px;
+  height: 72px;
+  border-radius: 0.9rem;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+  display: block;
 }
 
 .daily-tasks__card-text {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 1;
 }
 
 .daily-tasks__card-title {

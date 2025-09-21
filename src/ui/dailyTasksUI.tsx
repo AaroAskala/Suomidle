@@ -10,6 +10,7 @@ import {
 } from '../systems/dailyTasks';
 import { useLocale } from '../i18n/useLocale';
 import './dailyTasks.css';
+import { generateDailyTaskBadge } from './generatedSvg';
 
 const formatTime = (totalSeconds: number) => {
   const safeSeconds = Math.max(0, Math.floor(totalSeconds));
@@ -141,6 +142,7 @@ export function DailyTasksPanel() {
           description: t(`tasks.daily.items.${definition.id}.description` as const, {
             defaultValue: definition.desc_fi,
           }),
+          artworkUrl: generateDailyTaskBadge(definition.id, definition.title_fi, definition.category),
           progress,
           target,
           progressRatio,
@@ -213,12 +215,21 @@ export function DailyTasksPanel() {
               return (
                 <article className="daily-tasks__card" key={task.id}>
                   <header className="daily-tasks__card-header">
-                    <div className="daily-tasks__card-text">
-                      <h3 className="daily-tasks__card-title">{task.title}</h3>
-                      <p className="daily-tasks__card-desc">{task.description}</p>
-                      {task.rewardLabel && (
-                        <p className="daily-tasks__reward">{task.rewardLabel}</p>
-                      )}
+                    <div className="daily-tasks__card-main">
+                      <img
+                        src={task.artworkUrl}
+                        alt=""
+                        role="presentation"
+                        loading="lazy"
+                        className="daily-tasks__card-illustration"
+                      />
+                      <div className="daily-tasks__card-text">
+                        <h3 className="daily-tasks__card-title">{task.title}</h3>
+                        <p className="daily-tasks__card-desc">{task.description}</p>
+                        {task.rewardLabel && (
+                          <p className="daily-tasks__reward">{task.rewardLabel}</p>
+                        )}
+                      </div>
                     </div>
                     {task.statusLabel && (
                       <span className={`daily-tasks__status daily-tasks__status--${task.statusType}`}>
