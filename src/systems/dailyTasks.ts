@@ -736,9 +736,6 @@ const handleStreakTask = (
   events.push(now);
   const windowMs = Math.max(0, definition.condition.window_s * 1000);
   const maxGapMs = Math.max(0, definition.condition.max_gap_s * 1000);
-  while (events.length > 0 && now - events[0] > windowMs) {
-    events.shift();
-  }
   if (events.length > 1 && maxGapMs > 0) {
     for (let i = events.length - 1; i > 0; i -= 1) {
       if (events[i] - events[i - 1] > maxGapMs) {
@@ -749,9 +746,16 @@ const handleStreakTask = (
   }
   let progress = 0;
   if (events.length >= 2) {
-    progress = (events[events.length - 1] - events[0]) / 1000;
+    const elapsedMs = events[events.length - 1] - events[0];
+    const effectiveElapsedMs = windowMs > 0 ? Math.min(elapsedMs, windowMs) : elapsedMs;
+    progress = Math.max(0, effectiveElapsedMs) / 1000;
   }
-  progress = Math.max(0, progress);
+  if (windowMs > 0) {
+    const cutoff = now - windowMs;
+    while (events.length > 1 && events[1] <= cutoff) {
+      events.shift();
+    }
+  }
   const baseTask: DailyTaskInstanceState = { ...task, conditionState };
   return applyProgressUpdate(baseTask, definition, progress, now);
 };
