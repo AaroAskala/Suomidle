@@ -104,6 +104,132 @@ h1 {
   border-radius: 0.5rem;
 }
 
+.hud__cps-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.hud__cps-multipliers {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hud__cps-multipliers-button {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--color-text) 35%, transparent);
+  background: color-mix(in srgb, var(--surface-elevated) 35%, transparent);
+  color: inherit;
+  border-radius: 999px;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.hud__cps-multipliers-button:hover,
+.hud__cps-multipliers-button:focus-visible,
+.hud__cps-multipliers-button[aria-expanded='true'] {
+  background: color-mix(in srgb, var(--surface-elevated) 80%, transparent);
+  border-color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.hud__cps-multipliers-button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+.hud__cps-multipliers-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.hud__cps-multipliers-content {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 16rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--surface-elevated) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-text) 18%, transparent);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+  z-index: 20;
+  color: var(--color-text);
+}
+
+.hud__cps-multipliers-content::before {
+  content: '';
+  position: absolute;
+  top: -0.45rem;
+  right: 1rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  transform: rotate(45deg);
+  background: inherit;
+  border-left: inherit;
+  border-top: inherit;
+}
+
+.hud__cps-multipliers-header {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__cps-multipliers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.hud__cps-multipliers-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.hud__cps-multipliers-item-label {
+  font-weight: 500;
+}
+
+.hud__cps-multipliers-item-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.hud__cps-multipliers-footer {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .hud__cps-multipliers-content {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .hud__cps-multipliers-content::before {
+    right: 50%;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+  }
+}
+
 .hud__throw-button {
   position: relative;
   display: inline-flex;

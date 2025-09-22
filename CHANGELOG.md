@@ -11,6 +11,7 @@
 - Generate SVG artwork for late-game buildings and technologies that previously lacked icons.
 - Development-only environment flag that multiplies population-per-second by `tier * 100` to speed up local testing.
 - Add a procedurally generated splash animation and sound when throwing löyly.
+- Surface an interactive CPS multiplier tooltip beside the HUD counter with a detailed breakdown of active bonuses.
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
