@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HUD } from './components/HUD';
@@ -6,6 +6,10 @@ import { useGameStore } from './app/store';
 import { renderWithI18n, setTestLanguage } from './tests/testUtils';
 import i18n from './i18n';
 import { createInitialDailyTasksState } from './systems/dailyTasks';
+
+vi.mock('./audio/splash', () => ({
+  playSplashSound: vi.fn().mockResolvedValue(null),
+}));
 
 function resetStore() {
   useGameStore.setState({

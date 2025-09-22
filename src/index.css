@@ -104,6 +104,82 @@ h1 {
   border-radius: 0.5rem;
 }
 
+.hud__throw-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hud__throw-label {
+  position: relative;
+  z-index: 1;
+}
+
+.hud__splash-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.hud__splash {
+  --splash-offset-x: 0px;
+  --splash-scale: 1;
+  --splash-scale-start: 0.6;
+  position: absolute;
+  left: calc(50% + var(--splash-offset-x));
+  bottom: 18%;
+  width: 2.8rem;
+  height: 2.8rem;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 60%,
+    color-mix(in srgb, var(--brand-primary) 24%, white 76%) 0%,
+    color-mix(in srgb, var(--brand-primary) 65%, transparent) 70%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0.45rem 0.6rem rgba(0, 0, 0, 0.25));
+  transform-origin: 50% 100%;
+  animation: hudSplash 600ms ease-out forwards;
+}
+
+.hud__splash::after {
+  content: '';
+  position: absolute;
+  top: 28%;
+  left: 42%;
+  width: 26%;
+  height: 24%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  filter: blur(2px);
+}
+
+@keyframes hudSplash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(var(--splash-scale-start));
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -55%) scale(var(--splash-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud__splash {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* Generic HUD card */
 .hud__card {
   border-radius: 0.5rem;
