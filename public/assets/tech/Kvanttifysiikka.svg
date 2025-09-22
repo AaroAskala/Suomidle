@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.4" r="0.9">
+      <stop offset="0%" stop-color="#1b1f4e"/>
+      <stop offset="60%" stop-color="#101332"/>
+      <stop offset="100%" stop-color="#040514"/>
+    </radialGradient>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#ff9ff4"/>
+      <stop offset="100%" stop-color="#ff4fa6"/>
+    </radialGradient>
+    <linearGradient id="orbit" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7ad7ff"/>
+      <stop offset="100%" stop-color="#4f64ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="32" fill="url(#bg)"/>
+  <g fill="#ffffff" opacity="0.12">
+    <circle cx="52" cy="46" r="8"/>
+    <circle cx="210" cy="36" r="6"/>
+    <circle cx="186" cy="92" r="5"/>
+    <circle cx="42" cy="138" r="4"/>
+    <circle cx="220" cy="146" r="7"/>
+    <circle cx="108" cy="218" r="5"/>
+  </g>
+  <g transform="translate(128 128)">
+    <circle r="22" fill="url(#core)"/>
+    <circle r="10" fill="#fff5ff" opacity="0.4"/>
+    <g stroke="url(#orbit)" stroke-width="6" fill="none">
+      <ellipse rx="94" ry="44" transform="rotate(16)" opacity="0.85"/>
+      <ellipse rx="70" ry="108" transform="rotate(-18)" opacity="0.7"/>
+      <ellipse rx="36" ry="120" opacity="0.65"/>
+    </g>
+    <g fill="#7ad7ff" stroke="#ffffff" stroke-width="3">
+      <circle r="9" transform="rotate(16) translate(94 0)"/>
+      <circle r="9" transform="rotate(-18) translate(0 -108)"/>
+      <circle r="9" transform="translate(36 0)"/>
+    </g>
+    <g fill="#ffd966" stroke="#7f4fff" stroke-width="2" opacity="0.75">
+      <circle r="6" transform="rotate(16) translate(-94 0)"/>
+      <circle r="6" transform="rotate(-18) translate(0 108)"/>
+      <circle r="6" transform="translate(-36 0)"/>
+    </g>
+    <circle r="110" fill="none" stroke="rgba(122,215,255,0.1)" stroke-width="10" stroke-dasharray="24 18"/>
+  </g>
+  <rect width="256" height="256" rx="32" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="4"/>
+</svg>

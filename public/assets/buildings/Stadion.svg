@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="stadiumBg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#203a65"/>
+      <stop offset="100%" stop-color="#14203d"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2ea45a"/>
+      <stop offset="100%" stop-color="#136b35"/>
+    </linearGradient>
+    <linearGradient id="stands" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#546d9b"/>
+      <stop offset="100%" stop-color="#7f96c3"/>
+    </linearGradient>
+    <linearGradient id="roof" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#cfd8ee"/>
+      <stop offset="100%" stop-color="#94a5cf"/>
+    </linearGradient>
+    <linearGradient id="lights" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fdfdfd"/>
+      <stop offset="100%" stop-color="#bbc5e3"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="32" fill="url(#stadiumBg)"/>
+  <g fill="#1c2746" opacity="0.65">
+    <circle cx="48" cy="48" r="14"/>
+    <circle cx="208" cy="42" r="12"/>
+    <circle cx="226" cy="74" r="8"/>
+    <circle cx="30" cy="84" r="10"/>
+  </g>
+  <g transform="translate(28 68)">
+    <ellipse cx="100" cy="108" rx="100" ry="52" fill="url(#stands)" stroke="#27365a" stroke-width="6"/>
+    <ellipse cx="100" cy="104" rx="74" ry="38" fill="#101c32" opacity="0.65"/>
+    <ellipse cx="100" cy="108" rx="80" ry="40" fill="url(#field)" stroke="#0d4d28" stroke-width="4"/>
+    <ellipse cx="100" cy="108" rx="38" ry="18" fill="none" stroke="#d7f5db" stroke-width="4" stroke-dasharray="16 10"/>
+    <line x1="100" y1="68" x2="100" y2="148" stroke="#d7f5db" stroke-width="4" stroke-dasharray="12 8"/>
+    <ellipse cx="100" cy="108" rx="8" ry="6" fill="#d7f5db"/>
+    <g stroke="#21335c" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M-8 72c0-50 40-90 108-90s108 40 108 90"/>
+      <path d="M4 64c0-44 36-78 96-78s96 34 96 78"/>
+    </g>
+    <g fill="url(#roof)" stroke="#4c5e8a" stroke-width="4">
+      <path d="M-12 74c16-60 64-98 124-98s108 38 124 98l-26 16c-16-46-52-74-98-74s-82 28-98 74z"/>
+    </g>
+    <g fill="url(#lights)" stroke="#8d9ec5" stroke-width="3" stroke-linejoin="round">
+      <rect x="-18" y="38" width="16" height="36" rx="4"/>
+      <rect x="186" y="38" width="16" height="36" rx="4"/>
+      <rect x="34" y="20" width="18" height="40" rx="4"/>
+      <rect x="148" y="20" width="18" height="40" rx="4"/>
+    </g>
+    <g fill="#f7f8ff" opacity="0.75">
+      <circle cx="-10" cy="32" r="4"/>
+      <circle cx="194" cy="30" r="4"/>
+      <circle cx="40" cy="12" r="4"/>
+      <circle cx="158" cy="10" r="4"/>
+    </g>
+  </g>
+  <rect width="256" height="256" rx="32" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="4"/>
+</svg>

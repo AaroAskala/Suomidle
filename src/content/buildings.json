@@ -51,11 +51,35 @@
   { "id": "parlamenttitalo", "name": "Parlamenttitalo", "icon": "Parlamenttitalo.png",
     "baseCost": 999999999999999999999999999999999999999, "costMult": 1.15, "baseProd": 1000000000000000000000,
     "unlock": { "tier": 12 } },
-
-  { "id": "placeholder", "name": "TätäEiMissäänNimessäPitäisiNähdä!", "icon": "Sauna.png",
-    "baseCost": 1, "costMult": 1.15, "baseProd": 1,
-    "unlock": { "tier": 13 } }
+  {
+    "id": "rantabaari",
+    "name": "Rantabaari",
+    "icon": "Rantabaari.svg",
+    "baseCost": 9999999999999999999999999999999999999999999999999999999,
+    "costMult": 1.15,
+    "baseProd": 10000000000000000000000, 
+    "unlock": { "tier": 13 }
+  },
+  {
+    "id": "stadion",
+    "name": "Stadion",
+    "icon": "Stadion.svg",
+    "baseCost": 99999999999999999999999999999999999999999999999999999990000,
+    "costMult": 1.15,
+    "baseProd": 52500000000000000000000,
+    "unlock": { "tier": 14 }
+  },
+  {
+    "id": "observatorio",
+    "name": "Observatorio",
+    "icon": "Observatorio.svg",
+    "baseCost": 999999999999999999999999999999999999999999999999999999900000000,
+    "costMult": 1.15,
+    "baseProd": 256250000000000000000000,
+    "unlock": { "tier": 15 }
+  }
 ]
+
 
 
 

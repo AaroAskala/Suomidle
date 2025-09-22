@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2c0f4e"/>
+      <stop offset="60%" stop-color="#1d1042"/>
+      <stop offset="100%" stop-color="#0a071e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.2" r="0.7">
+      <stop offset="0%" stop-color="#ff80ff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ff80ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beamWarm" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffd966" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ff872f" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="beamCool" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8cc8ff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#2565ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="housing" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#39446b"/>
+      <stop offset="100%" stop-color="#12192e"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="32" fill="url(#bg)"/>
+  <circle cx="128" cy="64" r="90" fill="url(#glow)"/>
+  <g transform="translate(22 38)" opacity="0.9">
+    <path d="M48 0h40l12 56-8 8H44l-8-8z" fill="url(#housing)" stroke="#0f1428" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="56" y="16" width="24" height="16" rx="6" fill="#2f3a5a"/>
+    <path d="M64 64l-80 120h120l-24-120z" fill="url(#beamWarm)"/>
+    <circle cx="68" cy="68" r="8" fill="#ffd966"/>
+  </g>
+  <g transform="translate(126 38) scale(-1 1) translate(-126 0)" opacity="0.92">
+    <path d="M48 0h40l12 56-8 8H44l-8-8z" fill="url(#housing)" stroke="#0f1428" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="56" y="16" width="24" height="16" rx="6" fill="#2f3a5a"/>
+    <path d="M64 64l-80 120h120l-24-120z" fill="url(#beamCool)"/>
+    <circle cx="68" cy="68" r="8" fill="#8cc8ff"/>
+  </g>
+  <g fill="#ffb2ff" opacity="0.4">
+    <circle cx="52" cy="210" r="8"/>
+    <circle cx="204" cy="214" r="10"/>
+    <circle cx="136" cy="202" r="6"/>
+    <circle cx="88" cy="198" r="5"/>
+  </g>
+  <rect width="256" height="256" rx="32" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="4"/>
+</svg>
