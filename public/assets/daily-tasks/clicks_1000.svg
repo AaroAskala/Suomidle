@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-clicks_1000" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8dac6"/>
+      <stop offset="100%" stop-color="#613723"/>
+    </linearGradient>
+    <clipPath id="clip-clicks_1000">
+      <rect x="6" y="6" width="52" height="52" rx="14"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#clip-clicks_1000)">
+    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#grad-clicks_1000)"/>
+    <g transform="rotate(9.00, 32, 32)"><rect x="-128" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-112" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-96" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-80" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-64" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-48" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-32" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="-16" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="0" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="16" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="32" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="48" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="64" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="80" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="96" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/><rect x="112" y="-64" width="10" height="192" fill="#753f21" fill-opacity="0.22"/></g>
+    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#grad-clicks_1000)" fill-opacity="0.35"/>
+  </g>
+  <rect x="6" y="6" width="52" height="52" rx="14" stroke="#f8e6da" stroke-width="1.25" fill="none"/>
+    <path d="M32 15c-5.4 6.7-11 13.9-11 22.5 0 7.4 5.6 13.5 11 13.5s11-6.1 11-13.5C43 28.9 37.4 21.7 32 15z" fill="#f8fafc" stroke="#784021" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M32 26c3.3 4.2 5.2 7.9 5.2 11.5 0 4-2.5 7-5.2 7s-5.2-3-5.2-7C26.8 33.9 28.7 30.2 32 26z" fill="#f8d8c3" stroke="#4a2e25" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>

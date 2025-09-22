@@ -9,6 +9,7 @@ import {
   getRewardTemplate,
 } from '../systems/dailyTasks';
 import { useLocale } from '../i18n/useLocale';
+import { dailyTaskIcons } from '../assets/dailyTaskIcons';
 import './dailyTasks.css';
 
 const formatTime = (totalSeconds: number) => {
@@ -133,6 +134,8 @@ export function DailyTasksPanel() {
             : claimed
               ? t('tasks.daily.status.expired')
               : t('tasks.daily.button.progress');
+        const iconKey = definition.id as keyof typeof dailyTaskIcons;
+        const iconPath = dailyTaskIcons[iconKey] ?? null;
         return {
           id: taskId,
           title: t(`tasks.daily.items.${definition.id}.title` as const, {
@@ -141,6 +144,7 @@ export function DailyTasksPanel() {
           description: t(`tasks.daily.items.${definition.id}.description` as const, {
             defaultValue: definition.desc_fi,
           }),
+          iconPath,
           progress,
           target,
           progressRatio,
@@ -210,15 +214,25 @@ export function DailyTasksPanel() {
                 : task.claimed
                   ? 'btn btn--success'
                   : 'btn btn--disabled';
+              const iconUrl = task.iconPath
+                ? `${import.meta.env.BASE_URL}${task.iconPath}`
+                : null;
               return (
                 <article className="daily-tasks__card" key={task.id}>
                   <header className="daily-tasks__card-header">
-                    <div className="daily-tasks__card-text">
-                      <h3 className="daily-tasks__card-title">{task.title}</h3>
-                      <p className="daily-tasks__card-desc">{task.description}</p>
-                      {task.rewardLabel && (
-                        <p className="daily-tasks__reward">{task.rewardLabel}</p>
+                    <div className="daily-tasks__card-main">
+                      {iconUrl && (
+                        <span className="daily-tasks__icon" aria-hidden="true">
+                          <img src={iconUrl} alt="" loading="lazy" decoding="async" />
+                        </span>
                       )}
+                      <div className="daily-tasks__card-text">
+                        <h3 className="daily-tasks__card-title">{task.title}</h3>
+                        <p className="daily-tasks__card-desc">{task.description}</p>
+                        {task.rewardLabel && (
+                          <p className="daily-tasks__reward">{task.rewardLabel}</p>
+                        )}
+                      </div>
                     </div>
                     {task.statusLabel && (
                       <span className={`daily-tasks__status daily-tasks__status--${task.statusType}`}>
