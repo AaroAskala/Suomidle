@@ -20,21 +20,27 @@ describe('useLocale.formatNumber', () => {
     await setTestLanguage('en');
   });
 
-  it('uses scientific notation when the number exceeds the threshold', () => {
+  it('uses scientific notation with two decimal places when the number exceeds the threshold', () => {
+    renderWithI18n(<FormatNumberDisplay value={1_000_000_000} />);
+
+    expect(screen.getByTestId('formatted-value')).toHaveTextContent('1.00E9');
+  });
+
+  it('enforces two decimal places for scientific notation even when options request fewer digits', () => {
     renderWithI18n(
-      <FormatNumberDisplay value={1_000_000_000} options={{ maximumFractionDigits: 0 }} />,
+      <FormatNumberDisplay
+        value={1_000_000_000}
+        options={{ maximumFractionDigits: 0 }}
+        testId="custom-options"
+      />,
     );
 
-    expect(screen.getByTestId('formatted-value')).toHaveTextContent('1E9');
+    expect(screen.getByTestId('custom-options')).toHaveTextContent('1.00E9');
   });
 
   it('formats large bigint values with scientific notation', () => {
     renderWithI18n(
-      <FormatNumberDisplay
-        value={123_456_789_012_345_678_901_234_567_890n}
-        options={{ maximumFractionDigits: 2 }}
-        testId="bigint-value"
-      />,
+      <FormatNumberDisplay value={123_456_789_012_345_678_901_234_567_890n} testId="bigint-value" />,
     );
 
     expect(screen.getByTestId('bigint-value')).toHaveTextContent('1.23E29');

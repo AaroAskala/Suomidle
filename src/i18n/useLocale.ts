@@ -55,9 +55,21 @@ export function useLocale() {
     (value: number | bigint, options?: FormatNumberOptions) => {
       const locale = i18n.language || resolvedLang;
       const targetValue = typeof value === 'bigint' ? value : Number(value);
-      const formatOptions: FormatNumberOptions | undefined = shouldUseScientificNotation(targetValue)
-        ? { ...(options ?? {}), notation: 'scientific' }
-        : options;
+      let formatOptions: FormatNumberOptions | undefined = options;
+
+      if (shouldUseScientificNotation(targetValue)) {
+        const restOptions = { ...(options ?? {}) };
+        delete restOptions.minimumSignificantDigits;
+        delete restOptions.maximumSignificantDigits;
+
+        formatOptions = {
+          ...restOptions,
+          notation: 'scientific',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        };
+      }
+
       const formatter = new Intl.NumberFormat(locale, formatOptions);
       return formatter.format(targetValue);
     },
