@@ -9,6 +9,7 @@ import { useGameStore } from '../app/store';
 import { useLocale } from '../i18n/useLocale';
 import { getTemperatureGainMultiplier } from '../systems/dailyTasks';
 import { playSplashSound } from '../audio/splash';
+import { CpsMultiplierTooltip } from './CpsMultiplierTooltip';
 
 type Splash = {
   id: number;
@@ -104,7 +105,10 @@ export function HUD() {
           })}
         </span>
         <span> | </span>
-        <span>{t('hud.cps', { value: formatNumber(effectiveCps, { maximumFractionDigits: 2 }) })}</span>
+        <span className="hud__cps-display">
+          <span>{t('hud.cps', { value: formatNumber(effectiveCps, { maximumFractionDigits: 2 }) })}</span>
+          <CpsMultiplierTooltip />
+        </span>
       </div>
       <button
         className="btn btn--primary hud__throw-button"

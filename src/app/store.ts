@@ -5,13 +5,7 @@ import {
   createJSONStorage,
   type PersistOptions,
 } from 'zustand/middleware';
-import {
-  buildings,
-  getBuilding,
-  getTech,
-  getTier,
-  prestige as prestigeData,
-} from '../content';
+import { getBuilding, getTech, getTier, prestige as prestigeData } from '../content';
 import {
   applyPermanentBonuses,
   type PermanentBonuses,
@@ -23,6 +17,7 @@ import {
   getTotalCostForPurchases,
 } from './buildingPurchase';
 import maailmaShop from '../data/maailma_shop.json' assert { type: 'json' };
+import { computeCpsBase, computeTierBonusMultiplier } from './cpsUtils';
 import {
   createInitialDailyTasksState,
   syncDailyTasksState,
@@ -132,7 +127,7 @@ const DEV_TIER_CPS_MULTIPLIER_ENABLED = (() => {
   return parseEnvBoolean(env.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER);
 })();
 
-const computeDevTierPopulationMultiplier = (tierLevel: number): number => {
+export const computeDevTierPopulationMultiplier = (tierLevel: number): number => {
   if (!DEV_TIER_CPS_MULTIPLIER_ENABLED) return 1;
   if (!Number.isFinite(tierLevel)) return 1;
   const normalizedTier = Math.max(1, Math.trunc(tierLevel));
@@ -242,26 +237,6 @@ const computePermanentBonusesFromMaailma = (maailma: MaailmaState): PermanentBon
     maailma: cloneMaailmaForBonuses(maailma),
   } as Parameters<typeof applyPermanentBonuses>[0];
   return applyPermanentBonuses(payload);
-};
-
-const computeTierBonusMultiplier = (
-  tierLevel: number,
-  perTierBonuses: Record<string, number>,
-) => {
-  let multiplier = 1;
-  for (const [key, value] of Object.entries(perTierBonuses)) {
-    const fromTier = Number(key);
-    if (!Number.isFinite(fromTier)) continue;
-    const unlockedTiers = Math.max(0, tierLevel - fromTier + 1);
-    if (unlockedTiers <= 0) continue;
-    if (value >= 1) {
-      multiplier *= Math.pow(value, unlockedTiers);
-    } else {
-      const addition = Math.max(0, 1 + value * unlockedTiers);
-      multiplier *= addition;
-    }
-  }
-  return multiplier;
 };
 
 const createInitialMaailmaState = (): MaailmaState => ({
@@ -749,12 +724,7 @@ export const useGameStore = create<State>()(
       recompute: () => {
         const s = get();
         const permanent = s.modifiers.permanent;
-        let cpsBase = 0;
-        for (const b of buildings) {
-          const count = s.buildings[b.id] || 0;
-          if (count <= 0) continue;
-          cpsBase += b.baseProd * count;
-        }
+        const cpsBase = computeCpsBase(s.buildings);
         const baseProdMult = Math.max(0, permanent.baseProdMult);
         const techBonusMultiplier = Math.max(0, 1 + permanent.techMultiplierBonusAdd);
         const spentBonusMultiplier = Math.max(0, 1 + permanent.globalCpsAddFromTuhkaSpent);
