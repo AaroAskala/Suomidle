@@ -72,8 +72,36 @@
     "effects": [{ "type": "mult", "target": "population_cps", "value": 5.0 }],
     "limit": 1,
     "unlock": { "tier": 12 }
+  },
+  {
+    "id": "aurinkolasit",
+    "name": "Aurinkolasit",
+    "icon": "Aurinkolasit.png",
+    "cost": 999999999999999999999999999999999999999999999999999999, 
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 5.4 }],
+    "limit": 1,
+    "unlock": { "tier": 13 }
+  },
+  {
+    "id": "kuumat_valot",
+    "name": "Kuumat Valot",
+    "icon": "Kuumat_Valot.png",
+    "cost": 999999999999999999999999999999999999999999999999999999000, 
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 5.8 }],
+    "limit": 1,
+    "unlock": { "tier": 14 }
+  },
+  {
+    "id": "kvanttifysiikka",
+    "name": "Kvanttifysiikka",
+    "icon": "Kvanttifysiikka.png",
+    "cost": 999999999999999999999999999999999999999999999999999999000000, 
+    "effects": [{ "type": "mult", "target": "population_cps", "value": 6.0 }],
+    "limit": 1,
+    "unlock": { "tier": 15 }
   }
 
 ]
+
 
 
