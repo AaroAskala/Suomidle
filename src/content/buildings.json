@@ -54,7 +54,7 @@
   {
     "id": "rantabaari",
     "name": "Rantabaari",
-    "icon": "Rantabaari.png",
+    "icon": "Rantabaari.svg",
     "baseCost": 9999999999999999999999999999999999999999999999999999999,
     "costMult": 1.15,
     "baseProd": 10000000000000000000000, 
@@ -63,7 +63,7 @@
   {
     "id": "stadion",
     "name": "Stadion",
-    "icon": "Stadion.png",
+    "icon": "Stadion.svg",
     "baseCost": 99999999999999999999999999999999999999999999999999999990000,
     "costMult": 1.15,
     "baseProd": 52500000000000000000000,
@@ -72,7 +72,7 @@
   {
     "id": "observatorio",
     "name": "Observatorio",
-    "icon": "Observatorio.png",
+    "icon": "Observatorio.svg",
     "baseCost": 999999999999999999999999999999999999999999999999999999900000000,
     "costMult": 1.15,
     "baseProd": 256250000000000000000000,
