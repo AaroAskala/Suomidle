@@ -382,4 +382,66 @@ describe('model v6', () => {
       vi.resetModules();
     }
   });
+
+  it('applies the development tier multiplier when enabled', async () => {
+    const mutableEnv = import.meta.env as unknown as Record<string, string | undefined>;
+    const originalMode = mutableEnv.MODE;
+    const originalFlag = mutableEnv.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER;
+    const tierLevel = 4;
+
+    const loadStore = async () => {
+      vi.resetModules();
+      const module = await import('./app/store');
+      const store = module.useGameStore;
+      store.persist.clearStorage();
+      store.setState({
+        population: 0,
+        totalPopulation: 0,
+        tierLevel,
+        buildings: { sauna: 1 },
+        techCounts: {},
+        multipliers: { population_cps: 1 },
+        cps: 0,
+        clickPower: 1,
+        prestigePoints: 0,
+        prestigeMult: 1,
+        eraMult: 1,
+        eraPromptAcknowledged: true,
+      });
+      return store;
+    };
+
+    try {
+      mutableEnv.MODE = 'development';
+      delete mutableEnv.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER;
+
+      const baselineStore = await loadStore();
+      baselineStore.getState().recompute();
+      const baselineCps = baselineStore.getState().cps;
+
+      mutableEnv.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER = '1';
+      const boostedStore = await loadStore();
+      boostedStore.getState().recompute();
+      const boostedCps = boostedStore.getState().cps;
+
+      expect(baselineCps).toBeGreaterThan(0);
+      expect(boostedCps).toBeCloseTo(baselineCps * tierLevel * 100, 6);
+
+      await baselineStore.persist.clearStorage();
+      await boostedStore.persist.clearStorage();
+    } finally {
+      if (originalMode === undefined) {
+        delete mutableEnv.MODE;
+      } else {
+        mutableEnv.MODE = originalMode;
+      }
+      if (originalFlag === undefined) {
+        delete mutableEnv.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER;
+      } else {
+        mutableEnv.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER = originalFlag;
+      }
+      localStorage.clear();
+      vi.resetModules();
+    }
+  });
 });

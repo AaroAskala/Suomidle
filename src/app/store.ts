@@ -107,6 +107,36 @@ type ImportMetaEnvLike = {
   VITE_STORAGE_NAMESPACE?: string;
   BASE_URL?: string;
   MODE?: string;
+  VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER?: string;
+};
+
+const parseEnvBoolean = (value: string | undefined): boolean => {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return false;
+  return (
+    normalized === '1' ||
+    normalized === 'true' ||
+    normalized === 'yes' ||
+    normalized === 'on' ||
+    normalized === 'enable' ||
+    normalized === 'enabled'
+  );
+};
+
+const DEV_TIER_CPS_MULTIPLIER_ENABLED = (() => {
+  if (typeof import.meta === 'undefined') return false;
+  const env = ((import.meta.env as ImportMetaEnvLike | undefined) ?? {}) as ImportMetaEnvLike;
+  const mode = env.MODE?.trim().toLowerCase();
+  if (mode === 'production') return false;
+  return parseEnvBoolean(env.VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER);
+})();
+
+const computeDevTierPopulationMultiplier = (tierLevel: number): number => {
+  if (!DEV_TIER_CPS_MULTIPLIER_ENABLED) return 1;
+  if (!Number.isFinite(tierLevel)) return 1;
+  const normalizedTier = Math.max(1, Math.trunc(tierLevel));
+  return normalizedTier * 100;
 };
 
 const normalizeStorageNamespace = (value: string | undefined): string | null => {
@@ -732,6 +762,7 @@ export const useGameStore = create<State>()(
           s.tierLevel,
           permanent.perTierGlobalCpsAdd,
         );
+        const devTierMultiplier = computeDevTierPopulationMultiplier(s.tierLevel);
         const prestigeMult = Math.max(s.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
         const globalMultiplier =
           prestigeMult *
@@ -739,7 +770,8 @@ export const useGameStore = create<State>()(
           Math.max(0, s.multipliers.population_cps) *
           techBonusMultiplier *
           spentBonusMultiplier *
-          tierBonusMultiplier;
+          tierBonusMultiplier *
+          devTierMultiplier;
         const cps = cpsBase * baseProdMult * globalMultiplier;
         const clickPower = Math.max(1, Math.round(cps / 100));
         set({ cps, clickPower, lampotilaRate: Math.max(0, permanent.lampotilaRateMult) });
