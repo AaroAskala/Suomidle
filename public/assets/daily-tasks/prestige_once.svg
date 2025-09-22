@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-prestige_once" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8e5ea"/>
+      <stop offset="100%" stop-color="#5f3649"/>
+    </linearGradient>
+    <clipPath id="clip-prestige_once">
+      <rect x="6" y="6" width="52" height="52" rx="14"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#clip-prestige_once)">
+    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#grad-prestige_once)"/>
+    <g transform="rotate(1.00, 32, 32)"><rect x="-128" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-112" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-96" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-80" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-64" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-48" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-32" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="-16" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="0" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="16" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="32" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="48" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="64" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="80" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="96" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/><rect x="112" y="-64" width="10" height="192" fill="#7f4255" fill-opacity="0.22"/></g>
+    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#grad-prestige_once)" fill-opacity="0.35"/>
+  </g>
+  <rect x="6" y="6" width="52" height="52" rx="14" stroke="#f8e5ea" stroke-width="1.25" fill="none"/>
+    <path d="M22 40.5h20l-2 6H24z" fill="#c75d71" stroke="#793f53" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M22 26l5.5 6 4.5-9 4.5 9 5.5-6v10.5H22z" fill="#f8fafc" stroke="#793f53" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="32" cy="21" r="3" fill="#f9d8de" stroke="#4a2e41" stroke-width="1.4"/>
+</svg>

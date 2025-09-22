@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-unlock_next_tier" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#dcf5fa"/>
+      <stop offset="100%" stop-color="#155369"/>
+    </linearGradient>
+    <clipPath id="clip-unlock_next_tier">
+      <rect x="6" y="6" width="52" height="52" rx="14"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#clip-unlock_next_tier)">
+    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#grad-unlock_next_tier)"/>
+    <g transform="rotate(25.00, 32, 32)"><rect x="-128" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-112" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-96" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-80" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-64" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-48" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-32" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="-16" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="0" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="16" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="32" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="48" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="64" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="80" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="96" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/><rect x="112" y="-64" width="10" height="192" fill="#1a7f97" fill-opacity="0.22"/></g>
+    <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#grad-unlock_next_tier)" fill-opacity="0.35"/>
+  </g>
+  <rect x="6" y="6" width="52" height="52" rx="14" stroke="#d8f4fa" stroke-width="1.25" fill="none"/>
+    <path d="M22 40l10-11 6 6 12-14" fill="none" stroke="#c3f0f9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M45 19v9h-9" fill="none" stroke="#14465b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

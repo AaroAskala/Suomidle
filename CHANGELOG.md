@@ -7,6 +7,7 @@
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
+- Autogenerate SVG icons for daily tasks based on the shared task data and surface them alongside task details.
 
 ### Changed
 - Hide the Maailma shop until Polta Maailma has been used at least once.
@@ -28,4 +29,5 @@
 - Fix the store "Buy all" translations to use formatted counts so the TypeScript build completes successfully.
 - Render the building shop bulk purchase button so the "Buy all" option is visible in the card grid UI.
 - Keep the building shop "Buy all" controls above the grid so they are never hidden behind neighbouring cards.
+- Apply theme-aware colors to daily task reward text so it remains legible against both light and dark backgrounds.
 
