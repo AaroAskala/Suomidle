@@ -21,6 +21,7 @@
 
 
 ### Fixed
+- Ensure the "Löyly streak 60 s" daily task registers completions when players stay within the 2 s gap limit.
 - Prevent GitHub Pages deployments from failing when promoting the root build into the combined artifact.
 - Remove decimals from the Lämpötila counter for clearer progress tracking.
 - Align shop translation interpolations with numeric ICU formatting and fix the Polta Maailma confirmation phrase typing error.

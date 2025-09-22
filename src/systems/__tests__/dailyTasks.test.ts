@@ -84,6 +84,44 @@ describe('dailyTasks progression', () => {
     expect(task.progress).toBeGreaterThanOrEqual(60);
   });
 
+  it('completes streak tasks even when timing drifts within the allowed gap', () => {
+    const now = Date.now();
+    const state: DailyTasksState = {
+      ...createInitialDailyTasksState(),
+      rolledDate: '2024-01-01',
+      nextResetAt: now + 86_400_000,
+      taskOrder: ['combo_streak_60s'],
+      tasks: {
+        combo_streak_60s: {
+          id: 'combo_streak_60s',
+          rolledAt: '2024-01-01',
+          progress: 0,
+          completedAt: null,
+          claimedAt: null,
+          conditionState: { type: 'streak', events: [] },
+        },
+      },
+      metrics: {
+        baselines: { temperature: 0, population_earned_today: 0, prestige_multiplier: 1 },
+        current: { temperature: 0, population_earned_today: 0, prestige_multiplier: 1 },
+        uptimeSeconds: 0,
+        lastUptimeUpdate: null,
+      },
+      activeBuffs: [],
+      rerollsUsed: 0,
+    };
+    const context = mockContext({ tierLevel: 3, prestigeUnlocked: true });
+    let nextState = updateDailyTaskMetrics(state, context, now);
+    let timestamp = now;
+    for (let i = 0; i < 50; i += 1) {
+      nextState = handleDailyTaskEvent(nextState, { type: 'loyly_throw' }, context, timestamp);
+      timestamp += 1375;
+    }
+    const task = nextState.tasks['combo_streak_60s'];
+    expect(task.completedAt).not.toBeNull();
+    expect(task.progress).toBeGreaterThanOrEqual(60);
+  });
+
   it('only claims reward once', () => {
     const now = Date.now();
     const state: DailyTasksState = {
