@@ -11,6 +11,13 @@ npm test      # run tests
 npm run build # create production build
 ```
 
+## Development helpers
+
+- The `.env.development` file enables development-only boosts such as
+  `VITE_ENABLE_DEV_TIER_CPS_MULTIPLIER=1`, which multiplies population gains per
+  second by `tier * 100` when running `npm run dev`. Production builds ignore
+  this flag entirely.
+
 ## Asset generation
 
 Daily task icons are generated from the daily task data. Run the following command after editing
