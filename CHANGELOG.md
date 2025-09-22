@@ -8,6 +8,7 @@
 - Collapsible controls for the building, technology, tier, and Maailma shops.
 - Automate GitHub Pages deployments for the main site and /dev/ preview with combined artifacts.
 - Autogenerate SVG icons for daily tasks based on the shared task data and surface them alongside task details.
+- Generate SVG artwork for late-game buildings and technologies that previously lacked icons.
 - Development-only environment flag that multiplies population-per-second by `tier * 100` to speed up local testing.
 
 ### Changed

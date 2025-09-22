@@ -76,7 +76,7 @@
   {
     "id": "aurinkolasit",
     "name": "Aurinkolasit",
-    "icon": "Aurinkolasit.png",
+    "icon": "Aurinkolasit.svg",
     "cost": 999999999999999999999999999999999999999999999999999999, 
     "effects": [{ "type": "mult", "target": "population_cps", "value": 5.4 }],
     "limit": 1,
@@ -85,7 +85,7 @@
   {
     "id": "kuumat_valot",
     "name": "Kuumat Valot",
-    "icon": "Kuumat_Valot.png",
+    "icon": "Kuumat_Valot.svg",
     "cost": 999999999999999999999999999999999999999999999999999999000, 
     "effects": [{ "type": "mult", "target": "population_cps", "value": 5.8 }],
     "limit": 1,
@@ -94,7 +94,7 @@
   {
     "id": "kvanttifysiikka",
     "name": "Kvanttifysiikka",
-    "icon": "Kvanttifysiikka.png",
+    "icon": "Kvanttifysiikka.svg",
     "cost": 999999999999999999999999999999999999999999999999999999000000, 
     "effects": [{ "type": "mult", "target": "population_cps", "value": 6.0 }],
     "limit": 1,
