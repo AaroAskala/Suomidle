@@ -79,6 +79,12 @@ type GlobalCpsAddPerTuhkaSpentEffect = {
   cap?: number;
 };
 
+type GlobalMultPerBuildingEffect = {
+  type: 'global_mult_per_building';
+  value_per_building: number;
+  cap?: number;
+};
+
 type MaailmaShopEffect =
   | TechMultBonusAddEffect
   | BaseProdMultEffect
@@ -90,7 +96,8 @@ type MaailmaShopEffect =
   | LampotilaRateMultEffect
   | TemperatureMultInstantEffect
   | KeepTechOnSaunaResetEffect
-  | GlobalCpsAddPerTuhkaSpentEffect;
+  | GlobalCpsAddPerTuhkaSpentEffect
+  | GlobalMultPerBuildingEffect;
 
 type RawMaailmaShopItem = {
   id: string;
@@ -124,6 +131,7 @@ export interface PermanentBonuses {
   globalCpsAddPerTuhkaSpent: number;
   totalTuhkaSpent: number;
   globalCpsAddFromTuhkaSpent: number;
+  globalMultPerBuilding: number;
 }
 
 const createDefaultPermanentBonuses = (): PermanentBonuses => ({
@@ -139,6 +147,7 @@ const createDefaultPermanentBonuses = (): PermanentBonuses => ({
   globalCpsAddPerTuhkaSpent: 0,
   totalTuhkaSpent: 0,
   globalCpsAddFromTuhkaSpent: 0,
+  globalMultPerBuilding: 0,
 });
 
 const rawShopItems = (shopData as { shop?: RawMaailmaShopItem[] }).shop ?? [];
@@ -246,6 +255,7 @@ export const applyPermanentBonuses = (save: RawSave): PermanentBonuses => {
   const perTierGlobalCpsAdd: Record<string, number> = {};
   let perTuhkaBonusRate = 0;
   let totalTuhkaSpent = 0;
+  let perBuildingBonusRate = 0;
 
   for (const [id, rawLevel] of levels) {
     const item = shopItemsById.get(id);
@@ -345,6 +355,16 @@ export const applyPermanentBonuses = (save: RawSave): PermanentBonuses => {
         perTuhkaBonusRate = applyCap(perTuhkaBonusRate, effect.cap, effect.value_per_tuhka >= 0);
         break;
       }
+      case 'global_mult_per_building': {
+        const addition = effect.value_per_building * level;
+        perBuildingBonusRate += addition;
+        perBuildingBonusRate = applyCap(
+          perBuildingBonusRate,
+          effect.cap,
+          effect.value_per_building >= 0,
+        );
+        break;
+      }
       default: {
         // Ignore unknown effects but continue computing other bonuses.
         break;
@@ -382,6 +402,7 @@ export const applyPermanentBonuses = (save: RawSave): PermanentBonuses => {
   permanent.globalCpsAddPerTuhkaSpent = perTuhkaBonusRate;
   permanent.totalTuhkaSpent = totalTuhkaSpent;
   permanent.globalCpsAddFromTuhkaSpent = perTuhkaBonusRate * totalTuhkaSpent;
+  permanent.globalMultPerBuilding = perBuildingBonusRate;
 
   save.modifiers = { ...modifiers, permanent };
   return permanent;

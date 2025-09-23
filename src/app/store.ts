@@ -17,7 +17,7 @@ import {
   getTotalCostForPurchases,
 } from './buildingPurchase';
 import maailmaShop from '../data/maailma_shop.json' assert { type: 'json' };
-import { computeCpsBase, computeTierBonusMultiplier } from './cpsUtils';
+import { computeCpsBase, computeTierBonusMultiplier, computeTotalBuildingCount } from './cpsUtils';
 import {
   createInitialDailyTasksState,
   syncDailyTasksState,
@@ -807,6 +807,11 @@ export const useGameStore = create<State>()(
           permanent.perTierGlobalCpsAdd,
         );
         const devTierMultiplier = computeDevTierPopulationMultiplier(s.tierLevel);
+        const buildingCount = computeTotalBuildingCount(s.buildings);
+        const perBuildingRate = Number.isFinite(permanent.globalMultPerBuilding)
+          ? permanent.globalMultPerBuilding
+          : 0;
+        const perBuildingMultiplier = Math.max(0, 1 + perBuildingRate * buildingCount);
         const prestigeMult = Math.max(s.prestigeMult, permanent.saunaPrestigeBaseMultiplierMin);
         const globalMultiplier =
           prestigeMult *
@@ -815,7 +820,8 @@ export const useGameStore = create<State>()(
           techBonusMultiplier *
           spentBonusMultiplier *
           tierBonusMultiplier *
-          devTierMultiplier;
+          devTierMultiplier *
+          perBuildingMultiplier;
         const cps = cpsBase * baseProdMult * globalMultiplier;
         const clickPower = Math.max(1, Math.round(cps / 100));
         set({ cps, clickPower, lampotilaRate: Math.max(0, permanent.lampotilaRateMult) });

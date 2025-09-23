@@ -21,6 +21,7 @@ interface RawMaailmaShopEffect {
   readonly from_tier_inclusive?: number;
   readonly value_per_tier_per_level?: number;
   readonly value_per_tuhka?: number;
+  readonly value_per_building?: number;
 }
 
 interface RawMaailmaShopItem {

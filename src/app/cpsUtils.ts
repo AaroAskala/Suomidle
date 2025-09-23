@@ -10,6 +10,16 @@ export const computeCpsBase = (buildingCounts: Record<string, number>): number =
   return total;
 };
 
+export const computeTotalBuildingCount = (buildingCounts: Record<string, number>): number => {
+  let total = 0;
+  for (const building of buildings) {
+    const count = buildingCounts[building.id] ?? 0;
+    if (!Number.isFinite(count) || count <= 0) continue;
+    total += Math.floor(count);
+  }
+  return total;
+};
+
 export const computeTierBonusMultiplier = (
   tierLevel: number,
   perTierBonuses: Record<string, number>,
