@@ -33,6 +33,8 @@ import {
 export const BigBeautifulBalancePath = 7;
 let needsEraPrompt = false;
 
+export const MAAILMA_BUFF_REWARD_PREFIX = 'maailma:';
+
 interface Multipliers {
   population_cps: number;
 }
@@ -178,10 +180,33 @@ export const STORAGE_KEY = STORAGE_NAMESPACE
   : STORAGE_KEY_BASE;
 const decimalZero = new Decimal(0);
 
+type RawMaailmaShopEffect = {
+  type?: unknown;
+  value?: unknown;
+};
+
 type RawMaailmaShopItem = {
   id?: unknown;
   cost_tuhka?: unknown;
   max_level?: unknown;
+  effect?: unknown;
+};
+
+type ParsedMaailmaShopEffect = {
+  type: string;
+  value?: number;
+};
+
+const parseMaailmaShopEffect = (source: unknown): ParsedMaailmaShopEffect | null => {
+  if (!source || typeof source !== 'object') return null;
+  const effect = source as RawMaailmaShopEffect;
+  const type = typeof effect.type === 'string' ? effect.type : null;
+  if (!type) return null;
+  const parsed: ParsedMaailmaShopEffect = { type };
+  if (typeof effect.value === 'number' && Number.isFinite(effect.value)) {
+    parsed.value = effect.value;
+  }
+  return parsed;
 };
 
 const rawShopItems = Array.isArray((maailmaShop as { shop?: unknown }).shop)
@@ -190,7 +215,7 @@ const rawShopItems = Array.isArray((maailmaShop as { shop?: unknown }).shop)
 
 const maailmaShopItemsById = new Map<
   string,
-  { costs: number[]; maxLevel: number }
+  { costs: number[]; maxLevel: number; effect: ParsedMaailmaShopEffect | null }
 >();
 
 for (const item of rawShopItems) {
@@ -204,8 +229,53 @@ for (const item of rawShopItems) {
     typeof maxLevelRaw === 'number' && Number.isFinite(maxLevelRaw)
       ? Math.max(0, Math.floor(maxLevelRaw))
       : costs.length;
-  maailmaShopItemsById.set(item.id, { costs, maxLevel });
+  const effect = parseMaailmaShopEffect(item.effect);
+  maailmaShopItemsById.set(item.id, { costs, maxLevel, effect });
 }
+
+const getMaailmaShopItem = (id: string) => maailmaShopItemsById.get(id);
+
+const applyInstantMaailmaEffect = (
+  effect: ParsedMaailmaShopEffect | null,
+  id: string,
+  dailyTasks: DailyTasksState,
+): DailyTasksState => {
+  if (!effect || effect.type !== 'temperature_mult_instant') return dailyTasks;
+  const multiplier =
+    typeof effect.value === 'number' && Number.isFinite(effect.value) ? effect.value : 1;
+  if (!Number.isFinite(multiplier) || multiplier <= 0) return dailyTasks;
+  const buffValue = multiplier - 1;
+  if (!Number.isFinite(buffValue) || buffValue === 0) return dailyTasks;
+
+  const rewardId = `${MAAILMA_BUFF_REWARD_PREFIX}${id}`;
+  const existingIndex = dailyTasks.activeBuffs.findIndex((buff) => buff.rewardId === rewardId);
+  if (existingIndex >= 0) {
+    const existing = dailyTasks.activeBuffs[existingIndex];
+    if (
+      Math.abs(existing.value - buffValue) < Number.EPSILON &&
+      existing.endsAt >= Number.MAX_SAFE_INTEGER
+    ) {
+      return dailyTasks;
+    }
+    const nextBuffs = dailyTasks.activeBuffs.slice();
+    nextBuffs[existingIndex] = {
+      ...existing,
+      value: buffValue,
+      endsAt: Number.MAX_SAFE_INTEGER,
+    };
+    return { ...dailyTasks, activeBuffs: nextBuffs };
+  }
+
+  const buff = {
+    taskId: rewardId,
+    rewardId,
+    type: 'temp_gain_mult' as const,
+    value: buffValue,
+    endsAt: Number.MAX_SAFE_INTEGER,
+  };
+
+  return { ...dailyTasks, activeBuffs: [...dailyTasks.activeBuffs, buff] };
+};
 
 const countMaailmaPurchases = (purchases: string[], id: string) =>
   purchases.reduce((count, entry) => (entry === id ? count + 1 : count), 0);
@@ -693,6 +763,8 @@ export const useGameStore = create<State>()(
           const numericTuhka = Number.parseFloat(currentMaailma.tuhka);
           if (!Number.isFinite(numericTuhka)) return {};
           const level = countMaailmaPurchases(currentMaailma.purchases, id);
+          const item = getMaailmaShopItem(id);
+          if (!item) return {};
           const cost = getMaailmaNextCost(id, level);
           if (cost === undefined) return {};
           if (numericTuhka < cost) return {};
@@ -705,6 +777,7 @@ export const useGameStore = create<State>()(
           };
           const permanent = computePermanentBonusesFromMaailma(nextMaailma);
           const previousModifiers = state.modifiers ?? { permanent };
+          const nextDailyTasks = applyInstantMaailmaEffect(item.effect, id, state.dailyTasks);
           didPurchase = true;
           return {
             maailma: nextMaailma,
@@ -714,6 +787,7 @@ export const useGameStore = create<State>()(
               permanent.saunaPrestigeBaseMultiplierMin,
             ),
             lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
+            dailyTasks: nextDailyTasks,
           };
         });
         if (didPurchase) {

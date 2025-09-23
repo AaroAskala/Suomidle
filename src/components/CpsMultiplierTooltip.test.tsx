@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CpsMultiplierTooltip } from './CpsMultiplierTooltip';
-import { useGameStore } from '../app/store';
+import { useGameStore, MAAILMA_BUFF_REWARD_PREFIX } from '../app/store';
 import { renderWithI18n, setTestLanguage } from '../tests/testUtils';
 import { createInitialDailyTasksState } from '../systems/dailyTasks';
 
@@ -53,6 +53,13 @@ describe('CpsMultiplierTooltip', () => {
           value: 0.5,
           endsAt: Date.now() + 60_000,
         },
+        {
+          taskId: `${MAAILMA_BUFF_REWARD_PREFIX}loylyn_voima`,
+          rewardId: `${MAAILMA_BUFF_REWARD_PREFIX}loylyn_voima`,
+          type: 'temp_gain_mult' as const,
+          value: 1,
+          endsAt: Number.MAX_SAFE_INTEGER,
+        },
       ],
     };
 
@@ -84,7 +91,9 @@ describe('CpsMultiplierTooltip', () => {
     expect(screen.getByText(/Base production:/i)).toHaveTextContent('Base production: 10 /s');
     expect(screen.getByText(/Tech multiplier/i).closest('li')).toHaveTextContent('×2');
     expect(screen.getByText(/Maailma tech bonus/i).closest('li')).toHaveTextContent('×1.25');
-    expect(screen.getByText(/Total multiplier/i)).toHaveTextContent('×54.675');
-    expect(screen.getByText(/Effective CPS/i)).toHaveTextContent('546.75');
+    expect(screen.getByText(/Daily task multiplier/i).closest('li')).toHaveTextContent('×1.5');
+    expect(screen.getByText(/Maailma heat boost/i).closest('li')).toHaveTextContent('×2');
+    expect(screen.getByText(/Total multiplier/i)).toHaveTextContent('×109.35');
+    expect(screen.getByText(/Effective CPS/i)).toHaveTextContent('1,093.5');
   });
 });

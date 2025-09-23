@@ -8,7 +8,11 @@ import {
   type KeyboardEvent,
   type MouseEvent,
 } from 'react';
-import { useGameStore, computeDevTierPopulationMultiplier } from '../app/store';
+import {
+  useGameStore,
+  computeDevTierPopulationMultiplier,
+  MAAILMA_BUFF_REWARD_PREFIX,
+} from '../app/store';
 import { computeCpsBase, computeTierBonusMultiplier } from '../app/cpsUtils';
 import { useLocale } from '../i18n/useLocale';
 import { getTemperatureGainMultiplier } from '../systems/dailyTasks';
@@ -58,8 +62,31 @@ export function CpsMultiplierTooltip() {
     Math.max(prestigeMult, permanent.saunaPrestigeBaseMultiplierMin),
   );
   const eraMultiplier = sanitizeMultiplier(eraMult);
-  const dailyTasksMultiplier = sanitizeMultiplier(getTemperatureGainMultiplier(dailyTasks));
-  const effectiveCps = sanitizeMultiplier(cps * dailyTasksMultiplier);
+  const { totalTemperatureMultiplier, maailmaTemperatureMultiplier, taskBuffMultiplier } = useMemo(() => {
+    const total = sanitizeMultiplier(getTemperatureGainMultiplier(dailyTasks));
+    const buffs = Array.isArray(dailyTasks.activeBuffs) ? dailyTasks.activeBuffs : [];
+    let maailmaMultiplier = 1;
+    for (const buff of buffs) {
+      if (
+        typeof buff.rewardId === 'string' &&
+        buff.rewardId.startsWith(MAAILMA_BUFF_REWARD_PREFIX)
+      ) {
+        const factor = sanitizeMultiplier(1 + buff.value);
+        if (factor > 0) {
+          maailmaMultiplier *= factor;
+        }
+      }
+    }
+    maailmaMultiplier = sanitizeMultiplier(maailmaMultiplier);
+    const tasksMultiplier =
+      maailmaMultiplier > 0 ? sanitizeMultiplier(total / maailmaMultiplier) : total;
+    return {
+      totalTemperatureMultiplier: total,
+      maailmaTemperatureMultiplier: maailmaMultiplier,
+      taskBuffMultiplier: tasksMultiplier,
+    };
+  }, [dailyTasks]);
+  const effectiveCps = sanitizeMultiplier(cps * totalTemperatureMultiplier);
 
   const entries = useMemo<MultiplierEntry[]>(() => {
     const data: MultiplierEntry[] = [
@@ -71,14 +98,24 @@ export function CpsMultiplierTooltip() {
       { id: 'prestige', label: t('hud.cpsMultipliers.entry.prestige'), value: prestigeMultiplier },
       { id: 'era', label: t('hud.cpsMultipliers.entry.era'), value: eraMultiplier },
       { id: 'devTier', label: t('hud.cpsMultipliers.entry.devTier'), value: devTierMultiplier },
-      { id: 'dailyTasks', label: t('hud.cpsMultipliers.entry.dailyTasks'), value: dailyTasksMultiplier },
+      { id: 'dailyTasks', label: t('hud.cpsMultipliers.entry.dailyTasks'), value: taskBuffMultiplier },
+      {
+        id: 'maailmaTemperature',
+        label: t('hud.cpsMultipliers.entry.maailmaTemperature'),
+        value: maailmaTemperatureMultiplier,
+      },
     ];
     return data
       .map((entry) => ({ ...entry, value: sanitizeMultiplier(entry.value) }))
-      .filter((entry) => (entry.id === 'devTier' ? entry.value !== 1 : true));
+      .filter((entry) => {
+        if (entry.id === 'devTier') return entry.value !== 1;
+        if (entry.id === 'maailmaTemperature') return entry.value !== 1;
+        return true;
+      });
   }, [
     baseProdMult,
-    dailyTasksMultiplier,
+    taskBuffMultiplier,
+    maailmaTemperatureMultiplier,
     devTierMultiplier,
     eraMultiplier,
     prestigeMultiplier,
