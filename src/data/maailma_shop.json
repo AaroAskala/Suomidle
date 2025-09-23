@@ -3,7 +3,7 @@
     "id": "tuhka",
     "name_fi": "Tuhka",
     "short_fi": "Tuhka",
-    "accrual_formula_fi": "Tuhka = floor( sqrt(taso * log10(kertoja + 1)) )",
+    "accrual_formula_fi": "Tuhka = floor( 3.2 * sqrt(log10(kertoja + 1)) * (1 + 0.25 * max(0, taso - 10)) )",
     "spend_behaviour": "persistent",
     "icon": "Tuhka.png"
   },

@@ -15,6 +15,7 @@
 - Prompt players to refresh when a newer build becomes available after they interact with the game.
 
 ### Changed
+- Update the Tuhka gain formula to use a higher prestige scaling base and grant additional bonuses past tier 10.
 - Hide the Maailma shop until Polta Maailma has been used at least once.
 - Update the page title to display "suomidle" in browser tabs.
 - Namespace persisted local storage keys by environment to isolate saves across deployments.
