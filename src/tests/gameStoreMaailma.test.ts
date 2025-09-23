@@ -56,11 +56,11 @@ describe('Maailma upgrades via store actions', () => {
 
     const state = useGameStore.getState();
     expect(state.maailma.tuhka).toBe('475');
-    expect(state.modifiers.permanent.baseProdMult).toBeCloseTo(1.2, 6);
-    expect(state.modifiers.permanent.techMultiplierBonusAdd).toBeCloseTo(0.1, 6);
-    expect(state.modifiers.permanent.globalCpsAddFromTuhkaSpent).toBeCloseTo(0.0125, 6);
+    expect(state.modifiers.permanent.baseProdMult).toBeCloseTo(1.3, 6);
+    expect(state.modifiers.permanent.techMultiplierBonusAdd).toBeCloseTo(0.2, 6);
+    expect(state.modifiers.permanent.globalCpsAddFromTuhkaSpent).toBeCloseTo(0.125, 6);
     expect(state.modifiers.permanent.totalTuhkaSpent).toBe(25);
-    expect(state.cps).toBeCloseTo(13.365, 3);
+    expect(state.cps).toBeCloseTo(17.55, 2);
     expect(state.clickPower).toBe(1);
   });
 
