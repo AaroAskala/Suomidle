@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useGameStore } from '../app/store';
+import { useGameStore, MAAILMA_BUFF_REWARD_PREFIX } from '../app/store';
 import { applyPermanentBonuses } from '../effects/applyPermanentBonuses';
+import { createInitialDailyTasksState, getTemperatureGainMultiplier } from '../systems/dailyTasks';
 
 const resetStoreState = () => {
   useGameStore.persist.clearStorage();
@@ -31,6 +32,7 @@ const resetStoreState = () => {
       eraMult: 1,
       lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
       maailma: baseMaailma,
+      dailyTasks: createInitialDailyTasksState(),
     };
   });
   useGameStore.getState().recompute();
@@ -136,5 +138,25 @@ describe('Maailma upgrades via store actions', () => {
     expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1, 6);
     expect(useGameStore.getState().purchaseMaailmaUpgrade('alkulampo')).toBe(true);
     expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1.05, 6);
+  });
+
+  it('applies Löylyn voima as a persistent lämpötila multiplier buff', () => {
+    useGameStore.setState((state) => ({
+      ...state,
+      maailma: { ...state.maailma, tuhka: '10' },
+      dailyTasks: createInitialDailyTasksState(),
+    }));
+    useGameStore.getState().recompute();
+
+    expect(getTemperatureGainMultiplier(useGameStore.getState().dailyTasks)).toBeCloseTo(1, 6);
+    expect(useGameStore.getState().purchaseMaailmaUpgrade('loylyn_voima')).toBe(true);
+
+    const state = useGameStore.getState();
+    expect(state.maailma.tuhka).toBe('9');
+    const rewardKey = `${MAAILMA_BUFF_REWARD_PREFIX}loylyn_voima`;
+    const buff = state.dailyTasks.activeBuffs.find((entry) => entry.rewardId === rewardKey);
+    expect(buff?.value).toBeCloseTo(1, 6);
+    expect(buff?.endsAt).toBe(Number.MAX_SAFE_INTEGER);
+    expect(getTemperatureGainMultiplier(state.dailyTasks)).toBeCloseTo(2, 6);
   });
 });

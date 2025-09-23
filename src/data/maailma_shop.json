@@ -9,6 +9,18 @@
   },
   "shop": [
     {
+      "id": "loylyn_voima",
+      "name_fi": "Löylyn voima",
+      "icon": "Loylyn_voima.png",
+      "description_fi": "Kertakäyttöinen voima, joka tuplaa Lämpötilan kertoimen välittömästi (2x).",
+      "effect": {
+        "type": "temperature_mult_instant",
+        "value": 2
+      },
+      "max_level": 1,
+      "cost_tuhka": [1]
+    },
+    {
       "id": "tuhkan_viisaus",
       "name_fi": "Tuhkan viisaus",
       "icon": "Tuhkan_viisaus.png",

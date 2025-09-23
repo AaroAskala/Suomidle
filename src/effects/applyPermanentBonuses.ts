@@ -63,6 +63,11 @@ type LampotilaRateMultEffect = {
   cap?: number;
 };
 
+type TemperatureMultInstantEffect = {
+  type: 'temperature_mult_instant';
+  value: number;
+};
+
 type KeepTechOnSaunaResetEffect = {
   type: 'keep_tech_on_sauna_reset';
   value: boolean;
@@ -83,6 +88,7 @@ type MaailmaShopEffect =
   | OfflineProdMultEffect
   | PerTierGlobalCpsAddEffect
   | LampotilaRateMultEffect
+  | TemperatureMultInstantEffect
   | KeepTechOnSaunaResetEffect
   | GlobalCpsAddPerTuhkaSpentEffect;
 
@@ -323,6 +329,10 @@ export const applyPermanentBonuses = (save: RawSave): PermanentBonuses => {
         } else {
           lampotilaAdd += effect.value_per_level * level;
         }
+        break;
+      }
+      case 'temperature_mult_instant': {
+        // Instant effects are applied at purchase time and do not affect permanent bonuses.
         break;
       }
       case 'keep_tech_on_sauna_reset': {
