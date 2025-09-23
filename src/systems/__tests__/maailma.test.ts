@@ -69,7 +69,7 @@ afterEach(() => {
 });
 
 describe('maailma system', () => {
-  it('uses log-tier formula for tuhka awards', () => {
+  it('uses logarithmic prestige scaling and tier bonuses for tuhka awards', () => {
     const state = createGameState({
       tierLevel: 13,
       prestigeMult: Number(1.2e24),
@@ -77,7 +77,7 @@ describe('maailma system', () => {
 
     const preview = getTuhkaAwardPreview(state);
 
-    expect(preview.toNumber()).toBe(17);
+    expect(preview.toNumber()).toBe(27);
     expect(canPoltaMaailma(state)).toBe(true);
   });
 
