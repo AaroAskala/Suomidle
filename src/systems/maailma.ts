@@ -65,6 +65,34 @@ const zero = new Decimal(0);
 
 const decimalFrom = (value: Decimal.Value): Decimal => new Decimal(value);
 
+export const computeTuhkaAward = (
+  tierLevel: Decimal.Value | null | undefined,
+  prestigeMultiplier: Decimal.Value | null | undefined,
+): Decimal => {
+  const rawTier = decimalFrom(tierLevel ?? 0);
+  const tier = rawTier.isFinite() ? Decimal.max(rawTier, zero) : zero;
+  const rawMultiplier = decimalFrom(prestigeMultiplier ?? 0);
+  const multiplier = rawMultiplier.isFinite() ? Decimal.max(rawMultiplier, zero) : zero;
+  if (tier.lte(0)) return zero;
+
+  const logTerm = Decimal.log10(multiplier.plus(1));
+  if (!logTerm.isFinite() || logTerm.lte(0)) return zero;
+
+  const sqrtLogTerm = logTerm.sqrt();
+  if (!sqrtLogTerm.isFinite() || sqrtLogTerm.lte(0)) return zero;
+
+  const baseAward = sqrtLogTerm.mul(3.2);
+  if (!baseAward.isFinite() || baseAward.lte(0)) return zero;
+
+  const tierBonusMultiplier = Decimal.max(tier.minus(10), zero).mul(0.25).plus(1);
+  if (!tierBonusMultiplier.isFinite() || tierBonusMultiplier.lte(0)) return zero;
+
+  const scaledAward = baseAward.mul(tierBonusMultiplier);
+  if (!scaledAward.isFinite() || scaledAward.lte(0)) return zero;
+
+  return scaledAward.floor();
+};
+
 const decimalToDecimalString = (value: Decimal): DecimalString =>
   value.toFixed() as DecimalString;
 
@@ -182,32 +210,8 @@ const updateTuhkaTotals = (maailma: MaailmaState, award: Decimal): MaailmaState 
   };
 };
 
-export const getTuhkaAwardPreview = (state: GameState): Decimal => {
-  const rawTier = decimalFrom(state.tierLevel ?? 0);
-  const tier = rawTier.isFinite() ? Decimal.max(rawTier, zero) : zero;
-  const rawMultiplier = decimalFrom(state.prestigeMult ?? 0);
-  const multiplier = rawMultiplier.isFinite()
-    ? Decimal.max(rawMultiplier, zero)
-    : zero;
-  if (tier.lte(0)) return zero;
-
-  const logTerm = Decimal.log10(multiplier.plus(1));
-  if (!logTerm.isFinite() || logTerm.lte(0)) return zero;
-
-  const sqrtLogTerm = logTerm.sqrt();
-  if (!sqrtLogTerm.isFinite() || sqrtLogTerm.lte(0)) return zero;
-
-  const baseAward = sqrtLogTerm.mul(3.2);
-  if (!baseAward.isFinite() || baseAward.lte(0)) return zero;
-
-  const tierBonusMultiplier = Decimal.max(tier.minus(10), zero).mul(0.25).plus(1);
-  if (!tierBonusMultiplier.isFinite() || tierBonusMultiplier.lte(0)) return zero;
-
-  const scaledAward = baseAward.mul(tierBonusMultiplier);
-  if (!scaledAward.isFinite() || scaledAward.lte(0)) return zero;
-
-  return scaledAward.floor();
-};
+export const getTuhkaAwardPreview = (state: GameState): Decimal =>
+  computeTuhkaAward(state.tierLevel ?? 0, state.prestigeMult ?? 0);
 
 export const canPoltaMaailma = (state: GameState): boolean =>
   getTuhkaAwardPreview(state).gt(0);
