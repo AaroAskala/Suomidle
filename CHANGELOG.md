@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- Add the one-time "Löylyn voima" Maailma upgrade that instantly doubles the temperature multiplier and surfaces its bonus in the CPS breakdown.
+- Add the one-time "Löylyn voima" Maailma upgrade that instantly quintuples the temperature multiplier and surfaces its bonus in the CPS breakdown.
 - Add a "Buy all" option to building shop entries to purchase the maximum affordable amount at once.
 - Daily Tasks system with rotating objectives, persistent progress, and temporary Lämpötila buffs.
 - Configure deployments to publish the `aaroonparas.com` CNAME record.

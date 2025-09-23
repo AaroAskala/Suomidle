@@ -12,7 +12,7 @@
       "id": "loylyn_voima",
       "name_fi": "Löylyn voima",
       "icon": "Loylyn_voima.png",
-      "description_fi": "Kertakäyttöinen voima, joka tuplaa Lämpötilan kertoimen välittömästi (2x).",
+      "description_fi": "Kertakäyttöinen voima, joka viisinkertaistaa Lämpötilan kertoimen välittömästi (5×).",
       "effect": {
         "type": "temperature_mult_instant",
         "value": 5
