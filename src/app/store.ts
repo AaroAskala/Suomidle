@@ -1,4 +1,3 @@
-import Decimal from 'decimal.js';
 import { create } from 'zustand';
 import {
   persist,
