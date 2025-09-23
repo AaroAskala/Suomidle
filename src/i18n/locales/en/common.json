@@ -1,6 +1,9 @@
 {
   "app.title": "Suomidle",
   "app.tapToStart": "Tap to start",
+  "app.updateAvailable.title": "Update available",
+  "app.updateAvailable.message": "A newer version of the game is ready.",
+  "app.updateAvailable.refresh": "Refresh now",
   "nav.home": "Home",
   "nav.shop": "Shop",
   "nav.tech": "Technologies",

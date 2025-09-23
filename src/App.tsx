@@ -14,6 +14,7 @@ import { MaailmaShop } from './ui/MaailmaShop';
 import { PoltaMaailmaButton } from './ui/PoltaMaailmaButton';
 import { DailyTasksPanel } from './ui/dailyTasksUI';
 import { useLocale } from './i18n/useLocale';
+import { UpdateNotification } from './components/UpdateNotification';
 
 function App() {
   const { t } = useLocale();
@@ -60,6 +61,7 @@ function App() {
         </div>
       )}
       <Settings />
+      <UpdateNotification />
       <HUD />
       <DailyTasksPanel />
       <PrestigeCard />
