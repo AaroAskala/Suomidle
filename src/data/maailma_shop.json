@@ -12,10 +12,10 @@
       "id": "tuhkan_viisaus",
       "name_fi": "Tuhkan viisaus",
       "icon": "Tuhkan_viisaus.png",
-      "description_fi": "Teknologioiden kertoimiin pysyvä +10% lisäbonus (additiivinen).",
+      "description_fi": "Teknologioiden kertoimiin pysyvä +20% lisäbonus (additiivinen).",
       "effect": {
         "type": "tech_mult_bonus_add",
-        "value_per_level": 0.10,
+        "value_per_level": 0.20,
         "stack_mode": "add"
       },
       "max_level": 10,
@@ -25,10 +25,10 @@
       "id": "ikuiset_hiillokset",
       "name_fi": "Ikuiset hiillokset",
       "icon": "Ikuiset_hiillokset.png",
-      "description_fi": "Kaikkien rakennusten perustuotanto ×1.20 per taso (kertautuva).",
+      "description_fi": "Kaikkien rakennusten perustuotanto ×1.30 per taso (kertautuva).",
       "effect": {
         "type": "base_prod_mult",
-        "value_per_level": 1.20,
+        "value_per_level": 1.30,
         "stack_mode": "mult"
       },
       "max_level": 8,
@@ -69,7 +69,7 @@
         "floor": 1.10
       },
       "max_level": 5,
-      "cost_tuhka": [20, 30, 45, 70, 110]
+      "cost_tuhka": [10, 20, 35, 50, 60]
     },
     {
       "id": "kosminen_karsivallisyys",
@@ -88,11 +88,11 @@
       "id": "tuhkan_infuusio",
       "name_fi": "Tuhkan infuusio",
       "icon": "Tuhkan_infuusio.png",
-      "description_fi": "Jokaisesta avatuista tasoista yli T7 pysyvä +1% globaali CPS per taso.",
+      "description_fi": "Jokaisesta avatuista tasoista yli T7 pysyvä +10% globaali CPS per taso.",
       "effect": {
         "type": "per_tier_global_cps_add",
         "from_tier_inclusive": 7,
-        "value_per_tier_per_level": 0.01,
+        "value_per_tier_per_level": 0.1,
         "stack_mode": "add"
       },
       "max_level": 5,
@@ -121,16 +121,16 @@
         "value": true
       },
       "max_level": 1,
-      "cost_tuhka": [120]
+      "cost_tuhka": [30]
     },
     {
       "id": "tuhkan_riimu",
       "name_fi": "Tuhkan riimu",
       "icon": "Tuhkan_riimu.png",
-      "description_fi": "Jokainen käytetty Tuhka antaa +0.05% pysyvän globaalin CPS-bonuksen (kertyy).",
+      "description_fi": "Jokainen käytetty Tuhka antaa +0.5% pysyvän globaalin CPS-bonuksen (kertyy).",
       "effect": {
         "type": "global_cps_add_per_tuhka_spent",
-        "value_per_tuhka": 0.0005
+        "value_per_tuhka": 0.005
       },
       "max_level": 10,
       "cost_tuhka": [8, 12, 18, 27, 40, 60, 90, 135, 200, 300]
