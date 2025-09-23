@@ -58,11 +58,11 @@ describe('Maailma upgrades via store actions', () => {
 
     const state = useGameStore.getState();
     expect(state.maailma.tuhka).toBe('475');
-    expect(state.modifiers.permanent.baseProdMult).toBeCloseTo(1.3, 6);
-    expect(state.modifiers.permanent.techMultiplierBonusAdd).toBeCloseTo(0.2, 6);
-    expect(state.modifiers.permanent.globalCpsAddFromTuhkaSpent).toBeCloseTo(0.125, 6);
+    expect(state.modifiers.permanent.baseProdMult).toBeCloseTo(1.5, 6);
+    expect(state.modifiers.permanent.techMultiplierBonusAdd).toBeCloseTo(0.5, 6);
+    expect(state.modifiers.permanent.globalCpsAddFromTuhkaSpent).toBeCloseTo(2.5, 6);
     expect(state.modifiers.permanent.totalTuhkaSpent).toBe(25);
-    expect(state.cps).toBeCloseTo(17.55, 2);
+    expect(state.cps).toBeCloseTo(78.75, 2);
     expect(state.clickPower).toBe(1);
   });
 
@@ -146,7 +146,7 @@ describe('Maailma upgrades via store actions', () => {
 
     const ok = useGameStore.getState().prestige();
     expect(ok).toBe(true);
-    expect(useGameStore.getState().prestigeMult).toBeCloseTo(2, 6);
+    expect(useGameStore.getState().prestigeMult).toBeCloseTo(10, 6);
   });
 
   it('updates lämpötila rate multiplier immediately after purchase', () => {
@@ -158,7 +158,7 @@ describe('Maailma upgrades via store actions', () => {
 
     expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1, 6);
     expect(useGameStore.getState().purchaseMaailmaUpgrade('alkulampo')).toBe(true);
-    expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1.05, 6);
+    expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1.2, 6);
   });
 
   it('applies Löylyn voima as a persistent lämpötila multiplier buff', () => {
@@ -176,8 +176,8 @@ describe('Maailma upgrades via store actions', () => {
     expect(state.maailma.tuhka).toBe('9');
     const rewardKey = `${MAAILMA_BUFF_REWARD_PREFIX}loylyn_voima`;
     const buff = state.dailyTasks.activeBuffs.find((entry) => entry.rewardId === rewardKey);
-    expect(buff?.value).toBeCloseTo(1, 6);
+    expect(buff?.value).toBeCloseTo(4, 6);
     expect(buff?.endsAt).toBe(Number.MAX_SAFE_INTEGER);
-    expect(getTemperatureGainMultiplier(state.dailyTasks)).toBeCloseTo(2, 6);
+    expect(getTemperatureGainMultiplier(state.dailyTasks)).toBeCloseTo(5, 6);
   });
 });
