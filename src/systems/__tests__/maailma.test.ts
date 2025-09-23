@@ -113,7 +113,8 @@ describe('maailma system', () => {
     expect(result.techCounts).toEqual({});
     expect(result.tierLevel).toBe(1);
     expect(result.cps).toBe(0);
-    expect(result.multipliers.population_cps).toBeCloseTo(1 + 0.2 * 3, 10);
+    const expectedTechMultiplier = 1 + 0.5 * 3;
+    expect(result.multipliers.population_cps).toBeCloseTo(expectedTechMultiplier, 10);
     expect(result.prestigePoints).toBe(0);
     expect(result.prestigeMult).toBe(1);
     expect(result.eraMult).toBe(1);
@@ -189,7 +190,9 @@ describe('maailma system', () => {
 
     const result = poltaMaailmaConfirm(state);
 
-    expect(result.multipliers.population_cps).toBeCloseTo(3.38338, 6);
+    const spentTuhka = Number(state.maailma.totalTuhkaEarned) - Number(state.maailma.tuhka);
+    const expectedMultiplier = (1 + 0.5 * 2) * 1.5 ** 3 * (1 + spentTuhka * 0.1);
+    expect(result.multipliers.population_cps).toBeCloseTo(expectedMultiplier, 6);
     expect(result.prestigeMult).toBe(1);
     expect(result.maailma.tuhka).toBe(new Decimal('10').add(award).floor().toFixed());
     expect(result.maailma.totalTuhkaEarned).toBe(new Decimal('30').add(award).floor().toFixed());

@@ -151,10 +151,10 @@ describe('polta sauna', () => {
     const s = useGameStore.getState();
 
     expect(s.prestigePoints).toBe(0);
-    expect(s.prestigeMult).toBeCloseTo(2);
-    expect(s.modifiers.permanent.saunaPrestigeBaseMultiplierMin).toBeCloseTo(2);
-    expect(s.lampotilaRate).toBeCloseTo(1.05);
-    expect(s.modifiers.permanent.lampotilaRateMult).toBeCloseTo(1.05);
+    expect(s.prestigeMult).toBeCloseTo(10);
+    expect(s.modifiers.permanent.saunaPrestigeBaseMultiplierMin).toBeCloseTo(10);
+    expect(s.lampotilaRate).toBeCloseTo(1.2);
+    expect(s.modifiers.permanent.lampotilaRateMult).toBeCloseTo(1.2);
     expect(s.maailma.purchases.filter((id) => id === 'feeniks_sauna')).toHaveLength(1);
     expect(s.maailma.purchases.filter((id) => id === 'alkulampo')).toHaveLength(1);
   });
