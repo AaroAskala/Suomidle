@@ -24,6 +24,7 @@
 - Format scientific notation with two decimal places for consistent precision.
 - Surface a contextual "Buy all" summary and tooltips in the store for clearer bulk purchases.
 - Update the Finnish daily tasks expired bonus label to read "Bonus käytetty".
+- Align Maailma shop balance values, translations, and tests with the latest Ash data.
 
 
 ### Fixed
