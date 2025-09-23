@@ -1,4 +1,3 @@
-import Decimal from 'decimal.js';
 import { create } from 'zustand';
 import {
   persist,
@@ -18,6 +17,7 @@ import {
 } from './buildingPurchase';
 import maailmaShop from '../data/maailma_shop.json' assert { type: 'json' };
 import { computeCpsBase, computeTierBonusMultiplier, computeTotalBuildingCount } from './cpsUtils';
+import { computeTuhkaAward } from '../systems/maailma';
 import {
   createInitialDailyTasksState,
   syncDailyTasksState,
@@ -178,8 +178,6 @@ const STORAGE_NAMESPACE = resolveStorageNamespace();
 export const STORAGE_KEY = STORAGE_NAMESPACE
   ? `${STORAGE_KEY_BASE}:${STORAGE_NAMESPACE}`
   : STORAGE_KEY_BASE;
-const decimalZero = new Decimal(0);
-
 type RawMaailmaShopEffect = {
   type?: unknown;
   value?: unknown;
@@ -1265,23 +1263,7 @@ export const getTuhkaAwardPreview = (): TuhkaAwardPreview => {
   const state = useGameStore.getState();
   const current = toBigInt(state.maailma.tuhka);
   const totalEarned = toBigInt(state.maailma.totalTuhkaEarned);
-  const rawTier = new Decimal(state.tierLevel ?? 0);
-  const tier = rawTier.isFinite() ? Decimal.max(rawTier, decimalZero) : decimalZero;
-  const rawMultiplier = new Decimal(state.prestigeMult ?? 0);
-  const multiplier = rawMultiplier.isFinite()
-    ? Decimal.max(rawMultiplier, decimalZero)
-    : decimalZero;
-
-  let awardDecimal = decimalZero;
-  if (tier.gt(0)) {
-    const logTerm = Decimal.log10(multiplier.plus(1));
-    if (logTerm.isFinite() && logTerm.gt(0)) {
-      const product = tier.mul(logTerm);
-      if (product.isFinite() && product.gt(0)) {
-        awardDecimal = product.sqrt().floor();
-      }
-    }
-  }
+  const awardDecimal = computeTuhkaAward(state.tierLevel ?? 0, state.prestigeMult ?? 0);
 
   const award =
     awardDecimal.isFinite() && awardDecimal.gte(0)

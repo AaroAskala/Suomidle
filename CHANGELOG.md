@@ -31,6 +31,8 @@
 
 
 ### Fixed
+- Remove an unused Decimal.js import from the store to restore successful TypeScript builds.
+- Align the Tuhka preview and awards with the Maailma system helper so UI projections match granted ash.
 - Ensure the "Löyly streak 60 s" daily task registers completions when players stay within the 2 s gap limit.
 - Prevent GitHub Pages deployments from failing when promoting the root build into the combined artifact.
 - Remove decimals from the Lämpötila counter for clearer progress tracking.
