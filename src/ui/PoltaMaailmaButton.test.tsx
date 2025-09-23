@@ -51,8 +51,9 @@ describe('PoltaMaailmaButton', () => {
     const preview = getTuhkaAwardPreview();
 
     const tierBonus = Math.max(tierLevel - 10, 0) * 0.25 + 1;
+    const prestigeBonus = Math.max(prestigeMult - 1, 0);
     const expectedAwardNumber = Math.floor(
-      Math.sqrt(Math.log10(prestigeMult + 1)) * 3.2 * tierBonus,
+      Math.sqrt(Math.log10(prestigeBonus + 1)) * 3.2 * tierBonus,
     );
     const expectedAward = BigInt(expectedAwardNumber);
 

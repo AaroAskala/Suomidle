@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useGameStore, MAAILMA_BUFF_REWARD_PREFIX } from '../app/store';
+import { useGameStore, MAAILMA_BUFF_REWARD_PREFIX, getTuhkaAwardPreview } from '../app/store';
 import { applyPermanentBonuses } from '../effects/applyPermanentBonuses';
 import { createInitialDailyTasksState, getTemperatureGainMultiplier } from '../systems/dailyTasks';
 
@@ -41,6 +41,25 @@ const resetStoreState = () => {
 describe('Maailma upgrades via store actions', () => {
   beforeEach(() => {
     resetStoreState();
+  });
+
+  it('shows zero tuhka award when prestige multiplier is at baseline', () => {
+    useGameStore.setState((state) => ({
+      ...state,
+      tierLevel: 1,
+      prestigeMult: 1,
+      maailma: {
+        ...state.maailma,
+        tuhka: '0',
+        totalTuhkaEarned: '0',
+      },
+    }));
+
+    const preview = getTuhkaAwardPreview();
+
+    expect(preview.award).toBe(0n);
+    expect(preview.availableAfter).toBe(preview.current);
+    expect(preview.totalEarnedAfter).toBe(preview.totalEarned);
   });
 
   it('updates cps and permanent modifiers immediately after purchases', () => {

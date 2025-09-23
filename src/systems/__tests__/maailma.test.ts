@@ -81,6 +81,15 @@ describe('maailma system', () => {
     expect(canPoltaMaailma(state)).toBe(true);
   });
 
+  it('returns zero tuhka when the prestige multiplier is at the baseline', () => {
+    const state = createGameState();
+
+    const preview = getTuhkaAwardPreview(state);
+
+    expect(preview.toNumber()).toBe(0);
+    expect(canPoltaMaailma(state)).toBe(false);
+  });
+
   it('resets progress while preserving maailma state', () => {
     const state = createGameState({
       population: 987654,
