@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useGameStore } from '../app/store';
+import { useGameStore, MAAILMA_BUFF_REWARD_PREFIX } from '../app/store';
 import { applyPermanentBonuses } from '../effects/applyPermanentBonuses';
+import { createInitialDailyTasksState, getTemperatureGainMultiplier } from '../systems/dailyTasks';
 
 const resetStoreState = () => {
   useGameStore.persist.clearStorage();
@@ -31,6 +32,7 @@ const resetStoreState = () => {
       eraMult: 1,
       lampotilaRate: Math.max(0, permanent.lampotilaRateMult),
       maailma: baseMaailma,
+      dailyTasks: createInitialDailyTasksState(),
     };
   });
   useGameStore.getState().recompute();
@@ -62,6 +64,27 @@ describe('Maailma upgrades via store actions', () => {
     expect(state.modifiers.permanent.totalTuhkaSpent).toBe(25);
     expect(state.cps).toBeCloseTo(17.55, 2);
     expect(state.clickPower).toBe(1);
+  });
+
+  it('applies the per-building Maailma multiplier from Rakennuksen siunaus', () => {
+    useGameStore.setState((state) => ({
+      ...state,
+      buildings: { sauna: 10 },
+      multipliers: { population_cps: 1 },
+      prestigeMult: 1,
+      eraMult: 1,
+      maailma: { ...state.maailma, tuhka: '100' },
+    }));
+    useGameStore.getState().recompute();
+
+    const before = useGameStore.getState().cps;
+    expect(before).toBeGreaterThan(0);
+
+    expect(useGameStore.getState().purchaseMaailmaUpgrade('rakennuksen_siunaus')).toBe(true);
+
+    const after = useGameStore.getState().cps;
+    expect(after / before).toBeCloseTo(1.01, 6);
+    expect(useGameStore.getState().modifiers.permanent.globalMultPerBuilding).toBeCloseTo(0.001, 6);
   });
 
   it('allows early tier unlocks to bypass building requirements', () => {
@@ -136,5 +159,25 @@ describe('Maailma upgrades via store actions', () => {
     expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1, 6);
     expect(useGameStore.getState().purchaseMaailmaUpgrade('alkulampo')).toBe(true);
     expect(useGameStore.getState().lampotilaRate).toBeCloseTo(1.05, 6);
+  });
+
+  it('applies Löylyn voima as a persistent lämpötila multiplier buff', () => {
+    useGameStore.setState((state) => ({
+      ...state,
+      maailma: { ...state.maailma, tuhka: '10' },
+      dailyTasks: createInitialDailyTasksState(),
+    }));
+    useGameStore.getState().recompute();
+
+    expect(getTemperatureGainMultiplier(useGameStore.getState().dailyTasks)).toBeCloseTo(1, 6);
+    expect(useGameStore.getState().purchaseMaailmaUpgrade('loylyn_voima')).toBe(true);
+
+    const state = useGameStore.getState();
+    expect(state.maailma.tuhka).toBe('9');
+    const rewardKey = `${MAAILMA_BUFF_REWARD_PREFIX}loylyn_voima`;
+    const buff = state.dailyTasks.activeBuffs.find((entry) => entry.rewardId === rewardKey);
+    expect(buff?.value).toBeCloseTo(1, 6);
+    expect(buff?.endsAt).toBe(Number.MAX_SAFE_INTEGER);
+    expect(getTemperatureGainMultiplier(state.dailyTasks)).toBeCloseTo(2, 6);
   });
 });

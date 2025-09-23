@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- Add the one-time "Löylyn voima" Maailma upgrade that instantly doubles the temperature multiplier and surfaces its bonus in the CPS breakdown.
 - Add a "Buy all" option to building shop entries to purchase the maximum affordable amount at once.
 - Daily Tasks system with rotating objectives, persistent progress, and temporary Lämpötila buffs.
 - Configure deployments to publish the `aaroonparas.com` CNAME record.
@@ -13,8 +14,10 @@
 - Add a procedurally generated splash animation and sound when throwing löyly.
 - Surface an interactive CPS multiplier tooltip beside the HUD counter with a detailed breakdown of active bonuses.
 - Prompt players to refresh when a newer build becomes available after they interact with the game.
+- Introduce the "Rakennuksen siunaus" Maailma upgrade that adds a +0.1% global multiplier per owned building and surfaces its bonus in the CPS tooltip.
 
 ### Changed
+- Update the Tuhka gain formula to use a higher prestige scaling base and grant additional bonuses past tier 10.
 - Hide the Maailma shop until Polta Maailma has been used at least once.
 - Update the page title to display "suomidle" in browser tabs.
 - Namespace persisted local storage keys by environment to isolate saves across deployments.

@@ -21,6 +21,7 @@ interface RawMaailmaShopEffect {
   readonly from_tier_inclusive?: number;
   readonly value_per_tier_per_level?: number;
   readonly value_per_tuhka?: number;
+  readonly value_per_building?: number;
 }
 
 interface RawMaailmaShopItem {
@@ -193,10 +194,19 @@ export const getTuhkaAwardPreview = (state: GameState): Decimal => {
   const logTerm = Decimal.log10(multiplier.plus(1));
   if (!logTerm.isFinite() || logTerm.lte(0)) return zero;
 
-  const product = tier.mul(logTerm);
-  if (!product.isFinite() || product.lte(0)) return zero;
+  const sqrtLogTerm = logTerm.sqrt();
+  if (!sqrtLogTerm.isFinite() || sqrtLogTerm.lte(0)) return zero;
 
-  return product.sqrt().floor();
+  const baseAward = sqrtLogTerm.mul(3.2);
+  if (!baseAward.isFinite() || baseAward.lte(0)) return zero;
+
+  const tierBonusMultiplier = Decimal.max(tier.minus(10), zero).mul(0.25).plus(1);
+  if (!tierBonusMultiplier.isFinite() || tierBonusMultiplier.lte(0)) return zero;
+
+  const scaledAward = baseAward.mul(tierBonusMultiplier);
+  if (!scaledAward.isFinite() || scaledAward.lte(0)) return zero;
+
+  return scaledAward.floor();
 };
 
 export const canPoltaMaailma = (state: GameState): boolean =>
