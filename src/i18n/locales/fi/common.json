@@ -1,6 +1,9 @@
 {
   "app.title": "Suomidle",
   "app.tapToStart": "Napauta aloittaaksesi",
+  "app.updateAvailable.title": "Päivitys saatavilla",
+  "app.updateAvailable.message": "Peliin on saatavilla uudempi versio.",
+  "app.updateAvailable.refresh": "Päivitä sivu",
   "nav.home": "Koti",
   "nav.shop": "Kauppa",
   "nav.tech": "Teknologiat",

@@ -1,6 +1,9 @@
 {
   "app.title": "Suomidle",
   "app.tapToStart": "Tryck för att starta",
+  "app.updateAvailable.title": "Uppdatering tillgänglig",
+  "app.updateAvailable.message": "En nyare version av spelet finns tillgänglig.",
+  "app.updateAvailable.refresh": "Uppdatera sidan",
   "nav.home": "Hem",
   "nav.shop": "Butik",
   "nav.tech": "Tekniker",
