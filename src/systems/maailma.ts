@@ -73,9 +73,10 @@ export const computeTuhkaAward = (
   const tier = rawTier.isFinite() ? Decimal.max(rawTier, zero) : zero;
   const rawMultiplier = decimalFrom(prestigeMultiplier ?? 0);
   const multiplier = rawMultiplier.isFinite() ? Decimal.max(rawMultiplier, zero) : zero;
+  const bonusMultiplier = Decimal.max(multiplier.minus(1), zero);
   if (tier.lte(0)) return zero;
 
-  const logTerm = Decimal.log10(multiplier.plus(1));
+  const logTerm = Decimal.log10(bonusMultiplier.plus(1));
   if (!logTerm.isFinite() || logTerm.lte(0)) return zero;
 
   const sqrtLogTerm = logTerm.sqrt();
