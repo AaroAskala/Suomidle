@@ -31,6 +31,7 @@ function resetStore() {
         globalCpsAddFromTuhkaSpent: 0,
         perTierGlobalCpsAdd: {},
         saunaPrestigeBaseMultiplierMin: 1,
+        globalMultPerBuilding: 0,
       },
     },
   }));
@@ -75,6 +76,7 @@ describe('CpsMultiplierTooltip', () => {
           techMultiplierBonusAdd: 0.25,
           globalCpsAddFromTuhkaSpent: 0.5,
           perTierGlobalCpsAdd: { '8': 0.1 },
+          globalMultPerBuilding: 0.01,
         },
       },
       tierLevel: 9,
@@ -93,7 +95,8 @@ describe('CpsMultiplierTooltip', () => {
     expect(screen.getByText(/Maailma tech bonus/i).closest('li')).toHaveTextContent('×1.25');
     expect(screen.getByText(/Daily task multiplier/i).closest('li')).toHaveTextContent('×1.5');
     expect(screen.getByText(/Maailma heat boost/i).closest('li')).toHaveTextContent('×2');
-    expect(screen.getByText(/Total multiplier/i)).toHaveTextContent('×109.35');
-    expect(screen.getByText(/Effective CPS/i)).toHaveTextContent('1,093.5');
+    expect(screen.getByText(/Maailma building bonus/i).closest('li')).toHaveTextContent('×1.1');
+    expect(screen.getByText(/Total multiplier/i)).toHaveTextContent('×120.285');
+    expect(screen.getByText(/Effective CPS/i)).toHaveTextContent('1,202.85');
   });
 });

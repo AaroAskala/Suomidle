@@ -47,6 +47,18 @@
       "cost_tuhka": [12, 18, 27, 40, 60, 90, 135, 200]
     },
     {
+      "id": "rakennuksen_siunaus",
+      "name_fi": "Rakennuksen siunaus",
+      "icon": "Rakennuksen_siunaus.png",
+      "description_fi": "Saat +0.1% globaalin kertoimen jokaisesta ostetusta rakennuksesta.",
+      "effect": {
+        "type": "global_mult_per_building",
+        "value_per_building": 0.001
+      },
+      "max_level": 10,
+      "cost_tuhka": [15, 20, 25, 33, 50, 75, 110, 165, 250, 375]
+    },
+    {
       "id": "feeniks_sauna",
       "name_fi": "Feeniks-sauna",
       "icon": "Feeniks_sauna.png",

@@ -13,7 +13,11 @@ import {
   computeDevTierPopulationMultiplier,
   MAAILMA_BUFF_REWARD_PREFIX,
 } from '../app/store';
-import { computeCpsBase, computeTierBonusMultiplier } from '../app/cpsUtils';
+import {
+  computeCpsBase,
+  computeTierBonusMultiplier,
+  computeTotalBuildingCount,
+} from '../app/cpsUtils';
 import { useLocale } from '../i18n/useLocale';
 import { getTemperatureGainMultiplier } from '../systems/dailyTasks';
 
@@ -58,6 +62,14 @@ export function CpsMultiplierTooltip() {
     [permanent.perTierGlobalCpsAdd, tierLevel],
   );
   const devTierMultiplier = sanitizeMultiplier(computeDevTierPopulationMultiplier(tierLevel));
+  const totalBuildingCount = useMemo(
+    () => computeTotalBuildingCount(buildingCounts),
+    [buildingCounts],
+  );
+  const perBuildingRate = Number.isFinite(permanent.globalMultPerBuilding)
+    ? permanent.globalMultPerBuilding
+    : 0;
+  const buildingMultiplier = sanitizeMultiplier(1 + perBuildingRate * totalBuildingCount);
   const prestigeMultiplier = sanitizeMultiplier(
     Math.max(prestigeMult, permanent.saunaPrestigeBaseMultiplierMin),
   );
@@ -94,6 +106,11 @@ export function CpsMultiplierTooltip() {
       { id: 'tech', label: t('hud.cpsMultipliers.entry.tech'), value: techMultiplier },
       { id: 'techBonus', label: t('hud.cpsMultipliers.entry.techBonus'), value: techBonusMultiplier },
       { id: 'ash', label: t('hud.cpsMultipliers.entry.ash'), value: spentBonusMultiplier },
+      {
+        id: 'maailmaBuildings',
+        label: t('hud.cpsMultipliers.entry.maailmaBuildings'),
+        value: buildingMultiplier,
+      },
       { id: 'tier', label: t('hud.cpsMultipliers.entry.tier'), value: tierBonusMultiplier },
       { id: 'prestige', label: t('hud.cpsMultipliers.entry.prestige'), value: prestigeMultiplier },
       { id: 'era', label: t('hud.cpsMultipliers.entry.era'), value: eraMultiplier },
@@ -114,6 +131,7 @@ export function CpsMultiplierTooltip() {
       });
   }, [
     baseProdMult,
+    buildingMultiplier,
     taskBuffMultiplier,
     maailmaTemperatureMultiplier,
     devTierMultiplier,
@@ -124,6 +142,7 @@ export function CpsMultiplierTooltip() {
     techBonusMultiplier,
     techMultiplier,
     tierBonusMultiplier,
+    totalBuildingCount,
   ]);
 
   const productMultiplier = entries.reduce((acc, entry) => acc * entry.value, 1);

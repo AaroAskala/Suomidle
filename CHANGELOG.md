@@ -14,6 +14,7 @@
 - Add a procedurally generated splash animation and sound when throwing löyly.
 - Surface an interactive CPS multiplier tooltip beside the HUD counter with a detailed breakdown of active bonuses.
 - Prompt players to refresh when a newer build becomes available after they interact with the game.
+- Introduce the "Rakennuksen siunaus" Maailma upgrade that adds a +0.1% global multiplier per owned building and surfaces its bonus in the CPS tooltip.
 
 ### Changed
 - Update the Tuhka gain formula to use a higher prestige scaling base and grant additional bonuses past tier 10.

@@ -36,6 +36,7 @@ describe('applyPermanentBonuses', () => {
     expect(bonuses.globalCpsAddPerTuhkaSpent).toBeCloseTo(0.005 * 4, 10);
     expect(bonuses.totalTuhkaSpent).toBe(668);
     expect(bonuses.globalCpsAddFromTuhkaSpent).toBeCloseTo(0.005 * 4 * 668, 6);
+    expect(bonuses.globalMultPerBuilding).toBeCloseTo(0, 6);
   });
 
   it('handles array-style purchase tracking', () => {
@@ -58,5 +59,22 @@ describe('applyPermanentBonuses', () => {
     const expectedSpent = 5 + 8 + 12 + 8 + 12; // first three levels of viisaus, two of riimu
     expect(bonuses.totalTuhkaSpent).toBe(expectedSpent);
     expect(bonuses.globalCpsAddFromTuhkaSpent).toBeCloseTo(expectedSpent * 0.005 * 2, 6);
+    expect(bonuses.globalMultPerBuilding).toBeCloseTo(0, 6);
+  });
+
+  it('tracks global multiplier per building bonuses', () => {
+    const save = {
+      maailma: {
+        purchases: {
+          rakennuksen_siunaus: { id: 'rakennuksen_siunaus', level: 3 },
+        },
+      },
+    } satisfies Parameters<typeof applyPermanentBonuses>[0];
+
+    const bonuses = applyPermanentBonuses(save);
+
+    expect(bonuses.globalMultPerBuilding).toBeCloseTo(0.001 * 3, 10);
+    expect(bonuses.totalTuhkaSpent).toBe(15 + 20 + 25);
+    expect(bonuses.globalCpsAddFromTuhkaSpent).toBe(0);
   });
 });

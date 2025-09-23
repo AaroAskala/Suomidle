@@ -66,6 +66,27 @@ describe('Maailma upgrades via store actions', () => {
     expect(state.clickPower).toBe(1);
   });
 
+  it('applies the per-building Maailma multiplier from Rakennuksen siunaus', () => {
+    useGameStore.setState((state) => ({
+      ...state,
+      buildings: { sauna: 10 },
+      multipliers: { population_cps: 1 },
+      prestigeMult: 1,
+      eraMult: 1,
+      maailma: { ...state.maailma, tuhka: '100' },
+    }));
+    useGameStore.getState().recompute();
+
+    const before = useGameStore.getState().cps;
+    expect(before).toBeGreaterThan(0);
+
+    expect(useGameStore.getState().purchaseMaailmaUpgrade('rakennuksen_siunaus')).toBe(true);
+
+    const after = useGameStore.getState().cps;
+    expect(after / before).toBeCloseTo(1.01, 6);
+    expect(useGameStore.getState().modifiers.permanent.globalMultPerBuilding).toBeCloseTo(0.001, 6);
+  });
+
   it('allows early tier unlocks to bypass building requirements', () => {
     useGameStore.setState((state) => ({
       ...state,
