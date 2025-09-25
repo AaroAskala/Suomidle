@@ -9,7 +9,6 @@ describe('applyPermanentBonuses', () => {
           tuhkan_viisaus: { id: 'tuhkan_viisaus', level: 2 },
           ikuiset_hiillokset: { id: 'ikuiset_hiillokset', level: 3 },
           feeniks_sauna: { id: 'feeniks_sauna', level: 1 },
-          maailmankivi: { id: 'maailmankivi', level: 1 },
           tyhjyys_tehokkuus: { id: 'tyhjyys_tehokkuus', level: 10 },
           kosminen_karsivallisyys: { id: 'kosminen_karsivallisyys', level: 2 },
           tuhkan_infuusio: { id: 'tuhkan_infuusio', level: 3 },
@@ -26,7 +25,7 @@ describe('applyPermanentBonuses', () => {
     expect(bonuses.techMultiplierBonusAdd).toBeCloseTo(1.0, 6);
     expect(bonuses.baseProdMult).toBeCloseTo(1.5 ** 3, 6);
     expect(bonuses.saunaPrestigeBaseMultiplierMin).toBeCloseTo(10);
-    expect(bonuses.tierUnlockOffset).toBe(-1);
+    expect(bonuses.tierUnlockOffset).toBe(0);
     expect(bonuses.buildingCostMultiplier.delta).toBeCloseTo(-0.05, 6);
     expect(bonuses.buildingCostMultiplier.floor).toBeCloseTo(1.1, 6);
     expect(bonuses.offlineProdMult).toBeCloseTo(1 + 0.5 * 2, 6);
@@ -34,8 +33,8 @@ describe('applyPermanentBonuses', () => {
     expect(bonuses.perTierGlobalCpsAdd['7']).toBeCloseTo(1.5, 6);
     expect(bonuses.keepTechOnSaunaReset).toBe(true);
     expect(bonuses.globalCpsAddPerTuhkaSpent).toBeCloseTo(0.1 * 4, 10);
-    expect(bonuses.totalTuhkaSpent).toBe(668);
-    expect(bonuses.globalCpsAddFromTuhkaSpent).toBeCloseTo(0.1 * 4 * 668, 6);
+    expect(bonuses.totalTuhkaSpent).toBe(608);
+    expect(bonuses.globalCpsAddFromTuhkaSpent).toBeCloseTo(0.1 * 4 * 608, 6);
     expect(bonuses.globalMultPerBuilding).toBeCloseTo(0, 6);
   });
 

@@ -187,8 +187,6 @@
   "maailma.upgrades.rakennuksen_siunaus.description": "Saat +0.1% globaalin kertoimen jokaisesta omistamastasi rakennuksesta.",
   "maailma.upgrades.feeniks_sauna.name": "Feeniks-sauna",
   "maailma.upgrades.feeniks_sauna.description": "Jokainen Polta sauna alkaa vähintään ×10 peruskertoimella.",
-  "maailma.upgrades.maailmankivi.name": "Maailmankivi",
-  "maailma.upgrades.maailmankivi.description": "Avaa seuraava taso yhden tason aiemmin (–1 tier unlock).",
   "maailma.upgrades.tyhjyys_tehokkuus.name": "Tyhjyyden tehokkuus",
   "maailma.upgrades.tyhjyys_tehokkuus.description": "Rakennusten kustannuskertoimen alennus –0.01 per taso (esim. 1.15 → 1.14).",
   "maailma.upgrades.kosminen_karsivallisyys.name": "Kosminen kärsivällisyys",
