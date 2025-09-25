@@ -187,8 +187,6 @@
   "maailma.upgrades.rakennuksen_siunaus.description": "Få +0,1 % global multiplikator för varje byggnad du äger.",
   "maailma.upgrades.feeniks_sauna.name": "Fenixbastu",
   "maailma.upgrades.feeniks_sauna.description": "Varje Bränn bastun startar med minst ×10 baskoefficient.",
-  "maailma.upgrades.maailmankivi.name": "Världsstenen",
-  "maailma.upgrades.maailmankivi.description": "Lås upp nästa nivå ett steg tidigare (−1 nivåkrav).",
   "maailma.upgrades.tyhjyys_tehokkuus.name": "Tomhetseffektivitet",
   "maailma.upgrades.tyhjyys_tehokkuus.description": "Minskar byggnadskostnadsfaktorn med 0,01 per nivå (t.ex. 1,15 → 1,14).",
   "maailma.upgrades.kosminen_karsivallisyys.name": "Kosmiskt tålamod",
