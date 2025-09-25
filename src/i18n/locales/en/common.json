@@ -187,8 +187,6 @@
   "maailma.upgrades.ikuiset_hiillokset.description": "All buildings' base production ×1.50 per level (multiplicative).",
   "maailma.upgrades.feeniks_sauna.name": "Phoenix Sauna",
   "maailma.upgrades.feeniks_sauna.description": "Each Burn Sauna starts with at least ×10 base multiplier.",
-  "maailma.upgrades.maailmankivi.name": "Worldstone",
-  "maailma.upgrades.maailmankivi.description": "Unlock the next tier one level earlier (−1 tier unlock).",
   "maailma.upgrades.tyhjyys_tehokkuus.name": "Void Efficiency",
   "maailma.upgrades.tyhjyys_tehokkuus.description": "Reduces building cost multiplier by 0.01 per level (e.g. 1.15 → 1.14).",
   "maailma.upgrades.kosminen_karsivallisyys.name": "Cosmic Patience",

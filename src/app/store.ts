@@ -295,6 +295,28 @@ const formatDecimalString = (value: number) => {
   return cleaned.length > 0 ? cleaned : '0';
 };
 
+const removedMaailmaPurchaseRefunds: Record<string, number> = {
+  maailmankivi: 60,
+};
+
+function migrateRemovedMaailmaPurchases(maailma: MaailmaState): MaailmaState {
+  let next = maailma;
+  for (const [removedId, refund] of Object.entries(removedMaailmaPurchaseRefunds)) {
+    if (!Number.isFinite(refund) || refund <= 0) continue;
+    const count = countMaailmaPurchases(next.purchases, removedId);
+    if (count <= 0) continue;
+    const numericTuhka = Number.parseFloat(next.tuhka);
+    const safeTuhka = Number.isFinite(numericTuhka) ? numericTuhka : 0;
+    const totalRefund = refund * count;
+    const tuhka = formatDecimalString(safeTuhka + totalRefund);
+    const purchases = next.purchases.filter((entry) => entry !== removedId);
+    next = { ...next, tuhka, purchases };
+  }
+  return next;
+}
+
+export const __testMigrateRemovedMaailmaPurchases = migrateRemovedMaailmaPurchases;
+
 const cloneMaailmaForBonuses = (maailma: MaailmaState): MaailmaState => ({
   ...maailma,
   purchases: [...maailma.purchases],
@@ -422,7 +444,7 @@ const normalizeMaailma = (value: unknown): MaailmaState => {
     era,
   } as MaailmaState;
 
-  return normalized;
+  return migrateRemovedMaailmaPurchases(normalized);
 };
 
 const areMaailmaFieldsEqual = (a: MaailmaState, b: MaailmaState) =>

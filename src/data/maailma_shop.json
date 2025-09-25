@@ -71,18 +71,6 @@
       "cost_tuhka": [35]
     },
     {
-      "id": "maailmankivi",
-      "name_fi": "Maailmankivi",
-      "icon": "Maailmankivi.png",
-      "description_fi": "Avaa seuraava taso yhden tason aiemmin (–1 tier unlock).",
-      "effect": {
-        "type": "tier_unlock_offset",
-        "value": -1
-      },
-      "max_level": 1,
-      "cost_tuhka": [60]
-    },
-    {
       "id": "tyhjyys_tehokkuus",
       "name_fi": "Tyhjyyden tehokkuus",
       "icon": "Tyhjyys_tehokkuus.png",

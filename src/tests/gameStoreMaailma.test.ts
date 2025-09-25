@@ -106,28 +106,6 @@ describe('Maailma upgrades via store actions', () => {
     expect(useGameStore.getState().modifiers.permanent.globalMultPerBuilding).toBeCloseTo(0.001, 6);
   });
 
-  it('allows early tier unlocks to bypass building requirements', () => {
-    useGameStore.setState((state) => ({
-      ...state,
-      population: 100000,
-      tierLevel: 1,
-      buildings: {},
-      maailma: { ...state.maailma, tuhka: '100' },
-    }));
-    useGameStore.getState().recompute();
-
-    useGameStore.getState().purchaseBuilding('ensiapu');
-    const intermediate = useGameStore.getState();
-    expect(intermediate.buildings.ensiapu).toBeUndefined();
-    expect(intermediate.population).toBeCloseTo(100000, 6);
-
-    expect(useGameStore.getState().purchaseMaailmaUpgrade('maailmankivi')).toBe(true);
-    useGameStore.getState().purchaseBuilding('ensiapu');
-    const after = useGameStore.getState();
-    expect(after.buildings.ensiapu).toBe(1);
-    expect(after.population).toBeCloseTo(90000, 6);
-  });
-
   it('scales offline gains with the permanent multiplier', () => {
     useGameStore.setState((state) => ({
       ...state,
