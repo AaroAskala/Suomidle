@@ -142,7 +142,6 @@ export function CpsMultiplierTooltip() {
     techBonusMultiplier,
     techMultiplier,
     tierBonusMultiplier,
-    totalBuildingCount,
   ]);
 
   const productMultiplier = entries.reduce((acc, entry) => acc * entry.value, 1);
