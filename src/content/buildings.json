@@ -57,7 +57,7 @@
     "icon": "Rantabaari.svg",
     "baseCost": 9999999999999999999999999999999999999999999999999999999,
     "costMult": 1.15,
-    "baseProd": 10000000000000000000000, 
+    "baseProd": 10000000000000000000000,
     "unlock": { "tier": 13 }
   },
   {
@@ -77,9 +77,32 @@
     "costMult": 1.15,
     "baseProd": 256250000000000000000000,
     "unlock": { "tier": 15 }
+  },
+  {
+    "id": "avaruussatama",
+    "name": "Avaruussatama",
+    "icon": "Avaruussatama.svg",
+    "baseCost": 999999999999999999999999999999999999999999999999999999999999999999999999999000000000,
+    "costMult": 1.15,
+    "baseProd": 1000000000000000000000000000000,
+    "unlock": { "tier": 16 }
+  },
+  {
+    "id": "lennonjohtokeskus",
+    "name": "Lennonjohtokeskus",
+    "icon": "Lennonjohtokeskus.svg",
+    "baseCost": 99999999999999999999999999999999999999999999999999999999999999999999999999900000000000000000,
+    "costMult": 1.15,
+    "baseProd": 3000000000000000000000000000000,
+    "unlock": { "tier": 17 }
+  },
+  {
+    "id": "planeettatutkimuslaitos",
+    "name": "Planeettatutkimuslaitos",
+    "icon": "Planeettatutkimuslaitos.svg",
+    "baseCost": 9999999999999999999999999999999999999999999999999999999999999999999999999990000000000000000000000,
+    "costMult": 1.15,
+    "baseProd": 9000000000000000000000000000000,
+    "unlock": { "tier": 18 }
   }
 ]
-
-
-
-
